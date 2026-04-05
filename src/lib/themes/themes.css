@@ -1,0 +1,199 @@
+/*
+ * RaceReady Theme System
+ * ----------------------
+ * Set data-theme="<id>" on <html> to switch themes.
+ *
+ * Colors sourced from U-M Brand Identity Style Guide, February 2025
+ *
+ * Primary:   Michigan Blue  #00274C (PMS 282)
+ *            Michigan Maize #FFCB05 (PMS 7406)
+ * Secondary: Arboretum Blue #2f65a7  Ross Orange #d86018
+ *            Tappan Red #9a3324      Taubman Teal #00b2a9
+ * Neutrals:  UMMA Tan #cfc096        Puma Black #131516
+ *            Angell Hall Ash #989c97
+ * Fonts:     Atkinson Hyperlegible (body — recommended for accessibility)
+ *            Oswald (display/headings)
+ *            IBM Plex Mono (code)
+ */
+
+/* ─── Shared U-M palette (referenced by both themes) ────────────── */
+:root {
+  --michigan-blue:   #00274C;
+  --michigan-maize:  #FFCB05;
+  --arboretum-blue:  #2f65a7;
+  --tappan-red:      #9a3324;
+  --ross-orange:     #d86018;
+  --taubman-teal:    #00b2a9;
+  --rackham-green:   #75988d;
+  --a2-amethyst:     #702082;
+  --matthaei-violet: #575294;
+  --umma-tan:        #cfc096;
+  --burton-beige:    #9b9a6d;
+  --angell-ash:      #989c97;
+  --law-quad-stone:  #80764b;
+  --puma-black:      #131516;
+
+  /* Non-theme globals */
+  --nav-height: 64px;
+}
+
+/* ─── U-M Dark ───────────────────────────────────────────────────── */
+:root,
+[data-theme="um-dark"] {
+  color-scheme: dark;
+
+  /* Depth tints of Michigan Blue */
+  --navy:        #001a35;
+  --navy-mid:    #00274C;
+  --navy-light:  #003878;
+
+  /* Semantic */
+  --bg:              var(--navy-mid);
+  --bg-surface:      #002255;
+  --bg-card:         var(--navy-light);
+  --text:            #FFFFFF;
+  --text-muted:      var(--umma-tan);
+  --accent:          var(--michigan-maize);
+  --accent-alt:      var(--ross-orange);
+  --link:            var(--michigan-maize);
+  --border:          rgba(255, 203, 5, 0.18);
+  --border-hover:    rgba(255, 203, 5, 0.55);
+
+  /* Floating surfaces (dropdowns, popovers) */
+  --surface-overlay: #002255;
+  --overlay-text:    var(--umma-tan);
+
+  /* Footer */
+  --footer-bg:       #001f3d;
+  --footer-text:     var(--umma-tan);
+
+  /* Nav — always Michigan Blue, always white text */
+  --nav-bg:          rgba(0, 39, 76, 0.93);
+  --nav-text:        #FFFFFF;
+  --nav-text-muted:  rgba(255, 255, 255, 0.65);
+
+  /* Shadows */
+  --shadow-card:     0 4px 24px rgba(0, 0, 0, 0.45), 0 1px 4px rgba(0, 0, 0, 0.3);
+  --shadow-nav:      0 2px 16px rgba(0, 0, 0, 0.5);
+  --shadow-glow:     0 0 32px rgba(255, 203, 5, 0.25);
+
+  /* Typography */
+  --font-sans:       'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', system-ui, sans-serif;
+  --font-heading:    'Oswald', 'Montserrat', var(--font-sans);
+  --font-mono:       'IBM Plex Mono', ui-monospace, Consolas, monospace;
+
+  /* Hero */
+  --hero-bg:           var(--navy-mid);
+  --hero-wave-fill:    var(--navy);
+  --hero-glow-opacity: 0.15;
+  --hero-glow-1:       var(--arboretum-blue);
+  --hero-glow-2:       var(--michigan-maize);
+  --hero-stats-bg:     rgba(255, 255, 255, 0.04);
+  --hero-title-color:  #FFFFFF;
+  --title-grad-from:   var(--michigan-maize);
+  --title-grad-to:     #FFE566;
+
+  /* Badge */
+  --badge-bg:        rgba(255, 203, 5, 0.12);
+  --badge-border:    rgba(255, 203, 5, 0.35);
+  --badge-text:      var(--michigan-maize);
+  --badge-dot:       var(--michigan-maize);
+
+  /* CTA band (always dark Michigan Blue) */
+  --cta-bg:          var(--navy-mid);
+  --cta-text:        #FFFFFF;
+  --cta-text-muted:  var(--umma-tan);
+
+  /* Scrollbar */
+  --scrollbar-track: #001f3d;
+  --scrollbar-thumb: #003166;
+  --scrollbar-hover: var(--arboretum-blue);
+
+  /* Selection */
+  --selection-bg:    rgba(255, 203, 5, 0.3);
+
+  /* Button primary — Maize on Michigan Blue (WCAG AA) */
+  --btn-primary-bg:   var(--michigan-maize);
+  --btn-primary-text: var(--michigan-blue);
+  --btn-primary-hover:#FFD52E;
+}
+
+/* ─── U-M Light ──────────────────────────────────────────────────── */
+[data-theme="um-light"] {
+  color-scheme: light;
+
+  /* Depth tints kept for hero/wave fills */
+  --navy:        #001a35;
+  --navy-mid:    #00274C;
+  --navy-light:  #003878;
+
+  /* Semantic */
+  --bg:              #FFFFFF;
+  --bg-surface:      #F2F5F9;
+  --bg-card:         #FFFFFF;
+  --text:            var(--puma-black);
+  --text-muted:      #5c6778;
+  --accent:          var(--michigan-maize);
+  --accent-alt:      var(--ross-orange);
+  --link:            var(--michigan-blue);
+  --border:          rgba(0, 39, 76, 0.12);
+  --border-hover:    rgba(0, 39, 76, 0.4);
+
+  /* Floating surfaces */
+  --surface-overlay: #FFFFFF;
+  --overlay-text:    #4a5568;
+
+  /* Footer — Michigan Blue band (brand anchor) */
+  --footer-bg:       var(--michigan-blue);
+  --footer-text:     var(--umma-tan);
+
+  /* Nav — solid Michigan Blue on light pages, always white text */
+  --nav-bg:          rgba(0, 39, 76, 0.97);
+  --nav-text:        #FFFFFF;
+  --nav-text-muted:  rgba(255, 255, 255, 0.65);
+
+  /* Shadows — lighter, bluer */
+  --shadow-card:     0 2px 16px rgba(0, 39, 76, 0.08), 0 1px 4px rgba(0, 0, 0, 0.05);
+  --shadow-nav:      0 2px 12px rgba(0, 0, 0, 0.15);
+  --shadow-glow:     0 0 24px rgba(255, 203, 5, 0.35);
+
+  /* Typography — same U-M fonts */
+  --font-sans:       'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', system-ui, sans-serif;
+  --font-heading:    'Oswald', 'Montserrat', var(--font-sans);
+  --font-mono:       'IBM Plex Mono', ui-monospace, Consolas, monospace;
+
+  /* Hero — light background, Michigan Blue + Maize palette */
+  --hero-bg:           #FFFFFF;
+  --hero-wave-fill:    var(--bg-surface);
+  --hero-glow-opacity: 0.07;
+  --hero-glow-1:       var(--arboretum-blue);
+  --hero-glow-2:       var(--michigan-maize);
+  --hero-stats-bg:     rgba(0, 39, 76, 0.05);
+  --hero-title-color:  var(--michigan-blue);
+  --title-grad-from:   var(--michigan-blue);
+  --title-grad-to:     var(--arboretum-blue);
+
+  /* Badge — Michigan Blue tinted on white */
+  --badge-bg:        rgba(0, 39, 76, 0.07);
+  --badge-border:    rgba(0, 39, 76, 0.18);
+  --badge-text:      var(--michigan-blue);
+  --badge-dot:       var(--michigan-maize);
+
+  /* CTA band — Michigan Blue (consistent brand anchor on light pages) */
+  --cta-bg:          var(--michigan-blue);
+  --cta-text:        #FFFFFF;
+  --cta-text-muted:  var(--umma-tan);
+
+  /* Scrollbar */
+  --scrollbar-track: #e8ecf2;
+  --scrollbar-thumb: #b8c4d4;
+  --scrollbar-hover: var(--arboretum-blue);
+
+  /* Selection */
+  --selection-bg:    rgba(255, 203, 5, 0.4);
+
+  /* Button primary — Maize on Michigan Blue */
+  --btn-primary-bg:   var(--michigan-maize);
+  --btn-primary-text: var(--michigan-blue);
+  --btn-primary-hover:#FFD52E;
+}
