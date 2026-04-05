@@ -1,0 +1,311 @@
+<script lang="ts">
+  import type {
+    GameCanvasProps,
+    RenderContext,
+    Camera,
+    SceneState,
+    AnimationPlayback,
+    Vec2,
+  } from './types.ts'
+  import { renderScene } from './renderer/index.ts'
+  import { worldToScreen, screenToWorld, lerpVec2, lerpAngle } from './renderer/coords.ts'
+
+  // ── Props ────────────────────────────────────────────────────────────────────
+  let {
+    scene,
+    camera: cameraProp,
+    animation,
+    interactive = false,
+    onBoatClick,
+    onMarkClick,
+    onBoatDrag,
+    onMarkDrag,
+    onBackgroundClick,
+    class: className = '',
+  }: GameCanvasProps = $props()
+
+  // ── Element refs ─────────────────────────────────────────────────────────────
+  let canvasEl  = $state<HTMLCanvasElement | null>(null)
+  let wrapperEl = $state<HTMLDivElement | null>(null)
+
+  // ── Internal state ───────────────────────────────────────────────────────────
+  let dpr        = $state(window.devicePixelRatio || 1)
+  let rafId      = $state(0)
+  let playback   = $state<AnimationPlayback | null>(null)
+  let canvasSize = $state({ w: 0, h: 0 })  // CSS px; used by autoFitCamera
+
+  // ── Derived camera ───────────────────────────────────────────────────────────
+  let camera = $derived<Camera>(
+    cameraProp ?? autoFitCamera(scene.worldSize, canvasSize.w, canvasSize.h, dpr),
+  )
+
+  function autoFitCamera(
+    worldSize: Vec2,
+    cssW: number,
+    cssH: number,
+    _dpr: number,
+  ): Camera {
+    const FILL = 0.88
+    if (cssW === 0 || cssH === 0) {
+      return { center: { x: worldSize.x / 2, y: worldSize.y / 2 }, zoom: 8 }
+    }
+    // zoom in physical px/m — canvas dimensions are in physical px
+    const physW = cssW  * _dpr
+    const physH = cssH  * _dpr
+    const zoom  = Math.min(physW / worldSize.x, physH / worldSize.y) * FILL
+    return {
+      center: { x: worldSize.x / 2, y: worldSize.y / 2 },
+      zoom,
+    }
+  }
+
+  // ── Resize ───────────────────────────────────────────────────────────────────
+  $effect(() => {
+    if (!wrapperEl || !canvasEl) return
+
+    const ro = new ResizeObserver((entries) => {
+      const entry = entries[0]
+      if (!entry) return
+      const { width, height } = entry.contentRect
+      dpr = window.devicePixelRatio || 1
+      canvasEl!.width          = Math.floor(width  * dpr)
+      canvasEl!.height         = Math.floor(height * dpr)
+      canvasEl!.style.width    = `${width}px`
+      canvasEl!.style.height   = `${height}px`
+      canvasSize = { w: width, h: height }
+      // Synchronous repaint on resize so there's no blank frame
+      drawFrame(performance.now())
+    })
+
+    ro.observe(wrapperEl)
+    return () => ro.disconnect()
+  })
+
+  // ── Animation setup ──────────────────────────────────────────────────────────
+  $effect(() => {
+    if (!animation) {
+      playback = null
+      return
+    }
+    playback = {
+      clip:          animation,
+      playing:       true,
+      currentTime:   0,
+      startWallTime: performance.now(),
+    }
+  })
+
+  // ── rAF loop ─────────────────────────────────────────────────────────────────
+  $effect(() => {
+    if (!canvasEl) return
+    let running = true
+
+    function loop(ts: DOMHighResTimeStamp): void {
+      if (!running) return
+      drawFrame(ts)
+      rafId = requestAnimationFrame(loop)
+    }
+
+    rafId = requestAnimationFrame(loop)
+    return () => {
+      running = false
+      cancelAnimationFrame(rafId)
+    }
+  })
+
+  // ── Core draw function ────────────────────────────────────────────────────────
+  function drawFrame(timestamp: DOMHighResTimeStamp): void {
+    if (!canvasEl) return
+    const ctx = canvasEl.getContext('2d')
+    if (!ctx) return
+
+    // Advance animation clock
+    let animTime = 0
+    if (playback?.playing) {
+      const elapsed = (timestamp - playback.startWallTime) / 1000
+      if (playback.clip.loop) {
+        animTime = elapsed % playback.clip.durationSec
+      } else {
+        animTime = Math.min(elapsed, playback.clip.durationSec)
+        if (elapsed >= playback.clip.durationSec) {
+          playback = { ...playback, playing: false, currentTime: playback.clip.durationSec }
+        }
+      }
+      if (playback.playing) {
+        playback = { ...playback, currentTime: animTime }
+      }
+    }
+
+    const resolvedScene: SceneState = playback
+      ? applyAnimation(scene, playback, animTime)
+      : scene
+
+    const rc: RenderContext = {
+      ctx,
+      canvas:    canvasEl,
+      scene:     resolvedScene,
+      camera,
+      dpr,
+      timestamp,
+      animTime,
+    }
+
+    renderScene(rc)
+  }
+
+  // ── Animation interpolation ───────────────────────────────────────────────────
+  function applyAnimation(
+    base: SceneState,
+    pb: AnimationPlayback,
+    t: number,
+  ): SceneState {
+    const frames = pb.clip.keyframes
+    if (frames.length === 0) return base
+
+    // Clamp t
+    const clampedT = Math.max(0, Math.min(t, frames[frames.length - 1]!.time))
+
+    // Find surrounding keyframe pair
+    let aIdx = 0
+    for (let i = 0; i < frames.length - 1; i++) {
+      if (clampedT >= frames[i]!.time) aIdx = i
+    }
+    const a = frames[aIdx]!
+    const b = frames[Math.min(aIdx + 1, frames.length - 1)]!
+
+    const segDur = b.time - a.time
+    const raw    = segDur === 0 ? 0 : (clampedT - a.time) / segDur
+    const eased  = pb.clip.easing ? pb.clip.easing(raw) : raw
+
+    const bMap = new Map(b.boats.map(bd => [bd.boatId, bd]))
+
+    const animatedBoats = base.boats.map(boat => {
+      const aData = a.boats.find(bd => bd.boatId === boat.id)
+      const bData = bMap.get(boat.id)
+      if (!aData || !bData) return boat
+      return {
+        ...boat,
+        position: lerpVec2(aData.position, bData.position, eased),
+        heading:  lerpAngle(aData.heading, bData.heading, eased),
+      }
+    })
+
+    return { ...base, boats: animatedBoats }
+  }
+
+  // ── Hit-testing ───────────────────────────────────────────────────────────────
+  const BOAT_HIT_M = 6   // world-space hit radius in metres
+  const MARK_HIT_M = 4
+
+  function eventToWorld(e: MouseEvent): Vec2 | null {
+    if (!canvasEl) return null
+    const rect = canvasEl.getBoundingClientRect()
+    const screenPx: Vec2 = {
+      x: (e.clientX - rect.left) * dpr,
+      y: (e.clientY - rect.top)  * dpr,
+    }
+    return screenToWorld(screenPx, camera, canvasEl)
+  }
+
+  function hitBoat(worldPos: Vec2): string | null {
+    for (const boat of scene.boats) {
+      const d = Math.hypot(boat.position.x - worldPos.x, boat.position.y - worldPos.y)
+      if (d < BOAT_HIT_M) return boat.id
+    }
+    return null
+  }
+
+  function hitMark(worldPos: Vec2): string | null {
+    for (const mark of scene.marks) {
+      const d = Math.hypot(mark.position.x - worldPos.x, mark.position.y - worldPos.y)
+      if (d < MARK_HIT_M) return mark.id
+    }
+    return null
+  }
+
+  function handleClick(e: MouseEvent): void {
+    if (!interactive) return
+    const world = eventToWorld(e)
+    if (!world) return
+
+    const boatId = hitBoat(world)
+    if (boatId) { onBoatClick?.(boatId); return }
+
+    const markId = hitMark(world)
+    if (markId) { onMarkClick?.(markId); return }
+
+    onBackgroundClick?.(world)
+  }
+
+  // ── Drag ─────────────────────────────────────────────────────────────────────
+  let dragTarget = $state<{ type: 'boat' | 'mark'; id: string } | null>(null)
+
+  function handleMouseDown(e: MouseEvent): void {
+    if (!interactive) return
+    const world = eventToWorld(e)
+    if (!world) return
+
+    const boatId = hitBoat(world)
+    if (boatId) { dragTarget = { type: 'boat', id: boatId }; return }
+
+    const markId = hitMark(world)
+    if (markId) { dragTarget = { type: 'mark', id: markId }; return }
+  }
+
+  function handleMouseMove(e: MouseEvent): void {
+    if (!dragTarget) return
+    const world = eventToWorld(e)
+    if (!world) return
+
+    if (dragTarget.type === 'boat') onBoatDrag?.(dragTarget.id, world)
+    else                            onMarkDrag?.(dragTarget.id, world)
+  }
+
+  function handleMouseUp(): void {
+    dragTarget = null
+  }
+</script>
+
+<div
+  class="canvas-wrapper{className ? ` ${className}` : ''}"
+  class:interactive
+  bind:this={wrapperEl}
+>
+  <canvas
+    bind:this={canvasEl}
+    onclick={handleClick}
+    onmousedown={handleMouseDown}
+    onmousemove={handleMouseMove}
+    onmouseup={handleMouseUp}
+    onmouseleave={handleMouseUp}
+    role={interactive ? 'application' : 'img'}
+    aria-label="Sailing scenario diagram"
+  ></canvas>
+</div>
+
+<style>
+  .canvas-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    /* Fallback color while first frame renders */
+    background: #001a35;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: default;
+  }
+
+  .canvas-wrapper.interactive canvas {
+    cursor: crosshair;
+  }
+
+  .canvas-wrapper.interactive canvas:active {
+    cursor: grabbing;
+  }
+</style>

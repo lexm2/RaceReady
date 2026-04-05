@@ -20,7 +20,7 @@
   let isSearching   = $derived(searchQuery.trim().length > 0)
   let searchResults = $derived(
     isSearching
-      ? FLAT_SEARCH_LIST.filter(item =>
+      ? FLAT_SEARCH_LIST.filter((item: { title: string; }) =>
           item.title.toLowerCase().includes(searchQuery.toLowerCase())
         )
       : []
