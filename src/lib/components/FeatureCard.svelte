@@ -1,7 +1,17 @@
-<script>
-  let { icon, title, description, items, ctaLabel, ctaPage, accentColor = 'maize', navigate } = $props()
+<script lang="ts">
+  interface Props {
+    icon: string
+    title: string
+    description: string
+    items: string[]
+    ctaLabel: string
+    ctaPage: string
+    accentColor?: string
+    navigate: (page: string) => void
+  }
+  let { icon, title, description, items, ctaLabel, ctaPage, accentColor = 'maize', navigate }: Props = $props()
 
-  const colorMap = {
+  const colorMap: Record<string, string> = {
     maize:  'var(--michigan-maize)',
     blue:   'var(--arboretum-blue)',
     orange: 'var(--ross-orange)',

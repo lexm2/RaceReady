@@ -1,5 +1,6 @@
-<script>
-  let { size = 36, class: className = '' } = $props()
+<script lang="ts">
+  interface Props { size?: number; class?: string }
+  let { size = 36, class: className = '' }: Props = $props()
 </script>
 
 <svg

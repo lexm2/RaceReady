@@ -1,5 +1,6 @@
-<script>
-  import { theme } from './lib/themes/theme.svelte.js'
+<script lang="ts">
+  import type { Component } from 'svelte'
+  import { theme } from './lib/themes/theme.svelte.ts'
   import Navbar from './lib/components/Navbar.svelte'
   import Footer from './lib/components/Footer.svelte'
 
@@ -15,7 +16,7 @@
   import StarboardShowdownPage from './lib/pages/games/StarboardShowdownPage.svelte'
   import RegattaRunPage from './lib/pages/games/RegattaRunPage.svelte'
 
-  const ROUTES = {
+  const ROUTES: Record<string, Component> = {
     'home':           HomePage,
     'racing-rules':   RacingRulesPage,
     'tactics':        TacticsPage,
@@ -31,7 +32,7 @@
   let currentPage = $state('home')
   let ActivePage = $derived(ROUTES[currentPage] ?? HomePage)
 
-  function navigate(page) {
+  function navigate(page: string): void {
     currentPage = page
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }

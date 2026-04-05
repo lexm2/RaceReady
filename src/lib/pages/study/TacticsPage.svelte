@@ -1,5 +1,6 @@
-<script>
-  let { navigate } = $props()
+<script lang="ts">
+  interface Props { navigate: (page: string) => void }
+  let { navigate }: Props = $props()
 </script>
 
 <div class="page-container">

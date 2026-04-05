@@ -1,5 +1,17 @@
-<script>
-  let { label, items, isOpen, onToggle, onNavigate } = $props()
+<script lang="ts">
+  interface DropdownItem {
+    label: string
+    page: string
+    icon?: string
+  }
+  interface Props {
+    label: string
+    items: DropdownItem[]
+    isOpen: boolean
+    onToggle: () => void
+    onNavigate: (page: string) => void
+  }
+  let { label, items, isOpen, onToggle, onNavigate }: Props = $props()
 </script>
 
 <div class="nav-dropdown">

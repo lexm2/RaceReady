@@ -9,7 +9,20 @@
  *   3. The navbar switcher picks it up automatically
  */
 
-export const THEMES = [
+export interface Theme {
+  id: string
+  label: string
+  icon: string
+}
+
+export interface ThemeStore {
+  readonly current: string
+  set(id: string): void
+  toggle(): void
+  init(): void
+}
+
+export const THEMES: Theme[] = [
   {
     id: 'um-dark',
     label: 'U-M Dark',
@@ -25,10 +38,10 @@ export const THEMES = [
 const STORAGE_KEY = 'raceready-theme'
 const DEFAULT_THEME = 'um-dark'
 
-function createThemeStore() {
+function createThemeStore(): ThemeStore {
   let current = $state(DEFAULT_THEME)
 
-  function apply(id) {
+  function apply(id: string): void {
     current = id
     document.documentElement.setAttribute('data-theme', id)
     try {
@@ -38,7 +51,7 @@ function createThemeStore() {
     }
   }
 
-  function init() {
+  function init(): void {
     let saved = DEFAULT_THEME
     try {
       saved = localStorage.getItem(STORAGE_KEY) ?? DEFAULT_THEME
@@ -51,7 +64,7 @@ function createThemeStore() {
 
   return {
     get current() { return current },
-    set(id) { apply(id) },
+    set(id: string) { apply(id) },
     toggle() {
       const idx = THEMES.findIndex(t => t.id === current)
       apply(THEMES[(idx + 1) % THEMES.length].id)

@@ -1,13 +1,19 @@
-<script>
+<script lang="ts">
   import Dropdown from './Dropdown.svelte'
   import BurgeeLogo from './BurgeeLogo.svelte'
-  import { THEMES } from '$lib/themes/theme.svelte.js'
+  import { THEMES } from '$lib/themes/theme.svelte.ts'
+  import type { ThemeStore } from '$lib/themes/theme.svelte.ts'
 
-  let { currentPage, navigate, theme } = $props()
+  interface Props {
+    currentPage: string
+    navigate: (page: string) => void
+    theme: ThemeStore
+  }
+  let { currentPage, navigate, theme }: Props = $props()
 
-  let openDropdown = $state(null)
+  let openDropdown = $state<string | null>(null)
 
-  function toggleDropdown(name) {
+  function toggleDropdown(name: string): void {
     openDropdown = openDropdown === name ? null : name
   }
 
@@ -28,7 +34,7 @@
     }
   })
 
-  function handleNavigate(page) {
+  function handleNavigate(page: string): void {
     navigate(page)
     openDropdown = null
   }

@@ -1,6 +1,7 @@
-<script>
+<script lang="ts">
   import BurgeeLogo from './BurgeeLogo.svelte'
-  let { navigate } = $props()
+  interface Props { navigate: (page: string) => void }
+  let { navigate }: Props = $props()
 
   const studyLinks = [
     { label: 'Racing Rules',       page: 'racing-rules' },

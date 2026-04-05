@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
   import Hero from '../components/Hero.svelte'
   import FeatureCard from '../components/FeatureCard.svelte'
 
-  let { navigate } = $props()
+  interface Props { navigate: (page: string) => void }
+  let { navigate }: Props = $props()
 
   const studyItems = ['Racing Rules', 'Tactics & Strategy', 'Boat Knowledge', 'General Knowledge', 'Knots']
   const resourceItems = ['Full 2025–2028 Rulebook', 'Interactive Whiteboard']

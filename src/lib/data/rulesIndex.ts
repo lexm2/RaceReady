@@ -9,7 +9,24 @@
  *   rule       — leaf node; has a .path to load
  */
 
-export const RULES_INDEX = [
+export interface RuleLeaf {
+  id: string
+  title: string
+  type: 'rule' | 'standalone'
+  path: string
+}
+
+export interface RuleGroup {
+  id: string
+  title: string
+  type: 'part' | 'section'
+  preamble?: RuleLeaf
+  children: RuleNode[]
+}
+
+export type RuleNode = RuleLeaf | RuleGroup
+
+export const RULES_INDEX: RuleNode[] = [
   // ── Standalone documents ──────────────────────────────────────────
   {
     id: 'introduction',
@@ -289,22 +306,22 @@ export const RULES_INDEX = [
 // ── Helpers ───────────────────────────────────────────────────────────
 
 /** Recursively collect all loadable items (has .path) into a flat array. */
-function flattenIndex(items, acc = []) {
+function flattenIndex(items: RuleNode[], acc: RuleLeaf[] = []): RuleLeaf[] {
   for (const item of items) {
-    if (item.path) acc.push(item)
-    if (item.preamble) flattenIndex([item.preamble], acc)
-    if (item.children) flattenIndex(item.children, acc)
+    if ('path' in item) acc.push(item)
+    if ('preamble' in item && item.preamble) flattenIndex([item.preamble], acc)
+    if ('children' in item) flattenIndex(item.children, acc)
   }
   return acc
 }
 
 /** O(1) lookup map: id → { id, title, path } */
-export const RULES_BY_ID = Object.fromEntries(
+export const RULES_BY_ID: Record<string, RuleLeaf> = Object.fromEntries(
   flattenIndex(RULES_INDEX).map(item => [item.id, item])
 )
 
 /** Flat list of leaf rules/standalones for search (excludes preambles). */
-export const FLAT_SEARCH_LIST = flattenIndex(RULES_INDEX).filter(
+export const FLAT_SEARCH_LIST: RuleLeaf[] = flattenIndex(RULES_INDEX).filter(
   item => item.type === 'rule' || item.type === 'standalone'
 )
 
@@ -312,18 +329,18 @@ export const FLAT_SEARCH_LIST = flattenIndex(RULES_INDEX).filter(
  * Given a rule id, return the id of the part that contains it
  * (so we can auto-expand when a search result is selected).
  */
-export function findParentPartId(targetId) {
+export function findParentPartId(targetId: string): string | null {
   for (const node of RULES_INDEX) {
-    if (node.type !== 'part') continue
+    if (!('children' in node)) continue
     if (_containsId(node, targetId)) return node.id
   }
   return null
 }
 
-function _containsId(node, targetId) {
+function _containsId(node: RuleNode, targetId: string): boolean {
   if (node.id === targetId) return true
-  if (node.preamble && node.preamble.id === targetId) return true
-  if (node.children) {
+  if ('preamble' in node && node.preamble && node.preamble.id === targetId) return true
+  if ('children' in node) {
     for (const child of node.children) {
       if (_containsId(child, targetId)) return true
     }

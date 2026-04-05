@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
   import { marked } from 'marked'
-  import { RULES_INDEX, RULES_BY_ID, FLAT_SEARCH_LIST, findParentPartId } from '$lib/data/rulesIndex.js'
+  import { RULES_INDEX, RULES_BY_ID, FLAT_SEARCH_LIST, findParentPartId } from '$lib/data/rulesIndex.ts'
 
-  let { navigate } = $props()
+  interface Props { navigate: (page: string) => void }
+  let { navigate }: Props = $props()
 
   // Vite requires import.meta.glob at module scope with a static string literal
   const ruleFiles = import.meta.glob('/rules/**/*.md', { query: '?raw', import: 'default' })
@@ -11,7 +12,7 @@
   let selectedId    = $state('introduction')
   let contentHtml   = $state('')
   let isLoading     = $state(false)
-  let loadError     = $state(null)
+  let loadError     = $state<string | null>(null)
   let expandedParts = $state(new Set(['part1']))
   let sidebarOpen   = $state(false)
   let searchQuery   = $state('')
@@ -39,10 +40,10 @@
     }
     loader()
       .then(md => {
-        contentHtml = marked.parse(md)
+        contentHtml = marked.parse(md as string) as string
         isLoading = false
       })
-      .catch(e => {
+      .catch((e: Error) => {
         loadError = e.message
         isLoading = false
       })
@@ -50,7 +51,7 @@
 
   // Close sidebar on Escape (mobile)
   $effect(() => {
-    function onKeydown(e) {
+    function onKeydown(e: KeyboardEvent): void {
       if (e.key === 'Escape' && sidebarOpen) sidebarOpen = false
     }
     window.addEventListener('keydown', onKeydown)
@@ -58,7 +59,7 @@
   })
 
   // ── Actions ───────────────────────────────────────────────────────
-  function selectItem(id) {
+  function selectItem(id: string): void {
     selectedId = id
     if (window.matchMedia('(max-width: 768px)').matches) {
       sidebarOpen = false
@@ -66,7 +67,7 @@
     document.querySelector('.rulebook-content')?.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  function selectSearchResult(id) {
+  function selectSearchResult(id: string): void {
     // Auto-expand the part that contains this rule
     const partId = findParentPartId(id)
     if (partId) {
@@ -78,7 +79,7 @@
     selectItem(id)
   }
 
-  function togglePart(partId) {
+  function togglePart(partId: string): void {
     const next = new Set(expandedParts)
     if (next.has(partId)) {
       next.delete(partId)
