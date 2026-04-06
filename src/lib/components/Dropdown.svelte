@@ -1,7 +1,7 @@
 <script lang="ts">
   interface DropdownItem {
     label: string
-    page: string
+    href: string
     icon?: string
   }
   interface Props {
@@ -9,9 +9,9 @@
     items: DropdownItem[]
     isOpen: boolean
     onToggle: () => void
-    onNavigate: (page: string) => void
+    onClose: () => void
   }
-  let { label, items, isOpen, onToggle, onNavigate }: Props = $props()
+  let { label, items, isOpen, onToggle, onClose }: Props = $props();
 </script>
 
 <div class="nav-dropdown">
@@ -32,15 +32,12 @@
     <ul class="dropdown-menu" role="menu">
       {#each items as item}
         <li role="menuitem">
-          <button
-            class="dropdown-item"
-            onclick={() => { onNavigate(item.page); onToggle(); }}
-          >
+          <a class="dropdown-item" href={item.href} onclick={onClose}>
             {#if item.icon}
               <span class="item-icon">{item.icon}</span>
             {/if}
             {item.label}
-          </button>
+          </a>
         </li>
       {/each}
     </ul>
@@ -118,13 +115,11 @@
     width: 100%;
     padding: 10px 14px;
     background: transparent;
-    border: none;
     color: var(--overlay-text);
     font-size: 14px;
     font-family: var(--font-sans);
     font-weight: 400;
-    text-align: left;
-    cursor: pointer;
+    text-decoration: none;
     border-radius: var(--radius-sm);
     transition: background var(--transition), color var(--transition);
   }

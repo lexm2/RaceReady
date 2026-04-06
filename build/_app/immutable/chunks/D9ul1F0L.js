@@ -1,0 +1,1 @@
+import{X as e}from"./SQMMPuzR.js";e();

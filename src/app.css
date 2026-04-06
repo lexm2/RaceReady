@@ -55,8 +55,7 @@ body {
   transition: background var(--transition-slow), color var(--transition-slow);
 }
 
-#app {
-  min-height: 100vh;
+body {
   display: flex;
   flex-direction: column;
 }

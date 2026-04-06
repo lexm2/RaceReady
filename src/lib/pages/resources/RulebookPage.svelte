@@ -2,9 +2,6 @@
   import { marked } from 'marked'
   import { RULES_INDEX, RULES_BY_ID, FLAT_SEARCH_LIST, findParentPartId } from '$lib/data/rulesIndex.ts'
 
-  interface Props { navigate: (page: string) => void }
-  let { navigate }: Props = $props()
-
   // Vite requires import.meta.glob at module scope with a static string literal
   const ruleFiles = import.meta.glob('/rules/**/*.md', { query: '?raw', import: 'default' })
 

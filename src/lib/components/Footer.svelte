@@ -1,34 +1,32 @@
 <script lang="ts">
-  import BurgeeLogo from './BurgeeLogo.svelte'
-  interface Props { navigate: (page: string) => void }
-  let { navigate }: Props = $props()
+  import BurgeeLogo from './BurgeeLogo.svelte';
 
   const studyLinks = [
-    { label: 'Racing Rules',       page: 'racing-rules' },
-    { label: 'Tactics & Strategy', page: 'tactics' },
-    { label: 'Boat Knowledge',     page: 'boat-knowledge' },
-    { label: 'General Knowledge',  page: 'general' },
-    { label: 'Knots',              page: 'knots' },
-  ]
+    { label: 'Racing Rules',       href: '/study/racing-rules' },
+    { label: 'Tactics & Strategy', href: '/study/tactics' },
+    { label: 'Boat Knowledge',     href: '/study/boat-knowledge' },
+    { label: 'General Knowledge',  href: '/study/general' },
+    { label: 'Knots',              href: '/study/knots' },
+  ];
 
   const resourceLinks = [
-    { label: 'Racing Rules of Sailing', page: 'rulebook' },
-    { label: 'Whiteboard',              page: 'whiteboard' },
-  ]
+    { label: 'Racing Rules of Sailing', href: '/resources/rulebook' },
+    { label: 'Whiteboard',              href: '/resources/whiteboard' },
+  ];
 
   const gameLinks = [
-    { label: 'Starboard Showdown', page: 'starboard' },
-    { label: 'Regatta Run',        page: 'regatta-run' },
-  ]
+    { label: 'Starboard Showdown', href: '/games/starboard' },
+    { label: 'Regatta Run',        href: '/games/regatta-run' },
+  ];
 </script>
 
 <footer class="footer">
   <div class="container footer-inner">
     <div class="footer-brand">
-      <button class="brand-btn" onclick={() => navigate('home')}>
+      <a class="brand-link" href="/">
         <BurgeeLogo size={28} />
         <span class="brand-name">RaceReady</span>
-      </button>
+      </a>
       <p class="brand-tagline">
         Your complete sailing race<br />education platform.
       </p>
@@ -41,9 +39,7 @@
           <ul>
             {#each links as link}
               <li>
-                <button class="footer-link" onclick={() => navigate(link.page)}>
-                  {link.label}
-                </button>
+                <a class="footer-link" href={link.href}>{link.label}</a>
               </li>
             {/each}
           </ul>
@@ -83,17 +79,13 @@
     max-width: 220px;
   }
 
-  .brand-btn {
+  .brand-link {
     display: flex;
     align-items: center;
     gap: 10px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 0;
+    text-decoration: none;
     margin-bottom: var(--space-4);
   }
-
 
   .brand-name {
     font-size: 16px;
@@ -141,16 +133,12 @@
   }
 
   .footer-link {
-    background: transparent;
-    border: none;
     color: var(--footer-text);
     font-size: 14px;
     font-family: var(--font-sans);
-    cursor: pointer;
-    padding: 0;
-    text-align: left;
-    transition: color var(--transition);
+    text-decoration: none;
     opacity: 0.8;
+    transition: color var(--transition);
   }
 
   .footer-link:hover {

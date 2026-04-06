@@ -1,7 +1,5 @@
 <script lang="ts">
-  import BurgeeLogo from './BurgeeLogo.svelte'
-  interface Props { navigate: (page: string) => void }
-  let { navigate }: Props = $props()
+  import BurgeeLogo from './BurgeeLogo.svelte';
 </script>
 
 <section class="hero">
@@ -27,15 +25,13 @@
     </p>
 
     <div class="hero-cta">
-      <button class="btn-primary cta-main" onclick={() => navigate('racing-rules')}>
+      <a class="btn-primary cta-main" href="/study/racing-rules">
         Start Studying
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
           <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-      </button>
-      <button class="cta-secondary" onclick={() => navigate('starboard')}>
-        Play a Game
-      </button>
+      </a>
+      <a class="cta-secondary" href="/games/starboard">Play a Game</a>
     </div>
 
     <div class="hero-stats">
@@ -130,7 +126,6 @@
     transition: background var(--transition-slow), border-color var(--transition-slow), color var(--transition-slow);
   }
 
-
   @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.4; }
@@ -174,9 +169,12 @@
   .cta-main {
     padding: 14px 32px;
     font-size: 16px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
   }
 
-  /* Ghost button scoped to hero — adapts to hero bg colour */
   .cta-secondary {
     display: inline-flex;
     align-items: center;
@@ -189,7 +187,7 @@
     font-size: 16px;
     font-weight: 500;
     font-family: var(--font-sans);
-    cursor: pointer;
+    text-decoration: none;
     transition: border-color var(--transition), background var(--transition), color var(--transition-slow);
   }
 

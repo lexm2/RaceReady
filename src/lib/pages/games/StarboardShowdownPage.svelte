@@ -2,9 +2,6 @@
   import GameCanvas from '$lib/canvas/GameCanvas.svelte'
   import type { SceneState } from '$lib/canvas/types.ts'
 
-  interface Props { navigate: (page: string) => void }
-  let { navigate }: Props = $props()
-
   // Test scene — two boats on opposite tacks converging
   const testScene: SceneState = {
     worldSize: { x: 200, y: 150 },

@@ -1,17 +1,14 @@
 <script lang="ts">
-  import Hero from '../components/Hero.svelte'
-  import FeatureCard from '../components/FeatureCard.svelte'
+  import Hero from '../components/Hero.svelte';
+  import FeatureCard from '../components/FeatureCard.svelte';
 
-  interface Props { navigate: (page: string) => void }
-  let { navigate }: Props = $props()
-
-  const studyItems = ['Racing Rules', 'Tactics & Strategy', 'Boat Knowledge', 'General Knowledge', 'Knots']
-  const resourceItems = ['Full 2025–2028 Rulebook', 'Interactive Whiteboard']
-  const gameItems = ['Starboard Showdown', 'Regatta Run']
+  const studyItems = ['Racing Rules', 'Tactics & Strategy', 'Boat Knowledge', 'General Knowledge', 'Knots'];
+  const resourceItems = ['Full 2025–2028 Rulebook', 'Interactive Whiteboard'];
+  const gameItems = ['Starboard Showdown', 'Regatta Run'];
 </script>
 
 <div class="home">
-  <Hero {navigate} />
+  <Hero />
 
   <section class="features-section">
     <div class="container">
@@ -27,9 +24,8 @@
           description="Build a solid foundation in racing rules, boat handling, and tactical decision-making across five structured topics."
           items={studyItems}
           ctaLabel="Start Studying"
-          ctaPage="racing-rules"
+          ctaHref="/study/racing-rules"
           accentColor="maize"
-          {navigate}
         />
         <FeatureCard
           icon="📖"
@@ -37,9 +33,8 @@
           description="Access the complete Racing Rules of Sailing with clickable references and a digital whiteboard for scenario planning."
           items={resourceItems}
           ctaLabel="Open Rulebook"
-          ctaPage="rulebook"
+          ctaHref="/resources/rulebook"
           accentColor="blue"
-          {navigate}
         />
         <FeatureCard
           icon="🏆"
@@ -47,9 +42,8 @@
           description="Test your knowledge under pressure. Fast-paced racing scenarios with timed responses and performance tracking."
           items={gameItems}
           ctaLabel="Play Now"
-          ctaPage="starboard"
+          ctaHref="/games/starboard"
           accentColor="orange"
-          {navigate}
         />
       </div>
     </div>
@@ -62,12 +56,8 @@
         <p class="cta-desc">Start with the rules, sharpen your tactics, then test yourself under race pressure.</p>
       </div>
       <div class="cta-buttons">
-        <button class="btn-primary" onclick={() => navigate('racing-rules')}>
-          Start Learning
-        </button>
-        <button class="btn-ghost cta-ghost" onclick={() => navigate('starboard')}>
-          Try Starboard Showdown
-        </button>
+        <a class="btn-primary" href="/study/racing-rules">Start Learning</a>
+        <a class="btn-ghost cta-ghost" href="/games/starboard">Try Starboard Showdown</a>
       </div>
     </div>
   </section>
@@ -129,7 +119,11 @@
     flex-shrink: 0;
   }
 
-  /* Ghost button on the always-dark CTA band */
+  .btn-primary,
+  .btn-ghost {
+    text-decoration: none;
+  }
+
   .cta-ghost {
     color: var(--cta-text);
     border-color: rgba(255, 255, 255, 0.35);

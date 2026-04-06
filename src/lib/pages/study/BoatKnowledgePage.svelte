@@ -1,7 +1,3 @@
-<script lang="ts">
-  interface Props { navigate: (page: string) => void }
-  let { navigate }: Props = $props()
-</script>
 
 <div class="page-container">
   <div class="page-header">
@@ -19,7 +15,7 @@
       <span class="stub-icon">⛵</span>
       <h2>Coming Soon</h2>
       <p>Interactive boat diagrams, rapid-fire labeling quizzes, and trim guides by conditions are coming.</p>
-      <button class="btn-primary" onclick={() => navigate('home')}>Back to Home</button>
+      <a class="btn-primary" href="/">Back to Home</a>
     </div>
   </div>
 </div>

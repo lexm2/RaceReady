@@ -1,73 +1,66 @@
 <script lang="ts">
-  import Dropdown from './Dropdown.svelte'
-  import BurgeeLogo from './BurgeeLogo.svelte'
-  import { THEMES } from '$lib/themes/theme.svelte.ts'
-  import type { ThemeStore } from '$lib/themes/theme.svelte.ts'
+  import Dropdown from './Dropdown.svelte';
+  import BurgeeLogo from './BurgeeLogo.svelte';
+  import { THEMES } from '$lib/themes/theme.svelte.ts';
+  import type { ThemeStore } from '$lib/themes/theme.svelte.ts';
 
   interface Props {
-    currentPage: string
-    navigate: (page: string) => void
     theme: ThemeStore
   }
-  let { currentPage, navigate, theme }: Props = $props()
+  let { theme }: Props = $props();
 
-  let openDropdown = $state<string | null>(null)
+  let openDropdown = $state<string | null>(null);
 
   function toggleDropdown(name: string): void {
-    openDropdown = openDropdown === name ? null : name
+    openDropdown = openDropdown === name ? null : name;
   }
 
   $effect(() => {
     function handleOutsideClick(e) {
       if (!e.target.closest('.nav-dropdown')) {
-        openDropdown = null
+        openDropdown = null;
       }
     }
     function handleEscape(e) {
-      if (e.key === 'Escape') openDropdown = null
+      if (e.key === 'Escape') openDropdown = null;
     }
-    document.addEventListener('click', handleOutsideClick)
-    document.addEventListener('keydown', handleEscape)
+    document.addEventListener('click', handleOutsideClick);
+    document.addEventListener('keydown', handleEscape);
     return () => {
-      document.removeEventListener('click', handleOutsideClick)
-      document.removeEventListener('keydown', handleEscape)
-    }
-  })
-
-  function handleNavigate(page: string): void {
-    navigate(page)
-    openDropdown = null
-  }
+      document.removeEventListener('click', handleOutsideClick);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  });
 
   let nextTheme = $derived(
     THEMES[(THEMES.findIndex(t => t.id === theme.current) + 1) % THEMES.length]
-  )
+  );
 
   const studyItems = [
-    { label: 'Racing Rules',        page: 'racing-rules',   icon: '⚖️' },
-    { label: 'Tactics & Strategy',  page: 'tactics',        icon: '🧭' },
-    { label: 'Boat Knowledge',      page: 'boat-knowledge', icon: '⛵' },
-    { label: 'General Knowledge',   page: 'general',        icon: '📚' },
-    { label: 'Knots',               page: 'knots',          icon: '🪢' },
-  ]
+    { label: 'Racing Rules',        href: '/study/racing-rules',   icon: '⚖️' },
+    { label: 'Tactics & Strategy',  href: '/study/tactics',        icon: '🧭' },
+    { label: 'Boat Knowledge',      href: '/study/boat-knowledge', icon: '⛵' },
+    { label: 'General Knowledge',   href: '/study/general',        icon: '📚' },
+    { label: 'Knots',               href: '/study/knots',          icon: '🪢' },
+  ];
 
   const resourceItems = [
-    { label: 'Racing Rules of Sailing', page: 'rulebook',   icon: '📖' },
-    { label: 'Whiteboard',              page: 'whiteboard', icon: '🖊️' },
-  ]
+    { label: 'Racing Rules of Sailing', href: '/resources/rulebook',   icon: '📖' },
+    { label: 'Whiteboard',              href: '/resources/whiteboard', icon: '🖊️' },
+  ];
 
   const gameItems = [
-    { label: 'Starboard Showdown', page: 'starboard',   icon: '🏁' },
-    { label: 'Regatta Run',        page: 'regatta-run', icon: '🏆' },
-  ]
+    { label: 'Starboard Showdown', href: '/games/starboard',   icon: '🏁' },
+    { label: 'Regatta Run',        href: '/games/regatta-run', icon: '🏆' },
+  ];
 </script>
 
 <nav class="navbar">
   <div class="nav-inner">
-    <button class="brand" onclick={() => handleNavigate('home')}>
+    <a class="brand" href="/">
       <BurgeeLogo size={34} />
       <span class="brand-name">RaceReady</span>
-    </button>
+    </a>
 
     <div class="nav-links">
       <Dropdown
@@ -75,21 +68,21 @@
         items={studyItems}
         isOpen={openDropdown === 'study'}
         onToggle={() => toggleDropdown('study')}
-        onNavigate={handleNavigate}
+        onClose={() => { openDropdown = null; }}
       />
       <Dropdown
         label="Resources"
         items={resourceItems}
         isOpen={openDropdown === 'resources'}
         onToggle={() => toggleDropdown('resources')}
-        onNavigate={handleNavigate}
+        onClose={() => { openDropdown = null; }}
       />
       <Dropdown
         label="Games"
         items={gameItems}
         isOpen={openDropdown === 'games'}
         onToggle={() => toggleDropdown('games')}
-        onNavigate={handleNavigate}
+        onClose={() => { openDropdown = null; }}
       />
     </div>
 
@@ -104,9 +97,7 @@
         <span class="theme-label">{nextTheme.label}</span>
       </button>
 
-      <button class="btn-primary nav-cta" onclick={() => handleNavigate('starboard')}>
-        Play Now
-      </button>
+      <a class="btn-primary nav-cta" href="/games/starboard">Play Now</a>
     </div>
   </div>
 </nav>
@@ -141,14 +132,9 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 0;
     text-decoration: none;
     flex-shrink: 0;
   }
-
 
   .brand-name {
     font-size: 18px;
@@ -172,7 +158,6 @@
     flex-shrink: 0;
   }
 
-  /* Theme toggle */
   .theme-toggle {
     display: flex;
     align-items: center;
@@ -210,6 +195,7 @@
   .nav-cta {
     padding: 8px 20px;
     font-size: 14px;
+    text-decoration: none;
   }
 
   @media (max-width: 768px) {

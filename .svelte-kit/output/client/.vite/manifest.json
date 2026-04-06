@@ -1,0 +1,1234 @@
+{
+  ".svelte-kit/generated/client-optimized/app.js": {
+    "file": "_app/immutable/entry/app.CgKuSAax.js",
+    "name": "entry/app",
+    "src": ".svelte-kit/generated/client-optimized/app.js",
+    "isEntry": true,
+    "imports": [
+      "_SQMMPuzR.js",
+      "_BFYQcBYR.js",
+      "_I8rQr1kY.js"
+    ],
+    "dynamicImports": [
+      ".svelte-kit/generated/client-optimized/nodes/0.js",
+      ".svelte-kit/generated/client-optimized/nodes/1.js",
+      ".svelte-kit/generated/client-optimized/nodes/2.js",
+      ".svelte-kit/generated/client-optimized/nodes/3.js",
+      ".svelte-kit/generated/client-optimized/nodes/4.js",
+      ".svelte-kit/generated/client-optimized/nodes/5.js",
+      ".svelte-kit/generated/client-optimized/nodes/6.js",
+      ".svelte-kit/generated/client-optimized/nodes/7.js",
+      ".svelte-kit/generated/client-optimized/nodes/8.js",
+      ".svelte-kit/generated/client-optimized/nodes/9.js",
+      ".svelte-kit/generated/client-optimized/nodes/10.js",
+      ".svelte-kit/generated/client-optimized/nodes/11.js"
+    ]
+  },
+  ".svelte-kit/generated/client-optimized/nodes/0.js": {
+    "file": "_app/immutable/nodes/0.AdAzwGFX.js",
+    "name": "nodes/0",
+    "src": ".svelte-kit/generated/client-optimized/nodes/0.js",
+    "isEntry": true,
+    "imports": [
+      "_SQMMPuzR.js",
+      "_I8rQr1kY.js",
+      "_D9ul1F0L.js",
+      "_bHA25ZTa.js"
+    ],
+    "css": [
+      "_app/immutable/assets/0.DeKrlZbi.css"
+    ]
+  },
+  ".svelte-kit/generated/client-optimized/nodes/1.js": {
+    "file": "_app/immutable/nodes/1.DtRPFqcQ.js",
+    "name": "nodes/1",
+    "src": ".svelte-kit/generated/client-optimized/nodes/1.js",
+    "isEntry": true,
+    "imports": [
+      "_SQMMPuzR.js",
+      "_BsB0QL0C.js",
+      "_I8rQr1kY.js"
+    ]
+  },
+  ".svelte-kit/generated/client-optimized/nodes/10.js": {
+    "file": "_app/immutable/nodes/10.Bz46-8C3.js",
+    "name": "nodes/10",
+    "src": ".svelte-kit/generated/client-optimized/nodes/10.js",
+    "isEntry": true,
+    "imports": [
+      "_SQMMPuzR.js",
+      "_I8rQr1kY.js",
+      "_D9ul1F0L.js"
+    ]
+  },
+  ".svelte-kit/generated/client-optimized/nodes/11.js": {
+    "file": "_app/immutable/nodes/11.-R9BECRL.js",
+    "name": "nodes/11",
+    "src": ".svelte-kit/generated/client-optimized/nodes/11.js",
+    "isEntry": true,
+    "imports": [
+      "_SQMMPuzR.js",
+      "_I8rQr1kY.js",
+      "_D9ul1F0L.js"
+    ]
+  },
+  ".svelte-kit/generated/client-optimized/nodes/2.js": {
+    "file": "_app/immutable/nodes/2.BIU3K-uS.js",
+    "name": "nodes/2",
+    "src": ".svelte-kit/generated/client-optimized/nodes/2.js",
+    "isEntry": true,
+    "imports": [
+      "_SQMMPuzR.js",
+      "_I8rQr1kY.js",
+      "_D9ul1F0L.js",
+      "_bHA25ZTa.js"
+    ],
+    "css": [
+      "_app/immutable/assets/2.--rhtIVr.css"
+    ]
+  },
+  ".svelte-kit/generated/client-optimized/nodes/3.js": {
+    "file": "_app/immutable/nodes/3.SVu6NzOM.js",
+    "name": "nodes/3",
+    "src": ".svelte-kit/generated/client-optimized/nodes/3.js",
+    "isEntry": true,
+    "imports": [
+      "_SQMMPuzR.js",
+      "_I8rQr1kY.js",
+      "_D9ul1F0L.js"
+    ]
+  },
+  ".svelte-kit/generated/client-optimized/nodes/4.js": {
+    "file": "_app/immutable/nodes/4.D0I4CSPc.js",
+    "name": "nodes/4",
+    "src": ".svelte-kit/generated/client-optimized/nodes/4.js",
+    "isEntry": true,
+    "imports": [
+      "_SQMMPuzR.js",
+      "_I8rQr1kY.js",
+      "_D9ul1F0L.js"
+    ],
+    "css": [
+      "_app/immutable/assets/4.2cJxVMjd.css"
+    ]
+  },
+  ".svelte-kit/generated/client-optimized/nodes/5.js": {
+    "file": "_app/immutable/nodes/5.DjBo7rwi.js",
+    "name": "nodes/5",
+    "src": ".svelte-kit/generated/client-optimized/nodes/5.js",
+    "isEntry": true,
+    "imports": [
+      "_SQMMPuzR.js",
+      "_BFYQcBYR.js",
+      "_I8rQr1kY.js",
+      "_D9ul1F0L.js"
+    ],
+    "dynamicImports": [
+      "rules/appendices/appendix_a_scoring.md?raw",
+      "rules/appendices/appendix_b_windsurfing_fleet_racing_rules.md?raw",
+      "rules/appendices/appendix_c_match_racing_rules.md?raw",
+      "rules/appendices/appendix_d_team_racing_rules.md?raw",
+      "rules/appendices/appendix_e_radio_sailing_racing_rules.md?raw",
+      "rules/appendices/appendix_f_kiteboarding_racing_rules.md?raw",
+      "rules/appendices/appendix_g_identification_on_sails.md?raw",
+      "rules/appendices/appendix_j_notice_of_race_and_sailing_instructions.md?raw",
+      "rules/appendices/appendix_m_recommendations_for_protest_committees.md?raw",
+      "rules/appendices/appendix_n_international_juries.md?raw",
+      "rules/appendices/appendix_p_special_procedures_for_rule_42.md?raw",
+      "rules/appendices/appendix_r_procedures_for_appeals_and_requests.md?raw",
+      "rules/appendices/appendix_s_standard_sailing_instructions.md?raw",
+      "rules/appendices/appendix_t_arbitration.md?raw",
+      "rules/basic_principles/basic_principles.md?raw",
+      "rules/definitions/definitions.md?raw",
+      "rules/introduction/introduction.md?raw",
+      "rules/part1_fundamental_rules/README.md?raw",
+      "rules/part1_fundamental_rules/preamble.md?raw",
+      "rules/part1_fundamental_rules/rule_01_safety.md?raw",
+      "rules/part1_fundamental_rules/rule_02_fair_sailing.md?raw",
+      "rules/part1_fundamental_rules/rule_03_decision_to_race.md?raw",
+      "rules/part1_fundamental_rules/rule_04_acceptance_of_rules.md?raw",
+      "rules/part1_fundamental_rules/rule_05_rules_governing_officials.md?raw",
+      "rules/part1_fundamental_rules/rule_06_world_sailing_regulations.md?raw",
+      "rules/part1_fundamental_rules/rule_1_safety.md?raw",
+      "rules/part1_fundamental_rules/rule_2_fair_sailing.md?raw",
+      "rules/part1_fundamental_rules/rule_3_decision_to_race.md?raw",
+      "rules/part1_fundamental_rules/rule_4_acceptance_of_the_rules.md?raw",
+      "rules/part1_fundamental_rules/rule_5_rules_governing_organizing_authorities.md?raw",
+      "rules/part1_fundamental_rules/rule_6_world_sailing_regulations.md?raw",
+      "rules/part2_when_boats_meet/preamble.md?raw",
+      "rules/part2_when_boats_meet/section_a_right_of_way/preamble.md?raw",
+      "rules/part2_when_boats_meet/section_a_right_of_way/rule_10_on_opposite_tacks.md?raw",
+      "rules/part2_when_boats_meet/section_a_right_of_way/rule_10_opposite_tacks.md?raw",
+      "rules/part2_when_boats_meet/section_a_right_of_way/rule_11_on_the_same_tack_overlapped.md?raw",
+      "rules/part2_when_boats_meet/section_a_right_of_way/rule_11_same_tack_overlapped.md?raw",
+      "rules/part2_when_boats_meet/section_a_right_of_way/rule_12_on_the_same_tack_not_overlapped.md?raw",
+      "rules/part2_when_boats_meet/section_a_right_of_way/rule_12_same_tack_not_overlapped.md?raw",
+      "rules/part2_when_boats_meet/section_a_right_of_way/rule_13_while_tacking.md?raw",
+      "rules/part2_when_boats_meet/section_b_general_limitations/preamble.md?raw",
+      "rules/part2_when_boats_meet/section_b_general_limitations/rule_14_avoiding_contact.md?raw",
+      "rules/part2_when_boats_meet/section_b_general_limitations/rule_15_acquiring_right_of_way.md?raw",
+      "rules/part2_when_boats_meet/section_b_general_limitations/rule_16_changing_course.md?raw",
+      "rules/part2_when_boats_meet/section_b_general_limitations/rule_17_on_the_same_tack_proper_course.md?raw",
+      "rules/part2_when_boats_meet/section_b_general_limitations/rule_17_proper_course.md?raw",
+      "rules/part2_when_boats_meet/section_c_marks_and_obstructions/preamble.md?raw",
+      "rules/part2_when_boats_meet/section_c_marks_and_obstructions/rule_18_mark_room.md?raw",
+      "rules/part2_when_boats_meet/section_c_marks_and_obstructions/rule_19_room_to_pass_an_obstruction.md?raw",
+      "rules/part2_when_boats_meet/section_c_marks_and_obstructions/rule_19_room_to_pass_obstruction.md?raw",
+      "rules/part2_when_boats_meet/section_c_marks_and_obstructions/rule_20_room_to_tack_at_an_obstruction.md?raw",
+      "rules/part2_when_boats_meet/section_c_marks_and_obstructions/rule_20_room_to_tack_at_obstruction.md?raw",
+      "rules/part2_when_boats_meet/section_d_other_rules/preamble.md?raw",
+      "rules/part2_when_boats_meet/section_d_other_rules/rule_21_exonerations.md?raw",
+      "rules/part2_when_boats_meet/section_d_other_rules/rule_21_starting_errors_taking_penalties.md?raw",
+      "rules/part2_when_boats_meet/section_d_other_rules/rule_22_capsized_anchored.md?raw",
+      "rules/part2_when_boats_meet/section_d_other_rules/rule_22_capsized_anchored_or_aground_rescuing.md?raw",
+      "rules/part2_when_boats_meet/section_d_other_rules/rule_23_interfering_with_another_boat.md?raw",
+      "rules/part3_conduct_of_a_race/preamble.md?raw",
+      "rules/part3_conduct_of_a_race/rule_25_notice_of_race.md?raw",
+      "rules/part3_conduct_of_a_race/rule_25_notice_of_race_sailing_instructions.md?raw",
+      "rules/part3_conduct_of_a_race/rule_26_starting_races.md?raw",
+      "rules/part3_conduct_of_a_race/rule_27_other_race_committee_actions.md?raw",
+      "rules/part3_conduct_of_a_race/rule_27_other_race_committee_actions_before.md?raw",
+      "rules/part3_conduct_of_a_race/rule_28_sailing_the_course.md?raw",
+      "rules/part3_conduct_of_a_race/rule_29_recalls.md?raw",
+      "rules/part3_conduct_of_a_race/rule_30_starting_penalties.md?raw",
+      "rules/part3_conduct_of_a_race/rule_31_touching_a_mark.md?raw",
+      "rules/part3_conduct_of_a_race/rule_32_shortening_or_abandoning.md?raw",
+      "rules/part3_conduct_of_a_race/rule_32_shortening_or_abandoning_after_the_start.md?raw",
+      "rules/part3_conduct_of_a_race/rule_33_changing_next_leg.md?raw",
+      "rules/part3_conduct_of_a_race/rule_33_changing_the_next_leg_of_the_course.md?raw",
+      "rules/part3_conduct_of_a_race/rule_34_mark_missing.md?raw",
+      "rules/part3_conduct_of_a_race/rule_35_race_time_limit_and_scores.md?raw",
+      "rules/part3_conduct_of_a_race/rule_35_time_limit.md?raw",
+      "rules/part3_conduct_of_a_race/rule_36_races_restarted.md?raw",
+      "rules/part3_conduct_of_a_race/rule_36_races_restarted_or_resailed.md?raw",
+      "rules/part3_conduct_of_a_race/rule_37_search_and_rescue.md?raw",
+      "rules/part3_conduct_of_a_race/rule_37_search_and_rescue_instructions.md?raw",
+      "rules/part4_other_requirements/preamble.md?raw",
+      "rules/part4_other_requirements/section_a_general/preamble.md?raw",
+      "rules/part4_other_requirements/section_a_general/rule_40_personal_flotation_devices.md?raw",
+      "rules/part4_other_requirements/section_a_general/rule_41_outside_help.md?raw",
+      "rules/part4_other_requirements/section_a_general/rule_42_propulsion.md?raw",
+      "rules/part4_other_requirements/section_a_general/rule_43_exoneration.md?raw",
+      "rules/part4_other_requirements/section_a_general/rule_44_penalties_at_the_time_of_an_incident.md?raw",
+      "rules/part4_other_requirements/section_a_general/rule_44_penalties_at_time_of_incident.md?raw",
+      "rules/part4_other_requirements/section_a_general/rule_45_hauling_out.md?raw",
+      "rules/part4_other_requirements/section_a_general/rule_45_hauling_out_making_fast_anchoring.md?raw",
+      "rules/part4_other_requirements/section_a_general/rule_46_person_in_charge.md?raw",
+      "rules/part4_other_requirements/section_a_general/rule_47_trash_disposal.md?raw",
+      "rules/part4_other_requirements/section_b_equipment/preamble.md?raw",
+      "rules/part4_other_requirements/section_b_equipment/rule_48_limitations_on_equipment.md?raw",
+      "rules/part4_other_requirements/section_b_equipment/rule_48_limitations_on_equipment_and_crew.md?raw",
+      "rules/part4_other_requirements/section_b_equipment/rule_49_crew_position.md?raw",
+      "rules/part4_other_requirements/section_b_equipment/rule_49_crew_position_lifelines.md?raw",
+      "rules/part4_other_requirements/section_b_equipment/rule_50_competitor_clothing.md?raw",
+      "rules/part4_other_requirements/section_b_equipment/rule_50_competitor_clothing_and_equipment.md?raw",
+      "rules/part4_other_requirements/section_b_equipment/rule_51_movable_ballast.md?raw",
+      "rules/part4_other_requirements/section_b_equipment/rule_52_manual_power.md?raw",
+      "rules/part4_other_requirements/section_b_equipment/rule_53_skin_friction.md?raw",
+      "rules/part4_other_requirements/section_b_equipment/rule_54_forestays_and_headsail_tacks.md?raw",
+      "rules/part4_other_requirements/section_b_equipment/rule_55_setting_and_sheeting_sails.md?raw",
+      "rules/part4_other_requirements/section_b_equipment/rule_56_fog_signals_and_lights.md?raw",
+      "rules/part4_other_requirements/section_b_equipment/rule_56_fog_signals_and_lights_traffic_separation.md?raw",
+      "rules/part5_protests_redress/preamble.md?raw",
+      "rules/part5_protests_redress/section_a_protests/preamble.md?raw",
+      "rules/part5_protests_redress/section_a_protests/rule_60_protests.md?raw",
+      "rules/part5_protests_redress/section_a_protests/rule_61_redress.md?raw",
+      "rules/part5_protests_redress/section_a_protests/rule_62_support_persons.md?raw",
+      "rules/part5_protests_redress/section_b_hearings/preamble.md?raw",
+      "rules/part5_protests_redress/section_b_hearings/rule_63_conduct_of_hearings.md?raw",
+      "rules/part5_protests_redress/section_b_hearings/rule_64_discretionary_penalties.md?raw",
+      "rules/part5_protests_redress/section_b_hearings/rule_65_legal_liability.md?raw",
+      "rules/part5_protests_redress/section_b_hearings/rule_65_legal_liability_and_costs.md?raw",
+      "rules/part5_protests_redress/section_c_misconduct/preamble.md?raw",
+      "rules/part5_protests_redress/section_c_misconduct/rule_69_misconduct.md?raw",
+      "rules/part5_protests_redress/section_d_appeals/preamble.md?raw",
+      "rules/part5_protests_redress/section_d_appeals/rule_70_appeals_and_requests.md?raw",
+      "rules/part5_protests_redress/section_d_appeals/rule_70_appeals_and_requests_to_a_national_authority.md?raw",
+      "rules/part5_protests_redress/section_d_appeals/rule_71_national_authority_decisions.md?raw",
+      "rules/part5_protests_redress/section_d_appeals/rule_72_interpretations.md?raw",
+      "rules/part6_entry_qualification/preamble.md?raw",
+      "rules/part6_entry_qualification/rule_75_entering_an_event.md?raw",
+      "rules/part6_entry_qualification/rule_76_exclusion_of_boats.md?raw",
+      "rules/part6_entry_qualification/rule_76_exclusion_of_boats_or_competitors.md?raw",
+      "rules/part6_entry_qualification/rule_77_identification_on_sails.md?raw",
+      "rules/part6_entry_qualification/rule_78_compliance_with_class_rules.md?raw",
+      "rules/part6_entry_qualification/rule_78_compliance_with_class_rules_certificates.md?raw",
+      "rules/part6_entry_qualification/rule_79_categorization.md?raw",
+      "rules/part6_entry_qualification/rule_80_rescheduled_event.md?raw",
+      "rules/part7_event_organization/preamble.md?raw",
+      "rules/part7_event_organization/rule_85_changes_to_rules.md?raw",
+      "rules/part7_event_organization/rule_86_changes_to_racing_rules.md?raw",
+      "rules/part7_event_organization/rule_86_changes_to_the_racing_rules.md?raw",
+      "rules/part7_event_organization/rule_87_changes_to_class_rules.md?raw",
+      "rules/part7_event_organization/rule_88_national_prescriptions.md?raw",
+      "rules/part7_event_organization/rule_89_organizing_authority.md?raw",
+      "rules/part7_event_organization/rule_89_organizing_authority_notice_of_race.md?raw",
+      "rules/part7_event_organization/rule_90_race_committee.md?raw",
+      "rules/part7_event_organization/rule_90_race_committee_sailing_instructions_scoring.md?raw",
+      "rules/part7_event_organization/rule_91_protest_committee.md?raw",
+      "rules/part7_event_organization/rule_92_technical_committee.md?raw",
+      "rules/race_signals/race_signals.md?raw"
+    ],
+    "css": [
+      "_app/immutable/assets/5.ppHO0f7q.css"
+    ]
+  },
+  ".svelte-kit/generated/client-optimized/nodes/6.js": {
+    "file": "_app/immutable/nodes/6.ByZqh3pE.js",
+    "name": "nodes/6",
+    "src": ".svelte-kit/generated/client-optimized/nodes/6.js",
+    "isEntry": true,
+    "imports": [
+      "_SQMMPuzR.js",
+      "_I8rQr1kY.js",
+      "_D9ul1F0L.js"
+    ]
+  },
+  ".svelte-kit/generated/client-optimized/nodes/7.js": {
+    "file": "_app/immutable/nodes/7.CUk82lDu.js",
+    "name": "nodes/7",
+    "src": ".svelte-kit/generated/client-optimized/nodes/7.js",
+    "isEntry": true,
+    "imports": [
+      "_SQMMPuzR.js",
+      "_I8rQr1kY.js",
+      "_D9ul1F0L.js"
+    ]
+  },
+  ".svelte-kit/generated/client-optimized/nodes/8.js": {
+    "file": "_app/immutable/nodes/8.9-t4ca-h.js",
+    "name": "nodes/8",
+    "src": ".svelte-kit/generated/client-optimized/nodes/8.js",
+    "isEntry": true,
+    "imports": [
+      "_SQMMPuzR.js",
+      "_I8rQr1kY.js",
+      "_D9ul1F0L.js"
+    ]
+  },
+  ".svelte-kit/generated/client-optimized/nodes/9.js": {
+    "file": "_app/immutable/nodes/9.xMj3R3TR.js",
+    "name": "nodes/9",
+    "src": ".svelte-kit/generated/client-optimized/nodes/9.js",
+    "isEntry": true,
+    "imports": [
+      "_SQMMPuzR.js",
+      "_I8rQr1kY.js",
+      "_D9ul1F0L.js"
+    ]
+  },
+  "_BFYQcBYR.js": {
+    "file": "_app/immutable/chunks/BFYQcBYR.js",
+    "name": "preload-helper"
+  },
+  "_BsB0QL0C.js": {
+    "file": "_app/immutable/chunks/BsB0QL0C.js",
+    "name": "client",
+    "imports": [
+      "_SQMMPuzR.js"
+    ]
+  },
+  "_BurgeeLogo.CVZ67DbU.css": {
+    "file": "_app/immutable/assets/BurgeeLogo.CVZ67DbU.css",
+    "src": "_BurgeeLogo.CVZ67DbU.css"
+  },
+  "_D9ul1F0L.js": {
+    "file": "_app/immutable/chunks/D9ul1F0L.js",
+    "name": "legacy",
+    "imports": [
+      "_SQMMPuzR.js"
+    ]
+  },
+  "_I8rQr1kY.js": {
+    "file": "_app/immutable/chunks/I8rQr1kY.js",
+    "name": "disclose-version"
+  },
+  "_SQMMPuzR.js": {
+    "file": "_app/immutable/chunks/SQMMPuzR.js",
+    "name": "index-client"
+  },
+  "_bHA25ZTa.js": {
+    "file": "_app/immutable/chunks/bHA25ZTa.js",
+    "name": "BurgeeLogo",
+    "imports": [
+      "_SQMMPuzR.js",
+      "_I8rQr1kY.js"
+    ],
+    "css": [
+      "_app/immutable/assets/BurgeeLogo.CVZ67DbU.css"
+    ]
+  },
+  "node_modules/@sveltejs/kit/src/runtime/client/entry.js": {
+    "file": "_app/immutable/entry/start.Djybh35o.js",
+    "name": "entry/start",
+    "src": "node_modules/@sveltejs/kit/src/runtime/client/entry.js",
+    "isEntry": true,
+    "imports": [
+      "_BsB0QL0C.js"
+    ]
+  },
+  "rules/appendices/appendix_a_scoring.md?raw": {
+    "file": "_app/immutable/chunks/YpfdGZMM.js",
+    "name": "appendix_a_scoring",
+    "src": "rules/appendices/appendix_a_scoring.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/appendices/appendix_b_windsurfing_fleet_racing_rules.md?raw": {
+    "file": "_app/immutable/chunks/BNT72zDf.js",
+    "name": "appendix_b_windsurfing_fleet_racing_rules",
+    "src": "rules/appendices/appendix_b_windsurfing_fleet_racing_rules.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/appendices/appendix_c_match_racing_rules.md?raw": {
+    "file": "_app/immutable/chunks/C14kZMYR.js",
+    "name": "appendix_c_match_racing_rules",
+    "src": "rules/appendices/appendix_c_match_racing_rules.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/appendices/appendix_d_team_racing_rules.md?raw": {
+    "file": "_app/immutable/chunks/CKpkkIfC.js",
+    "name": "appendix_d_team_racing_rules",
+    "src": "rules/appendices/appendix_d_team_racing_rules.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/appendices/appendix_e_radio_sailing_racing_rules.md?raw": {
+    "file": "_app/immutable/chunks/DMk4FAga.js",
+    "name": "appendix_e_radio_sailing_racing_rules",
+    "src": "rules/appendices/appendix_e_radio_sailing_racing_rules.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/appendices/appendix_f_kiteboarding_racing_rules.md?raw": {
+    "file": "_app/immutable/chunks/BfWcxrpS.js",
+    "name": "appendix_f_kiteboarding_racing_rules",
+    "src": "rules/appendices/appendix_f_kiteboarding_racing_rules.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/appendices/appendix_g_identification_on_sails.md?raw": {
+    "file": "_app/immutable/chunks/DhF-O9ab.js",
+    "name": "appendix_g_identification_on_sails",
+    "src": "rules/appendices/appendix_g_identification_on_sails.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/appendices/appendix_j_notice_of_race_and_sailing_instructions.md?raw": {
+    "file": "_app/immutable/chunks/DKXATIJU.js",
+    "name": "appendix_j_notice_of_race_and_sailing_instructions",
+    "src": "rules/appendices/appendix_j_notice_of_race_and_sailing_instructions.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/appendices/appendix_m_recommendations_for_protest_committees.md?raw": {
+    "file": "_app/immutable/chunks/DecCkzUD.js",
+    "name": "appendix_m_recommendations_for_protest_committees",
+    "src": "rules/appendices/appendix_m_recommendations_for_protest_committees.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/appendices/appendix_n_international_juries.md?raw": {
+    "file": "_app/immutable/chunks/CclxF4cL.js",
+    "name": "appendix_n_international_juries",
+    "src": "rules/appendices/appendix_n_international_juries.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/appendices/appendix_p_special_procedures_for_rule_42.md?raw": {
+    "file": "_app/immutable/chunks/BLupLIqI.js",
+    "name": "appendix_p_special_procedures_for_rule_42",
+    "src": "rules/appendices/appendix_p_special_procedures_for_rule_42.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/appendices/appendix_r_procedures_for_appeals_and_requests.md?raw": {
+    "file": "_app/immutable/chunks/C5bHKPYL.js",
+    "name": "appendix_r_procedures_for_appeals_and_requests",
+    "src": "rules/appendices/appendix_r_procedures_for_appeals_and_requests.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/appendices/appendix_s_standard_sailing_instructions.md?raw": {
+    "file": "_app/immutable/chunks/Bfd5bEyT.js",
+    "name": "appendix_s_standard_sailing_instructions",
+    "src": "rules/appendices/appendix_s_standard_sailing_instructions.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/appendices/appendix_t_arbitration.md?raw": {
+    "file": "_app/immutable/chunks/DUupj7PW.js",
+    "name": "appendix_t_arbitration",
+    "src": "rules/appendices/appendix_t_arbitration.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/basic_principles/basic_principles.md?raw": {
+    "file": "_app/immutable/chunks/Cq3Z-NDR.js",
+    "name": "basic_principles",
+    "src": "rules/basic_principles/basic_principles.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/definitions/definitions.md?raw": {
+    "file": "_app/immutable/chunks/egopA-Yv.js",
+    "name": "definitions",
+    "src": "rules/definitions/definitions.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/introduction/introduction.md?raw": {
+    "file": "_app/immutable/chunks/CzsZ22JJ.js",
+    "name": "introduction",
+    "src": "rules/introduction/introduction.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part1_fundamental_rules/README.md?raw": {
+    "file": "_app/immutable/chunks/DuFWPk0s.js",
+    "name": "README",
+    "src": "rules/part1_fundamental_rules/README.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part1_fundamental_rules/preamble.md?raw": {
+    "file": "_app/immutable/chunks/D8N4MD1k.js",
+    "name": "preamble",
+    "src": "rules/part1_fundamental_rules/preamble.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part1_fundamental_rules/rule_01_safety.md?raw": {
+    "file": "_app/immutable/chunks/DB34uP4L.js",
+    "name": "rule_01_safety",
+    "src": "rules/part1_fundamental_rules/rule_01_safety.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part1_fundamental_rules/rule_02_fair_sailing.md?raw": {
+    "file": "_app/immutable/chunks/BnbfK3NY2.js",
+    "name": "rule_02_fair_sailing",
+    "src": "rules/part1_fundamental_rules/rule_02_fair_sailing.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part1_fundamental_rules/rule_03_decision_to_race.md?raw": {
+    "file": "_app/immutable/chunks/jm2X77iB2.js",
+    "name": "rule_03_decision_to_race",
+    "src": "rules/part1_fundamental_rules/rule_03_decision_to_race.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part1_fundamental_rules/rule_04_acceptance_of_rules.md?raw": {
+    "file": "_app/immutable/chunks/CeAIUBOl2.js",
+    "name": "rule_04_acceptance_of_rules",
+    "src": "rules/part1_fundamental_rules/rule_04_acceptance_of_rules.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part1_fundamental_rules/rule_05_rules_governing_officials.md?raw": {
+    "file": "_app/immutable/chunks/CjM2ymjC2.js",
+    "name": "rule_05_rules_governing_officials",
+    "src": "rules/part1_fundamental_rules/rule_05_rules_governing_officials.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part1_fundamental_rules/rule_06_world_sailing_regulations.md?raw": {
+    "file": "_app/immutable/chunks/CXEMKMj32.js",
+    "name": "rule_06_world_sailing_regulations",
+    "src": "rules/part1_fundamental_rules/rule_06_world_sailing_regulations.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part1_fundamental_rules/rule_1_safety.md?raw": {
+    "file": "_app/immutable/chunks/DUoWtbbz2.js",
+    "name": "rule_1_safety",
+    "src": "rules/part1_fundamental_rules/rule_1_safety.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part1_fundamental_rules/rule_2_fair_sailing.md?raw": {
+    "file": "_app/immutable/chunks/BgWHIzBZ2.js",
+    "name": "rule_2_fair_sailing",
+    "src": "rules/part1_fundamental_rules/rule_2_fair_sailing.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part1_fundamental_rules/rule_3_decision_to_race.md?raw": {
+    "file": "_app/immutable/chunks/Spiakatz2.js",
+    "name": "rule_3_decision_to_race",
+    "src": "rules/part1_fundamental_rules/rule_3_decision_to_race.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part1_fundamental_rules/rule_4_acceptance_of_the_rules.md?raw": {
+    "file": "_app/immutable/chunks/DlM7Sys12.js",
+    "name": "rule_4_acceptance_of_the_rules",
+    "src": "rules/part1_fundamental_rules/rule_4_acceptance_of_the_rules.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part1_fundamental_rules/rule_5_rules_governing_organizing_authorities.md?raw": {
+    "file": "_app/immutable/chunks/BCduy-Og2.js",
+    "name": "rule_5_rules_governing_organizing_authorities",
+    "src": "rules/part1_fundamental_rules/rule_5_rules_governing_organizing_authorities.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part1_fundamental_rules/rule_6_world_sailing_regulations.md?raw": {
+    "file": "_app/immutable/chunks/Lo-Yq47u2.js",
+    "name": "rule_6_world_sailing_regulations",
+    "src": "rules/part1_fundamental_rules/rule_6_world_sailing_regulations.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/preamble.md?raw": {
+    "file": "_app/immutable/chunks/OxPntmEQ2.js",
+    "name": "preamble",
+    "src": "rules/part2_when_boats_meet/preamble.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_a_right_of_way/preamble.md?raw": {
+    "file": "_app/immutable/chunks/DPs9cRct2.js",
+    "name": "preamble",
+    "src": "rules/part2_when_boats_meet/section_a_right_of_way/preamble.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_a_right_of_way/rule_10_on_opposite_tacks.md?raw": {
+    "file": "_app/immutable/chunks/zv-7teUo2.js",
+    "name": "rule_10_on_opposite_tacks",
+    "src": "rules/part2_when_boats_meet/section_a_right_of_way/rule_10_on_opposite_tacks.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_a_right_of_way/rule_10_opposite_tacks.md?raw": {
+    "file": "_app/immutable/chunks/BzhpdQB72.js",
+    "name": "rule_10_opposite_tacks",
+    "src": "rules/part2_when_boats_meet/section_a_right_of_way/rule_10_opposite_tacks.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_a_right_of_way/rule_11_on_the_same_tack_overlapped.md?raw": {
+    "file": "_app/immutable/chunks/CP2us0F52.js",
+    "name": "rule_11_on_the_same_tack_overlapped",
+    "src": "rules/part2_when_boats_meet/section_a_right_of_way/rule_11_on_the_same_tack_overlapped.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_a_right_of_way/rule_11_same_tack_overlapped.md?raw": {
+    "file": "_app/immutable/chunks/B8_SE7dH2.js",
+    "name": "rule_11_same_tack_overlapped",
+    "src": "rules/part2_when_boats_meet/section_a_right_of_way/rule_11_same_tack_overlapped.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_a_right_of_way/rule_12_on_the_same_tack_not_overlapped.md?raw": {
+    "file": "_app/immutable/chunks/D1qEj_8-2.js",
+    "name": "rule_12_on_the_same_tack_not_overlapped",
+    "src": "rules/part2_when_boats_meet/section_a_right_of_way/rule_12_on_the_same_tack_not_overlapped.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_a_right_of_way/rule_12_same_tack_not_overlapped.md?raw": {
+    "file": "_app/immutable/chunks/C0TxU04j2.js",
+    "name": "rule_12_same_tack_not_overlapped",
+    "src": "rules/part2_when_boats_meet/section_a_right_of_way/rule_12_same_tack_not_overlapped.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_a_right_of_way/rule_13_while_tacking.md?raw": {
+    "file": "_app/immutable/chunks/kp17UozJ2.js",
+    "name": "rule_13_while_tacking",
+    "src": "rules/part2_when_boats_meet/section_a_right_of_way/rule_13_while_tacking.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_b_general_limitations/preamble.md?raw": {
+    "file": "_app/immutable/chunks/phmb5s632.js",
+    "name": "preamble",
+    "src": "rules/part2_when_boats_meet/section_b_general_limitations/preamble.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_b_general_limitations/rule_14_avoiding_contact.md?raw": {
+    "file": "_app/immutable/chunks/_3Cp_lQZ2.js",
+    "name": "rule_14_avoiding_contact",
+    "src": "rules/part2_when_boats_meet/section_b_general_limitations/rule_14_avoiding_contact.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_b_general_limitations/rule_15_acquiring_right_of_way.md?raw": {
+    "file": "_app/immutable/chunks/B--WqRWj.js",
+    "name": "rule_15_acquiring_right_of_way",
+    "src": "rules/part2_when_boats_meet/section_b_general_limitations/rule_15_acquiring_right_of_way.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_b_general_limitations/rule_16_changing_course.md?raw": {
+    "file": "_app/immutable/chunks/mHv8rh0e.js",
+    "name": "rule_16_changing_course",
+    "src": "rules/part2_when_boats_meet/section_b_general_limitations/rule_16_changing_course.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_b_general_limitations/rule_17_on_the_same_tack_proper_course.md?raw": {
+    "file": "_app/immutable/chunks/BS0KptO6.js",
+    "name": "rule_17_on_the_same_tack_proper_course",
+    "src": "rules/part2_when_boats_meet/section_b_general_limitations/rule_17_on_the_same_tack_proper_course.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_b_general_limitations/rule_17_proper_course.md?raw": {
+    "file": "_app/immutable/chunks/DIo_N7UW.js",
+    "name": "rule_17_proper_course",
+    "src": "rules/part2_when_boats_meet/section_b_general_limitations/rule_17_proper_course.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_c_marks_and_obstructions/preamble.md?raw": {
+    "file": "_app/immutable/chunks/pu7VugeU.js",
+    "name": "preamble",
+    "src": "rules/part2_when_boats_meet/section_c_marks_and_obstructions/preamble.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_c_marks_and_obstructions/rule_18_mark_room.md?raw": {
+    "file": "_app/immutable/chunks/vN3Iihx3.js",
+    "name": "rule_18_mark_room",
+    "src": "rules/part2_when_boats_meet/section_c_marks_and_obstructions/rule_18_mark_room.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_c_marks_and_obstructions/rule_19_room_to_pass_an_obstruction.md?raw": {
+    "file": "_app/immutable/chunks/DDNkY2x3.js",
+    "name": "rule_19_room_to_pass_an_obstruction",
+    "src": "rules/part2_when_boats_meet/section_c_marks_and_obstructions/rule_19_room_to_pass_an_obstruction.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_c_marks_and_obstructions/rule_19_room_to_pass_obstruction.md?raw": {
+    "file": "_app/immutable/chunks/Cpw0qR6d.js",
+    "name": "rule_19_room_to_pass_obstruction",
+    "src": "rules/part2_when_boats_meet/section_c_marks_and_obstructions/rule_19_room_to_pass_obstruction.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_c_marks_and_obstructions/rule_20_room_to_tack_at_an_obstruction.md?raw": {
+    "file": "_app/immutable/chunks/DhNlGY09.js",
+    "name": "rule_20_room_to_tack_at_an_obstruction",
+    "src": "rules/part2_when_boats_meet/section_c_marks_and_obstructions/rule_20_room_to_tack_at_an_obstruction.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_c_marks_and_obstructions/rule_20_room_to_tack_at_obstruction.md?raw": {
+    "file": "_app/immutable/chunks/B0JZeEep.js",
+    "name": "rule_20_room_to_tack_at_obstruction",
+    "src": "rules/part2_when_boats_meet/section_c_marks_and_obstructions/rule_20_room_to_tack_at_obstruction.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_d_other_rules/preamble.md?raw": {
+    "file": "_app/immutable/chunks/Dc5Ys6vk.js",
+    "name": "preamble",
+    "src": "rules/part2_when_boats_meet/section_d_other_rules/preamble.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_d_other_rules/rule_21_exonerations.md?raw": {
+    "file": "_app/immutable/chunks/BK7O0uW9.js",
+    "name": "rule_21_exonerations",
+    "src": "rules/part2_when_boats_meet/section_d_other_rules/rule_21_exonerations.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_d_other_rules/rule_21_starting_errors_taking_penalties.md?raw": {
+    "file": "_app/immutable/chunks/cvIJhjPI.js",
+    "name": "rule_21_starting_errors_taking_penalties",
+    "src": "rules/part2_when_boats_meet/section_d_other_rules/rule_21_starting_errors_taking_penalties.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_d_other_rules/rule_22_capsized_anchored.md?raw": {
+    "file": "_app/immutable/chunks/C-ApBAyr.js",
+    "name": "rule_22_capsized_anchored",
+    "src": "rules/part2_when_boats_meet/section_d_other_rules/rule_22_capsized_anchored.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_d_other_rules/rule_22_capsized_anchored_or_aground_rescuing.md?raw": {
+    "file": "_app/immutable/chunks/CoNVRTmo.js",
+    "name": "rule_22_capsized_anchored_or_aground_rescuing",
+    "src": "rules/part2_when_boats_meet/section_d_other_rules/rule_22_capsized_anchored_or_aground_rescuing.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part2_when_boats_meet/section_d_other_rules/rule_23_interfering_with_another_boat.md?raw": {
+    "file": "_app/immutable/chunks/BpY3BHhn.js",
+    "name": "rule_23_interfering_with_another_boat",
+    "src": "rules/part2_when_boats_meet/section_d_other_rules/rule_23_interfering_with_another_boat.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part3_conduct_of_a_race/preamble.md?raw": {
+    "file": "_app/immutable/chunks/Be7hnBjg.js",
+    "name": "preamble",
+    "src": "rules/part3_conduct_of_a_race/preamble.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part3_conduct_of_a_race/rule_25_notice_of_race.md?raw": {
+    "file": "_app/immutable/chunks/BBF1MAnq.js",
+    "name": "rule_25_notice_of_race",
+    "src": "rules/part3_conduct_of_a_race/rule_25_notice_of_race.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part3_conduct_of_a_race/rule_25_notice_of_race_sailing_instructions.md?raw": {
+    "file": "_app/immutable/chunks/CwUqsUq-.js",
+    "name": "rule_25_notice_of_race_sailing_instructions",
+    "src": "rules/part3_conduct_of_a_race/rule_25_notice_of_race_sailing_instructions.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part3_conduct_of_a_race/rule_26_starting_races.md?raw": {
+    "file": "_app/immutable/chunks/LJ7lJhJk.js",
+    "name": "rule_26_starting_races",
+    "src": "rules/part3_conduct_of_a_race/rule_26_starting_races.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part3_conduct_of_a_race/rule_27_other_race_committee_actions.md?raw": {
+    "file": "_app/immutable/chunks/CxlevAP4.js",
+    "name": "rule_27_other_race_committee_actions",
+    "src": "rules/part3_conduct_of_a_race/rule_27_other_race_committee_actions.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part3_conduct_of_a_race/rule_27_other_race_committee_actions_before.md?raw": {
+    "file": "_app/immutable/chunks/KtjQg6iD.js",
+    "name": "rule_27_other_race_committee_actions_before",
+    "src": "rules/part3_conduct_of_a_race/rule_27_other_race_committee_actions_before.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part3_conduct_of_a_race/rule_28_sailing_the_course.md?raw": {
+    "file": "_app/immutable/chunks/DG2VuFE5.js",
+    "name": "rule_28_sailing_the_course",
+    "src": "rules/part3_conduct_of_a_race/rule_28_sailing_the_course.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part3_conduct_of_a_race/rule_29_recalls.md?raw": {
+    "file": "_app/immutable/chunks/92zMux7h.js",
+    "name": "rule_29_recalls",
+    "src": "rules/part3_conduct_of_a_race/rule_29_recalls.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part3_conduct_of_a_race/rule_30_starting_penalties.md?raw": {
+    "file": "_app/immutable/chunks/D2PAMqv9.js",
+    "name": "rule_30_starting_penalties",
+    "src": "rules/part3_conduct_of_a_race/rule_30_starting_penalties.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part3_conduct_of_a_race/rule_31_touching_a_mark.md?raw": {
+    "file": "_app/immutable/chunks/DvRtUJlL.js",
+    "name": "rule_31_touching_a_mark",
+    "src": "rules/part3_conduct_of_a_race/rule_31_touching_a_mark.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part3_conduct_of_a_race/rule_32_shortening_or_abandoning.md?raw": {
+    "file": "_app/immutable/chunks/BK0LqTWh.js",
+    "name": "rule_32_shortening_or_abandoning",
+    "src": "rules/part3_conduct_of_a_race/rule_32_shortening_or_abandoning.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part3_conduct_of_a_race/rule_32_shortening_or_abandoning_after_the_start.md?raw": {
+    "file": "_app/immutable/chunks/dQRuRA_C.js",
+    "name": "rule_32_shortening_or_abandoning_after_the_start",
+    "src": "rules/part3_conduct_of_a_race/rule_32_shortening_or_abandoning_after_the_start.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part3_conduct_of_a_race/rule_33_changing_next_leg.md?raw": {
+    "file": "_app/immutable/chunks/sHr6JF4H.js",
+    "name": "rule_33_changing_next_leg",
+    "src": "rules/part3_conduct_of_a_race/rule_33_changing_next_leg.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part3_conduct_of_a_race/rule_33_changing_the_next_leg_of_the_course.md?raw": {
+    "file": "_app/immutable/chunks/Cxscg31x.js",
+    "name": "rule_33_changing_the_next_leg_of_the_course",
+    "src": "rules/part3_conduct_of_a_race/rule_33_changing_the_next_leg_of_the_course.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part3_conduct_of_a_race/rule_34_mark_missing.md?raw": {
+    "file": "_app/immutable/chunks/BfyS5EoS.js",
+    "name": "rule_34_mark_missing",
+    "src": "rules/part3_conduct_of_a_race/rule_34_mark_missing.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part3_conduct_of_a_race/rule_35_race_time_limit_and_scores.md?raw": {
+    "file": "_app/immutable/chunks/D1PQHapz.js",
+    "name": "rule_35_race_time_limit_and_scores",
+    "src": "rules/part3_conduct_of_a_race/rule_35_race_time_limit_and_scores.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part3_conduct_of_a_race/rule_35_time_limit.md?raw": {
+    "file": "_app/immutable/chunks/B6BG8EF5.js",
+    "name": "rule_35_time_limit",
+    "src": "rules/part3_conduct_of_a_race/rule_35_time_limit.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part3_conduct_of_a_race/rule_36_races_restarted.md?raw": {
+    "file": "_app/immutable/chunks/BEWcMkdY.js",
+    "name": "rule_36_races_restarted",
+    "src": "rules/part3_conduct_of_a_race/rule_36_races_restarted.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part3_conduct_of_a_race/rule_36_races_restarted_or_resailed.md?raw": {
+    "file": "_app/immutable/chunks/j42tgFfG.js",
+    "name": "rule_36_races_restarted_or_resailed",
+    "src": "rules/part3_conduct_of_a_race/rule_36_races_restarted_or_resailed.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part3_conduct_of_a_race/rule_37_search_and_rescue.md?raw": {
+    "file": "_app/immutable/chunks/DNiAZxFL.js",
+    "name": "rule_37_search_and_rescue",
+    "src": "rules/part3_conduct_of_a_race/rule_37_search_and_rescue.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part3_conduct_of_a_race/rule_37_search_and_rescue_instructions.md?raw": {
+    "file": "_app/immutable/chunks/CAr_Z19L.js",
+    "name": "rule_37_search_and_rescue_instructions",
+    "src": "rules/part3_conduct_of_a_race/rule_37_search_and_rescue_instructions.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/preamble.md?raw": {
+    "file": "_app/immutable/chunks/DnXZajx1.js",
+    "name": "preamble",
+    "src": "rules/part4_other_requirements/preamble.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_a_general/preamble.md?raw": {
+    "file": "_app/immutable/chunks/Y5fJxdcF2.js",
+    "name": "preamble",
+    "src": "rules/part4_other_requirements/section_a_general/preamble.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_a_general/rule_40_personal_flotation_devices.md?raw": {
+    "file": "_app/immutable/chunks/Dg8xO0kz2.js",
+    "name": "rule_40_personal_flotation_devices",
+    "src": "rules/part4_other_requirements/section_a_general/rule_40_personal_flotation_devices.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_a_general/rule_41_outside_help.md?raw": {
+    "file": "_app/immutable/chunks/CwTbGBDt2.js",
+    "name": "rule_41_outside_help",
+    "src": "rules/part4_other_requirements/section_a_general/rule_41_outside_help.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_a_general/rule_42_propulsion.md?raw": {
+    "file": "_app/immutable/chunks/B6Et5DNB2.js",
+    "name": "rule_42_propulsion",
+    "src": "rules/part4_other_requirements/section_a_general/rule_42_propulsion.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_a_general/rule_43_exoneration.md?raw": {
+    "file": "_app/immutable/chunks/BBzICRjK2.js",
+    "name": "rule_43_exoneration",
+    "src": "rules/part4_other_requirements/section_a_general/rule_43_exoneration.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_a_general/rule_44_penalties_at_the_time_of_an_incident.md?raw": {
+    "file": "_app/immutable/chunks/p96pza1Y2.js",
+    "name": "rule_44_penalties_at_the_time_of_an_incident",
+    "src": "rules/part4_other_requirements/section_a_general/rule_44_penalties_at_the_time_of_an_incident.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_a_general/rule_44_penalties_at_time_of_incident.md?raw": {
+    "file": "_app/immutable/chunks/CLd9uNMS2.js",
+    "name": "rule_44_penalties_at_time_of_incident",
+    "src": "rules/part4_other_requirements/section_a_general/rule_44_penalties_at_time_of_incident.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_a_general/rule_45_hauling_out.md?raw": {
+    "file": "_app/immutable/chunks/BrKyuC_M2.js",
+    "name": "rule_45_hauling_out",
+    "src": "rules/part4_other_requirements/section_a_general/rule_45_hauling_out.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_a_general/rule_45_hauling_out_making_fast_anchoring.md?raw": {
+    "file": "_app/immutable/chunks/CZLGLEBq2.js",
+    "name": "rule_45_hauling_out_making_fast_anchoring",
+    "src": "rules/part4_other_requirements/section_a_general/rule_45_hauling_out_making_fast_anchoring.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_a_general/rule_46_person_in_charge.md?raw": {
+    "file": "_app/immutable/chunks/xltjs9l62.js",
+    "name": "rule_46_person_in_charge",
+    "src": "rules/part4_other_requirements/section_a_general/rule_46_person_in_charge.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_a_general/rule_47_trash_disposal.md?raw": {
+    "file": "_app/immutable/chunks/DOnwwqV02.js",
+    "name": "rule_47_trash_disposal",
+    "src": "rules/part4_other_requirements/section_a_general/rule_47_trash_disposal.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_b_equipment/preamble.md?raw": {
+    "file": "_app/immutable/chunks/CjFU5Ov-2.js",
+    "name": "preamble",
+    "src": "rules/part4_other_requirements/section_b_equipment/preamble.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_b_equipment/rule_48_limitations_on_equipment.md?raw": {
+    "file": "_app/immutable/chunks/9ko_nchn2.js",
+    "name": "rule_48_limitations_on_equipment",
+    "src": "rules/part4_other_requirements/section_b_equipment/rule_48_limitations_on_equipment.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_b_equipment/rule_48_limitations_on_equipment_and_crew.md?raw": {
+    "file": "_app/immutable/chunks/DATRgLvT2.js",
+    "name": "rule_48_limitations_on_equipment_and_crew",
+    "src": "rules/part4_other_requirements/section_b_equipment/rule_48_limitations_on_equipment_and_crew.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_b_equipment/rule_49_crew_position.md?raw": {
+    "file": "_app/immutable/chunks/DCXMVX4W2.js",
+    "name": "rule_49_crew_position",
+    "src": "rules/part4_other_requirements/section_b_equipment/rule_49_crew_position.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_b_equipment/rule_49_crew_position_lifelines.md?raw": {
+    "file": "_app/immutable/chunks/DSW__NIs2.js",
+    "name": "rule_49_crew_position_lifelines",
+    "src": "rules/part4_other_requirements/section_b_equipment/rule_49_crew_position_lifelines.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_b_equipment/rule_50_competitor_clothing.md?raw": {
+    "file": "_app/immutable/chunks/DQDBX0by2.js",
+    "name": "rule_50_competitor_clothing",
+    "src": "rules/part4_other_requirements/section_b_equipment/rule_50_competitor_clothing.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_b_equipment/rule_50_competitor_clothing_and_equipment.md?raw": {
+    "file": "_app/immutable/chunks/CD5cyIJK2.js",
+    "name": "rule_50_competitor_clothing_and_equipment",
+    "src": "rules/part4_other_requirements/section_b_equipment/rule_50_competitor_clothing_and_equipment.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_b_equipment/rule_51_movable_ballast.md?raw": {
+    "file": "_app/immutable/chunks/BriTDV0e2.js",
+    "name": "rule_51_movable_ballast",
+    "src": "rules/part4_other_requirements/section_b_equipment/rule_51_movable_ballast.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_b_equipment/rule_52_manual_power.md?raw": {
+    "file": "_app/immutable/chunks/SdCo605R2.js",
+    "name": "rule_52_manual_power",
+    "src": "rules/part4_other_requirements/section_b_equipment/rule_52_manual_power.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_b_equipment/rule_53_skin_friction.md?raw": {
+    "file": "_app/immutable/chunks/BkW__e2m2.js",
+    "name": "rule_53_skin_friction",
+    "src": "rules/part4_other_requirements/section_b_equipment/rule_53_skin_friction.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_b_equipment/rule_54_forestays_and_headsail_tacks.md?raw": {
+    "file": "_app/immutable/chunks/sOfKhgS72.js",
+    "name": "rule_54_forestays_and_headsail_tacks",
+    "src": "rules/part4_other_requirements/section_b_equipment/rule_54_forestays_and_headsail_tacks.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_b_equipment/rule_55_setting_and_sheeting_sails.md?raw": {
+    "file": "_app/immutable/chunks/kcJhmNFd2.js",
+    "name": "rule_55_setting_and_sheeting_sails",
+    "src": "rules/part4_other_requirements/section_b_equipment/rule_55_setting_and_sheeting_sails.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_b_equipment/rule_56_fog_signals_and_lights.md?raw": {
+    "file": "_app/immutable/chunks/Dngnzjdz2.js",
+    "name": "rule_56_fog_signals_and_lights",
+    "src": "rules/part4_other_requirements/section_b_equipment/rule_56_fog_signals_and_lights.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part4_other_requirements/section_b_equipment/rule_56_fog_signals_and_lights_traffic_separation.md?raw": {
+    "file": "_app/immutable/chunks/CBIECKL62.js",
+    "name": "rule_56_fog_signals_and_lights_traffic_separation",
+    "src": "rules/part4_other_requirements/section_b_equipment/rule_56_fog_signals_and_lights_traffic_separation.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part5_protests_redress/preamble.md?raw": {
+    "file": "_app/immutable/chunks/CMOOZBpB2.js",
+    "name": "preamble",
+    "src": "rules/part5_protests_redress/preamble.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part5_protests_redress/section_a_protests/preamble.md?raw": {
+    "file": "_app/immutable/chunks/1L4dpP8E.js",
+    "name": "preamble",
+    "src": "rules/part5_protests_redress/section_a_protests/preamble.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part5_protests_redress/section_a_protests/rule_60_protests.md?raw": {
+    "file": "_app/immutable/chunks/ChVewCJh.js",
+    "name": "rule_60_protests",
+    "src": "rules/part5_protests_redress/section_a_protests/rule_60_protests.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part5_protests_redress/section_a_protests/rule_61_redress.md?raw": {
+    "file": "_app/immutable/chunks/CwUkT8Xd.js",
+    "name": "rule_61_redress",
+    "src": "rules/part5_protests_redress/section_a_protests/rule_61_redress.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part5_protests_redress/section_a_protests/rule_62_support_persons.md?raw": {
+    "file": "_app/immutable/chunks/FXwH1amv.js",
+    "name": "rule_62_support_persons",
+    "src": "rules/part5_protests_redress/section_a_protests/rule_62_support_persons.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part5_protests_redress/section_b_hearings/preamble.md?raw": {
+    "file": "_app/immutable/chunks/BY4nNApA.js",
+    "name": "preamble",
+    "src": "rules/part5_protests_redress/section_b_hearings/preamble.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part5_protests_redress/section_b_hearings/rule_63_conduct_of_hearings.md?raw": {
+    "file": "_app/immutable/chunks/DZM3x3Ut.js",
+    "name": "rule_63_conduct_of_hearings",
+    "src": "rules/part5_protests_redress/section_b_hearings/rule_63_conduct_of_hearings.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part5_protests_redress/section_b_hearings/rule_64_discretionary_penalties.md?raw": {
+    "file": "_app/immutable/chunks/DlH5MEPZ.js",
+    "name": "rule_64_discretionary_penalties",
+    "src": "rules/part5_protests_redress/section_b_hearings/rule_64_discretionary_penalties.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part5_protests_redress/section_b_hearings/rule_65_legal_liability.md?raw": {
+    "file": "_app/immutable/chunks/VYwr1rTm.js",
+    "name": "rule_65_legal_liability",
+    "src": "rules/part5_protests_redress/section_b_hearings/rule_65_legal_liability.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part5_protests_redress/section_b_hearings/rule_65_legal_liability_and_costs.md?raw": {
+    "file": "_app/immutable/chunks/BlWVQ_ds.js",
+    "name": "rule_65_legal_liability_and_costs",
+    "src": "rules/part5_protests_redress/section_b_hearings/rule_65_legal_liability_and_costs.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part5_protests_redress/section_c_misconduct/preamble.md?raw": {
+    "file": "_app/immutable/chunks/Cc4hyI7n.js",
+    "name": "preamble",
+    "src": "rules/part5_protests_redress/section_c_misconduct/preamble.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part5_protests_redress/section_c_misconduct/rule_69_misconduct.md?raw": {
+    "file": "_app/immutable/chunks/lIh0ohgr.js",
+    "name": "rule_69_misconduct",
+    "src": "rules/part5_protests_redress/section_c_misconduct/rule_69_misconduct.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part5_protests_redress/section_d_appeals/preamble.md?raw": {
+    "file": "_app/immutable/chunks/AlA5eIEW.js",
+    "name": "preamble",
+    "src": "rules/part5_protests_redress/section_d_appeals/preamble.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part5_protests_redress/section_d_appeals/rule_70_appeals_and_requests.md?raw": {
+    "file": "_app/immutable/chunks/DGVMkm_X.js",
+    "name": "rule_70_appeals_and_requests",
+    "src": "rules/part5_protests_redress/section_d_appeals/rule_70_appeals_and_requests.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part5_protests_redress/section_d_appeals/rule_70_appeals_and_requests_to_a_national_authority.md?raw": {
+    "file": "_app/immutable/chunks/eB3lA6DK.js",
+    "name": "rule_70_appeals_and_requests_to_a_national_authority",
+    "src": "rules/part5_protests_redress/section_d_appeals/rule_70_appeals_and_requests_to_a_national_authority.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part5_protests_redress/section_d_appeals/rule_71_national_authority_decisions.md?raw": {
+    "file": "_app/immutable/chunks/BV6Yhk_N.js",
+    "name": "rule_71_national_authority_decisions",
+    "src": "rules/part5_protests_redress/section_d_appeals/rule_71_national_authority_decisions.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part5_protests_redress/section_d_appeals/rule_72_interpretations.md?raw": {
+    "file": "_app/immutable/chunks/Cs1vXhT9.js",
+    "name": "rule_72_interpretations",
+    "src": "rules/part5_protests_redress/section_d_appeals/rule_72_interpretations.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part6_entry_qualification/preamble.md?raw": {
+    "file": "_app/immutable/chunks/2QRPXvkC.js",
+    "name": "preamble",
+    "src": "rules/part6_entry_qualification/preamble.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part6_entry_qualification/rule_75_entering_an_event.md?raw": {
+    "file": "_app/immutable/chunks/icbH8LBy.js",
+    "name": "rule_75_entering_an_event",
+    "src": "rules/part6_entry_qualification/rule_75_entering_an_event.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part6_entry_qualification/rule_76_exclusion_of_boats.md?raw": {
+    "file": "_app/immutable/chunks/Dh-5Aroo.js",
+    "name": "rule_76_exclusion_of_boats",
+    "src": "rules/part6_entry_qualification/rule_76_exclusion_of_boats.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part6_entry_qualification/rule_76_exclusion_of_boats_or_competitors.md?raw": {
+    "file": "_app/immutable/chunks/DWNaNAao.js",
+    "name": "rule_76_exclusion_of_boats_or_competitors",
+    "src": "rules/part6_entry_qualification/rule_76_exclusion_of_boats_or_competitors.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part6_entry_qualification/rule_77_identification_on_sails.md?raw": {
+    "file": "_app/immutable/chunks/jPtepda-.js",
+    "name": "rule_77_identification_on_sails",
+    "src": "rules/part6_entry_qualification/rule_77_identification_on_sails.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part6_entry_qualification/rule_78_compliance_with_class_rules.md?raw": {
+    "file": "_app/immutable/chunks/Bn5xTuGB.js",
+    "name": "rule_78_compliance_with_class_rules",
+    "src": "rules/part6_entry_qualification/rule_78_compliance_with_class_rules.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part6_entry_qualification/rule_78_compliance_with_class_rules_certificates.md?raw": {
+    "file": "_app/immutable/chunks/6u_Bm_6p.js",
+    "name": "rule_78_compliance_with_class_rules_certificates",
+    "src": "rules/part6_entry_qualification/rule_78_compliance_with_class_rules_certificates.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part6_entry_qualification/rule_79_categorization.md?raw": {
+    "file": "_app/immutable/chunks/D8aLAPub.js",
+    "name": "rule_79_categorization",
+    "src": "rules/part6_entry_qualification/rule_79_categorization.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part6_entry_qualification/rule_80_rescheduled_event.md?raw": {
+    "file": "_app/immutable/chunks/20oWKlrJ.js",
+    "name": "rule_80_rescheduled_event",
+    "src": "rules/part6_entry_qualification/rule_80_rescheduled_event.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part7_event_organization/preamble.md?raw": {
+    "file": "_app/immutable/chunks/Dz-g94tK.js",
+    "name": "preamble",
+    "src": "rules/part7_event_organization/preamble.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part7_event_organization/rule_85_changes_to_rules.md?raw": {
+    "file": "_app/immutable/chunks/CMqsQ7eD.js",
+    "name": "rule_85_changes_to_rules",
+    "src": "rules/part7_event_organization/rule_85_changes_to_rules.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part7_event_organization/rule_86_changes_to_racing_rules.md?raw": {
+    "file": "_app/immutable/chunks/Dyzil4WX.js",
+    "name": "rule_86_changes_to_racing_rules",
+    "src": "rules/part7_event_organization/rule_86_changes_to_racing_rules.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part7_event_organization/rule_86_changes_to_the_racing_rules.md?raw": {
+    "file": "_app/immutable/chunks/CNWclMHa.js",
+    "name": "rule_86_changes_to_the_racing_rules",
+    "src": "rules/part7_event_organization/rule_86_changes_to_the_racing_rules.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part7_event_organization/rule_87_changes_to_class_rules.md?raw": {
+    "file": "_app/immutable/chunks/os38_zcN.js",
+    "name": "rule_87_changes_to_class_rules",
+    "src": "rules/part7_event_organization/rule_87_changes_to_class_rules.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part7_event_organization/rule_88_national_prescriptions.md?raw": {
+    "file": "_app/immutable/chunks/DMiSwQUe.js",
+    "name": "rule_88_national_prescriptions",
+    "src": "rules/part7_event_organization/rule_88_national_prescriptions.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part7_event_organization/rule_89_organizing_authority.md?raw": {
+    "file": "_app/immutable/chunks/CRTa3B7Y.js",
+    "name": "rule_89_organizing_authority",
+    "src": "rules/part7_event_organization/rule_89_organizing_authority.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part7_event_organization/rule_89_organizing_authority_notice_of_race.md?raw": {
+    "file": "_app/immutable/chunks/DqAiGFj2.js",
+    "name": "rule_89_organizing_authority_notice_of_race",
+    "src": "rules/part7_event_organization/rule_89_organizing_authority_notice_of_race.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part7_event_organization/rule_90_race_committee.md?raw": {
+    "file": "_app/immutable/chunks/Cg8iTmpJ.js",
+    "name": "rule_90_race_committee",
+    "src": "rules/part7_event_organization/rule_90_race_committee.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part7_event_organization/rule_90_race_committee_sailing_instructions_scoring.md?raw": {
+    "file": "_app/immutable/chunks/DrQUp9gb.js",
+    "name": "rule_90_race_committee_sailing_instructions_scoring",
+    "src": "rules/part7_event_organization/rule_90_race_committee_sailing_instructions_scoring.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part7_event_organization/rule_91_protest_committee.md?raw": {
+    "file": "_app/immutable/chunks/DkGqb5V7.js",
+    "name": "rule_91_protest_committee",
+    "src": "rules/part7_event_organization/rule_91_protest_committee.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/part7_event_organization/rule_92_technical_committee.md?raw": {
+    "file": "_app/immutable/chunks/DgVisEvt.js",
+    "name": "rule_92_technical_committee",
+    "src": "rules/part7_event_organization/rule_92_technical_committee.md?raw",
+    "isDynamicEntry": true
+  },
+  "rules/race_signals/race_signals.md?raw": {
+    "file": "_app/immutable/chunks/C3YK8uXv.js",
+    "name": "race_signals",
+    "src": "rules/race_signals/race_signals.md?raw",
+    "isDynamicEntry": true
+  }
+}

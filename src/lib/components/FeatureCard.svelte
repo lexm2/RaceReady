@@ -5,11 +5,10 @@
     description: string
     items: string[]
     ctaLabel: string
-    ctaPage: string
+    ctaHref: string
     accentColor?: string
-    navigate: (page: string) => void
   }
-  let { icon, title, description, items, ctaLabel, ctaPage, accentColor = 'maize', navigate }: Props = $props()
+  let { icon, title, description, items, ctaLabel, ctaHref, accentColor = 'maize' }: Props = $props();
 
   const colorMap: Record<string, string> = {
     maize:  'var(--michigan-maize)',
@@ -17,12 +16,11 @@
     orange: 'var(--ross-orange)',
     teal:   'var(--taubman-teal)',
     red:    'var(--tappan-red)',
-    // legacy aliases
     seafoam: 'var(--michigan-maize)',
     gold:    'var(--ross-orange)',
-  }
+  };
 
-  let accent = $derived(colorMap[accentColor] ?? 'var(--michigan-maize)')
+  let accent = $derived(colorMap[accentColor] ?? 'var(--michigan-maize)');
 </script>
 
 <div class="feature-card" style="--card-accent: {accent}">
@@ -44,12 +42,12 @@
     {/each}
   </ul>
 
-  <button class="card-cta" onclick={() => navigate(ctaPage)}>
+  <a class="card-cta" href={ctaHref}>
     {ctaLabel}
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
       <path d="M2.5 7h9M8 3.5l3.5 3.5L8 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-  </button>
+  </a>
 </div>
 
 <style>
@@ -145,7 +143,7 @@
     font-size: 14px;
     font-weight: 600;
     font-family: var(--font-sans);
-    cursor: pointer;
+    text-decoration: none;
     transition: background var(--transition), color var(--transition);
     margin-top: auto;
   }
