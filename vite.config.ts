@@ -7,5 +7,8 @@ export default defineConfig({
     fs: {
       allow: ['rules']
     }
+  },
+  preview: {
+    allowedHosts: ['anti-workforce-productive-firm.trycloudflare.com']
   }
 });

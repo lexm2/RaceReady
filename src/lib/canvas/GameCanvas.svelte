@@ -8,7 +8,8 @@
     Vec2,
   } from './types.ts'
   import { renderScene } from './renderer/index.ts'
-  import { worldToScreen, screenToWorld, lerpVec2, lerpAngle } from './renderer/coords.ts'
+  import { worldToScreen, screenToWorld, lerpVec2, lerpAngle, normalizeAngle } from './renderer/coords.ts'
+  import { getHandleScreenPos } from './renderer/ui.ts'
 
   // ── Props ────────────────────────────────────────────────────────────────────
   let {
@@ -16,10 +17,12 @@
     camera: cameraProp,
     animation,
     interactive = false,
+    selectedBoatId,
     onBoatClick,
     onMarkClick,
     onBoatDrag,
     onMarkDrag,
+    onBoatRotate,
     onBackgroundClick,
     class: className = '',
   }: GameCanvasProps = $props()
@@ -148,6 +151,7 @@
       dpr,
       timestamp,
       animTime,
+      selectedBoatId,
     }
 
     renderScene(rc)
@@ -194,17 +198,32 @@
   }
 
   // ── Hit-testing ───────────────────────────────────────────────────────────────
-  const BOAT_HIT_M = 6   // world-space hit radius in metres
-  const MARK_HIT_M = 4
+  const BOAT_HIT_M       = 6    // world-space metres
+  const MARK_HIT_M       = 4
+  const HANDLE_HIT_PX    = 10   // screen-space CSS px
 
-  function eventToWorld(e: MouseEvent): Vec2 | null {
+  function eventToScreen(e: MouseEvent): Vec2 | null {
     if (!canvasEl) return null
     const rect = canvasEl.getBoundingClientRect()
-    const screenPx: Vec2 = {
+    return {
       x: (e.clientX - rect.left) * dpr,
       y: (e.clientY - rect.top)  * dpr,
     }
-    return screenToWorld(screenPx, camera, canvasEl)
+  }
+
+  function eventToWorld(e: MouseEvent): Vec2 | null {
+    const screen = eventToScreen(e)
+    if (!screen || !canvasEl) return null
+    return screenToWorld(screen, camera, canvasEl)
+  }
+
+  function hitHandle(screenPx: Vec2): string | null {
+    if (!selectedBoatId || !canvasEl) return null
+    const boat = scene.boats.find(b => b.id === selectedBoatId)
+    if (!boat) return null
+    const handle = getHandleScreenPos(boat, camera, canvasEl, dpr)
+    const d = Math.hypot(screenPx.x - handle.x, screenPx.y - handle.y)
+    return d < HANDLE_HIT_PX * dpr ? boat.id : null
   }
 
   function hitBoat(worldPos: Vec2): string | null {
@@ -223,6 +242,16 @@
     return null
   }
 
+  function headingFromScreenPos(boatId: string, screenPx: Vec2): number | null {
+    if (!canvasEl) return null
+    const boat = scene.boats.find(b => b.id === boatId)
+    if (!boat) return null
+    const boatScreen = worldToScreen(boat.position, camera, canvasEl)
+    const dx = screenPx.x - boatScreen.x
+    const dy = screenPx.y - boatScreen.y
+    return normalizeAngle((Math.atan2(dx, -dy) * 180) / Math.PI)
+  }
+
   function handleClick(e: MouseEvent): void {
     if (!interactive) return
     const world = eventToWorld(e)
@@ -238,13 +267,21 @@
   }
 
   // ── Drag ─────────────────────────────────────────────────────────────────────
-  let dragTarget = $state<{ type: 'boat' | 'mark'; id: string } | null>(null)
+  let dragTarget = $state<{ type: 'boat' | 'mark' | 'rotate'; id: string } | null>(null)
 
   function handleMouseDown(e: MouseEvent): void {
     if (!interactive) return
-    const world = eventToWorld(e)
-    if (!world) return
+    const screen = eventToScreen(e)
+    if (!screen) return
 
+    // Check rotation handle first (screen-space, higher priority)
+    const handleBoatId = hitHandle(screen)
+    if (handleBoatId) {
+      dragTarget = { type: 'rotate', id: handleBoatId }
+      return
+    }
+
+    const world = screenToWorld(screen, camera, canvasEl!)
     const boatId = hitBoat(world)
     if (boatId) { dragTarget = { type: 'boat', id: boatId }; return }
 
@@ -254,9 +291,17 @@
 
   function handleMouseMove(e: MouseEvent): void {
     if (!dragTarget) return
+
+    if (dragTarget.type === 'rotate') {
+      const screen = eventToScreen(e)
+      if (!screen) return
+      const heading = headingFromScreenPos(dragTarget.id, screen)
+      if (heading !== null) onBoatRotate?.(dragTarget.id, heading)
+      return
+    }
+
     const world = eventToWorld(e)
     if (!world) return
-
     if (dragTarget.type === 'boat') onBoatDrag?.(dragTarget.id, world)
     else                            onMarkDrag?.(dragTarget.id, world)
   }

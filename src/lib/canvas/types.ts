@@ -136,6 +136,8 @@ export interface RenderContext {
   timestamp: number
   /** Seconds into the current animation clip (0 when no clip is active). */
   animTime: number
+  /** ID of the currently selected boat — renderer draws selection ring + handle. */
+  selectedBoatId?: string
 }
 
 // ─── Component props ──────────────────────────────────────────────────────────
@@ -154,5 +156,9 @@ export interface GameCanvasProps {
   /** Fires on every mousemove while dragging a mark. Parent updates scene state. */
   onMarkDrag?: (markId: string, pos: Vec2) => void
   onBackgroundClick?: (worldPos: Vec2) => void
+  /** ID of the boat currently selected (shows rotation ring + handle). */
+  selectedBoatId?: string
+  /** Fired when the user drags the rotation handle. New heading in degrees [0, 360). */
+  onBoatRotate?: (boatId: string, heading: number) => void
   class?: string
 }

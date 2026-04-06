@@ -3,7 +3,7 @@ import { drawWater } from './water.ts'
 import { drawBoat, drawBoatWake } from './boat.ts'
 import { drawMark } from './mark.ts'
 import { drawWindIndicator } from './wind.ts'
-import { drawLabels, drawCompassRose, drawGrid } from './ui.ts'
+import { drawLabels, drawCompassRose, drawGrid, drawSelectionRing } from './ui.ts'
 import { worldToScreen } from './coords.ts'
 
 /**
@@ -51,7 +51,12 @@ export function renderScene(rc: RenderContext): void {
     drawLabels(rc)
   }
 
-  // 9. Corner HUD widgets (topmost layer)
+  // 9. Selection ring + rotation handle (above labels, below HUD)
+  if (rc.selectedBoatId) {
+    drawSelectionRing(rc)
+  }
+
+  // 10. Corner HUD widgets (topmost layer)
   if (rc.scene.display.showWindIndicator) {
     drawWindIndicator(rc)
   }

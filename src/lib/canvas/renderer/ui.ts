@@ -1,5 +1,85 @@
-import type { RenderContext } from '../types.ts'
+import type { RenderContext, BoatState } from '../types.ts'
 import { worldToScreen } from './coords.ts'
+
+// ─── Constants shared with GameCanvas for hit-testing ────────────────────────
+/** Hull length in world units — must match boat.ts. */
+export const HULL_LENGTH_M = 10
+/** Returns the screen-space position of the rotation handle for a given boat. */
+export function getHandleScreenPos(
+  boat: BoatState,
+  camera: { center: { x: number; y: number }; zoom: number },
+  canvas: HTMLCanvasElement,
+  dpr: number,
+): { x: number; y: number } {
+  const screen = worldToScreen(boat.position, camera, canvas)
+  const L      = HULL_LENGTH_M * camera.zoom
+  const ringR  = Math.max(L * 0.65, 30 * dpr)
+  const dist   = ringR + 25 * dpr
+  const rad    = (boat.heading * Math.PI) / 180
+  return {
+    x: screen.x + Math.sin(rad) * dist,
+    y: screen.y - Math.cos(rad) * dist,
+  }
+}
+
+// ─── Selection ring ───────────────────────────────────────────────────────────
+
+export function drawSelectionRing(rc: RenderContext): void {
+  if (!rc.selectedBoatId) return
+  const boat = rc.scene.boats.find(b => b.id === rc.selectedBoatId)
+  if (!boat) return
+
+  const { ctx, canvas, camera, dpr } = rc
+  const screen  = worldToScreen(boat.position, camera, canvas)
+  const L       = HULL_LENGTH_M * camera.zoom
+  const ringR   = Math.max(L * 0.65, 30 * dpr)
+  const handle  = getHandleScreenPos(boat, camera, canvas, dpr)
+  const headRad = (boat.heading * Math.PI) / 180
+
+  ctx.save()
+
+  // Dashed ring around the boat
+  ctx.beginPath()
+  ctx.arc(screen.x, screen.y, ringR, 0, Math.PI * 2)
+  ctx.setLineDash([5 * dpr, 4 * dpr])
+  ctx.strokeStyle = 'rgba(255,203,5,0.65)'
+  ctx.lineWidth   = 1.5 * dpr
+  ctx.stroke()
+  ctx.setLineDash([])
+
+  // Stem line from ring edge to handle
+  const stemStartX = screen.x + Math.sin(headRad) * ringR
+  const stemStartY = screen.y - Math.cos(headRad) * ringR
+  ctx.beginPath()
+  ctx.moveTo(stemStartX, stemStartY)
+  ctx.lineTo(handle.x, handle.y)
+  ctx.strokeStyle = 'rgba(255,203,5,0.45)'
+  ctx.lineWidth   = 1 * dpr
+  ctx.stroke()
+
+  // Handle dot
+  const hr = 6 * dpr
+  ctx.beginPath()
+  ctx.arc(handle.x, handle.y, hr, 0, Math.PI * 2)
+  ctx.fillStyle   = '#FFCB05'
+  ctx.fill()
+  ctx.strokeStyle = '#00274C'
+  ctx.lineWidth   = 1.5 * dpr
+  ctx.stroke()
+
+  // Small arrow inside the handle to hint "rotate"
+  ctx.save()
+  ctx.translate(handle.x, handle.y)
+  ctx.rotate(headRad)
+  ctx.beginPath()
+  ctx.arc(0, 0, hr * 0.45, -Math.PI * 0.75, Math.PI * 0.25)
+  ctx.strokeStyle = '#00274C'
+  ctx.lineWidth   = 1 * dpr
+  ctx.stroke()
+  ctx.restore()
+
+  ctx.restore()
+}
 
 // ─── Labels ───────────────────────────────────────────────────────────────────
 
