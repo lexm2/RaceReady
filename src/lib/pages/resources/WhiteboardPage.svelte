@@ -137,6 +137,9 @@
   function setBoatColor(id: string, hex: string): void {
     scene.boats = scene.boats.map(b => b.id === id ? { ...b, hullColor: hex } : b)
   }
+
+  // ── Panel collapse ─────────────────────────────────────────────────
+  let panelOpen = $state(true)
 </script>
 
 <div class="page-container">
@@ -162,105 +165,140 @@
         {onBoatRotate}
         {onBackgroundClick}
       />
+
+      <!-- Floating overlay panel -->
+      <aside class="overlay-panel" class:open={panelOpen}>
+        <button
+          class="panel-toggle"
+          onclick={() => panelOpen = !panelOpen}
+          aria-label={panelOpen ? 'Collapse panel' : 'Expand panel'}
+        >
+          {panelOpen ? '✕' : '⚙'}
+        </button>
+
+        {#if panelOpen}
+          <div class="panel-body">
+            <section class="panel-section">
+              <h3>Wind</h3>
+              <div class="wind-control">
+                <input type="range" min="0" max="359" bind:value={scene.wind.directionDeg} class="wind-slider" />
+                <span class="wind-label">{scene.wind.directionDeg}°</span>
+              </div>
+            </section>
+
+            <section class="panel-section">
+              <h3>Display</h3>
+              <div class="toggles">
+                <label class="toggle"><input type="checkbox" checked={scene.display.showLabels}       onchange={() => toggle('showLabels')}        />Labels</label>
+                <label class="toggle"><input type="checkbox" checked={scene.display.showWake}         onchange={() => toggle('showWake')}          />Wakes</label>
+                <label class="toggle"><input type="checkbox" checked={scene.display.showWindStreaks}  onchange={() => toggle('showWindStreaks')}   />Wind streaks</label>
+                <label class="toggle"><input type="checkbox" checked={scene.display.showGrid}         onchange={() => toggle('showGrid')}          />Grid</label>
+                <label class="toggle"><input type="checkbox" checked={scene.display.showWindIndicator} onchange={() => toggle('showWindIndicator')} />Wind indicator</label>
+                <label class="toggle"><input type="checkbox" checked={scene.display.showCompassRose}  onchange={() => toggle('showCompassRose')}   />Compass rose</label>
+              </div>
+            </section>
+
+            <section class="panel-section">
+              <h3>Boats</h3>
+              <ul class="boat-list">
+                {#each scene.boats as boat (boat.id)}
+                  <li class="boat-row">
+                    <label class="boat-swatch-wrap" title="Hull color">
+                      <input
+                        type="color"
+                        class="boat-color-picker"
+                        value={hullHex(boat.hullColor)}
+                        oninput={(e) => setBoatColor(boat.id, (e.target as HTMLInputElement).value)}
+                      />
+                      <span class="boat-swatch" style="background:{hullHex(boat.hullColor)}"></span>
+                    </label>
+                    <span class="boat-name">{boat.label}</span>
+                    <button class="boat-remove" onclick={() => removeBoat(boat.id)} aria-label="Remove {boat.label}">×</button>
+                  </li>
+                {/each}
+              </ul>
+              <button class="add-boat-btn" onclick={addBoat}>+ Add Boat</button>
+            </section>
+          </div>
+        {/if}
+      </aside>
     </div>
-
-    <!-- Toolbar -->
-    <aside class="toolbar">
-      <section class="tool-section">
-        <h3>Display</h3>
-        <div class="toggles">
-          <label class="toggle">
-            <input type="checkbox" checked={scene.display.showLabels}    onchange={() => toggle('showLabels')}        />
-            Labels
-          </label>
-          <label class="toggle">
-            <input type="checkbox" checked={scene.display.showWake}      onchange={() => toggle('showWake')}          />
-            Wakes
-          </label>
-          <label class="toggle">
-            <input type="checkbox" checked={scene.display.showWindStreaks} onchange={() => toggle('showWindStreaks')} />
-            Wind streaks
-          </label>
-          <label class="toggle">
-            <input type="checkbox" checked={scene.display.showGrid}      onchange={() => toggle('showGrid')}          />
-            Grid
-          </label>
-          <label class="toggle">
-            <input type="checkbox" checked={scene.display.showWindIndicator} onchange={() => toggle('showWindIndicator')} />
-            Wind indicator
-          </label>
-          <label class="toggle">
-            <input type="checkbox" checked={scene.display.showCompassRose}   onchange={() => toggle('showCompassRose')}  />
-            Compass rose
-          </label>
-        </div>
-      </section>
-
-      <section class="tool-section">
-        <h3>Boats</h3>
-        <ul class="boat-list">
-          {#each scene.boats as boat (boat.id)}
-            <li class="boat-row">
-              <label class="boat-swatch-wrap" title="Hull color">
-                <input
-                  type="color"
-                  class="boat-color-picker"
-                  value={hullHex(boat.hullColor)}
-                  oninput={(e) => setBoatColor(boat.id, (e.target as HTMLInputElement).value)}
-                />
-                <span class="boat-swatch" style="background:{hullHex(boat.hullColor)}"></span>
-              </label>
-              <span class="boat-name">{boat.label}</span>
-              <button class="boat-remove" onclick={() => removeBoat(boat.id)} aria-label="Remove {boat.label}">×</button>
-            </li>
-          {/each}
-        </ul>
-        <button class="add-boat-btn" onclick={addBoat}>+ Add Boat</button>
-      </section>
-
-      <section class="tool-section hint">
-        <p>Drag boats and marks to reposition them.</p>
-      </section>
-    </aside>
   </div>
 </div>
 
 <style>
   .whiteboard-layout {
-    display: grid;
-    grid-template-columns: 1fr 220px;
-    grid-template-rows: calc(100vh - var(--nav-height) - 140px);
-    gap: var(--space-4);
     padding: var(--space-4) var(--space-6);
+    height: calc(100vh - var(--nav-height) - 140px);
     min-height: 0;
   }
 
   .canvas-wrap {
+    position: relative;
+    height: 100%;
     border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: var(--shadow-card);
-    min-height: 0;
   }
 
-  /* ── Toolbar ─────────────────────────────────────────────────────── */
-  .toolbar {
+  /* ── Overlay panel ───────────────────────────────────────────────── */
+  .overlay-panel {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+    z-index: 10;
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    align-items: flex-end;
+    gap: var(--space-2);
+  }
+
+  .panel-toggle {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--bg-card) 88%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-card);
+  }
+  .panel-toggle:hover { color: var(--text); }
+
+  .panel-body {
+    background: color-mix(in srgb, var(--bg-card) 88%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    padding: var(--space-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    width: 190px;
+    max-height: calc(100% - 52px);
     overflow-y: auto;
   }
 
-  .tool-section {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: var(--space-3) var(--space-4);
+  .panel-section {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
   }
 
-  .tool-section h3 {
+  .panel-section + .panel-section {
+    border-top: 1px solid var(--border);
+    padding-top: var(--space-3);
+  }
+
+  .panel-section h3 {
     font-family: var(--font-heading);
     font-size: 0.7rem;
     text-transform: uppercase;
@@ -269,6 +307,25 @@
     margin: 0;
   }
 
+  /* Wind */
+  .wind-control {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .wind-slider {
+    flex: 1;
+    accent-color: var(--accent);
+  }
+
+  .wind-label {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    min-width: 2.5rem;
+    text-align: right;
+  }
 
   /* Toggles */
   .toggles {
@@ -281,16 +338,17 @@
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     color: var(--text);
     cursor: pointer;
   }
 
   .toggle input[type='checkbox'] {
     accent-color: var(--accent);
-    width: 14px;
-    height: 14px;
+    width: 13px;
+    height: 13px;
     cursor: pointer;
+    flex-shrink: 0;
   }
 
   /* Boats */
@@ -307,7 +365,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     color: var(--text);
   }
 
@@ -363,26 +421,18 @@
     border-radius: var(--radius-sm);
     color: var(--accent);
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     padding: var(--space-1) var(--space-2);
     text-align: center;
     width: 100%;
   }
   .add-boat-btn:hover { background: var(--bg-hover, rgba(0,0,0,0.04)); }
 
-  /* Hint */
-  .tool-section.hint p {
-    font-size: 0.78rem;
-    color: var(--text-muted);
-    margin: 0;
-    line-height: 1.5;
-  }
-
   /* ── Responsive ──────────────────────────────────────────────────── */
   @media (max-width: 768px) {
     .whiteboard-layout {
-      grid-template-columns: 1fr;
-      grid-template-rows: 60vw auto;
+      padding: var(--space-3);
+      height: calc(100vh - var(--nav-height) - 120px);
     }
   }
 </style>
