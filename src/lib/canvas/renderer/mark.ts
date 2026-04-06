@@ -1,13 +1,19 @@
 import type { RenderContext, Mark } from '../types.ts'
 import { worldToScreen } from './coords.ts'
 
-const BUOY_RADIUS = 6   // screen px (constant regardless of zoom — always legible)
-const MARK_FONT   = '10px Oswald, sans-serif'
+const BUOY_RADIUS  = 6    // screen px (constant regardless of zoom — always legible)
+/** Zone radius per RRS: 3 boat lengths. Boat length = 10 m → 30 m. */
+const ZONE_RADIUS_M = 30
 
 export function drawMark(rc: RenderContext, mark: Mark): void {
   const { ctx, canvas, camera, dpr } = rc
   const screen = worldToScreen(mark.position, camera, canvas)
   const r = BUOY_RADIUS * dpr
+
+  // Zone ring drawn first (in world space) so the buoy sits on top
+  if (mark.type === 'buoy' || mark.type === 'gate_buoy') {
+    drawZoneRing(ctx, screen, mark, camera.zoom, dpr)
+  }
 
   ctx.save()
   ctx.translate(screen.x, screen.y)
@@ -38,6 +44,45 @@ export function drawMark(rc: RenderContext, mark: Mark): void {
 }
 
 // ─── Private helpers ──────────────────────────────────────────────────────────
+
+function drawZoneRing(
+  ctx: CanvasRenderingContext2D,
+  screen: { x: number; y: number },
+  mark: Mark,
+  zoom: number,
+  dpr: number,
+): void {
+  const zoneR = ZONE_RADIUS_M * zoom   // world metres → physical px
+
+  // Tinted fill — very subtle so it doesn't obscure boats
+  const fillColor = mark.side === 'port'      ? 'rgba(216,96,24,0.06)'
+                  : mark.side === 'starboard' ? 'rgba(34,197,94,0.06)'
+                  :                             'rgba(255,203,5,0.06)'
+
+  // Dashed stroke — same hue as the buoy, more visible
+  const strokeColor = mark.side === 'port'      ? 'rgba(216,96,24,0.45)'
+                    : mark.side === 'starboard' ? 'rgba(34,197,94,0.45)'
+                    :                             'rgba(255,203,5,0.45)'
+
+  ctx.save()
+
+  // Fill
+  ctx.beginPath()
+  ctx.arc(screen.x, screen.y, zoneR, 0, Math.PI * 2)
+  ctx.fillStyle = fillColor
+  ctx.fill()
+
+  // Dashed border
+  ctx.beginPath()
+  ctx.arc(screen.x, screen.y, zoneR, 0, Math.PI * 2)
+  ctx.setLineDash([6 * dpr, 5 * dpr])
+  ctx.strokeStyle = strokeColor
+  ctx.lineWidth   = 1 * dpr
+  ctx.stroke()
+  ctx.setLineDash([])
+
+  ctx.restore()
+}
 
 function drawBuoy(
   ctx: CanvasRenderingContext2D,

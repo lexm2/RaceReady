@@ -90,15 +90,6 @@
     }
   }
 
-  // ── Wind control ───────────────────────────────────────────────────
-  let windDeg = $state(scene.wind.directionDeg)
-
-  $effect(() => {
-    scene = {
-      ...scene,
-      wind: { ...scene.wind, directionDeg: windDeg },
-    }
-  })
 
   // ── Display toggles ────────────────────────────────────────────────
   function toggle(key: keyof typeof scene.display): void {
@@ -106,6 +97,45 @@
       ...scene,
       display: { ...scene.display, [key]: !scene.display[key] },
     }
+  }
+
+  // ── Boats ──────────────────────────────────────────────────────────
+  const COLOR_HEX: Record<string, string> = {
+    maize: '#FFCB05', blue: '#00274C', arboretum: '#2f65a7',
+    orange: '#d86018', teal: '#00b2a9', red: '#9a3324', white: '#FFFFFF',
+  }
+  function hullHex(c: string): string { return COLOR_HEX[c] ?? c }
+
+  const NEW_BOAT_COLORS = [
+    { hull: 'teal',      sail: 'white' },
+    { hull: 'arboretum', sail: 'maize' },
+    { hull: 'red',       sail: 'white' },
+    { hull: 'blue',      sail: 'maize' },
+  ]
+
+  function addBoat(): void {
+    const n = scene.boats.length
+    const colors = NEW_BOAT_COLORS[n % NEW_BOAT_COLORS.length]
+    scene.boats = [...scene.boats, {
+      id:        `boat-${Date.now()}`,
+      position:  { x: scene.worldSize.x / 2, y: scene.worldSize.y / 2 },
+      heading:   0,
+      tack:      'starboard',
+      speed:     5,
+      hullColor: colors.hull,
+      sailColor: colors.sail,
+      label:     `Boat ${n + 1}`,
+      isPlayer:  false,
+    }]
+  }
+
+  function removeBoat(id: string): void {
+    scene.boats = scene.boats.filter(b => b.id !== id)
+    if (selectedBoatId === id) selectedBoatId = undefined
+  }
+
+  function setBoatColor(id: string, hex: string): void {
+    scene.boats = scene.boats.map(b => b.id === id ? { ...b, hullColor: hex } : b)
   }
 </script>
 
@@ -137,20 +167,6 @@
     <!-- Toolbar -->
     <aside class="toolbar">
       <section class="tool-section">
-        <h3>Wind</h3>
-        <div class="wind-control">
-          <input
-            type="range"
-            min="0"
-            max="359"
-            bind:value={windDeg}
-            class="wind-slider"
-          />
-          <span class="wind-label">{windDeg}°</span>
-        </div>
-      </section>
-
-      <section class="tool-section">
         <h3>Display</h3>
         <div class="toggles">
           <label class="toggle">
@@ -178,6 +194,28 @@
             Compass rose
           </label>
         </div>
+      </section>
+
+      <section class="tool-section">
+        <h3>Boats</h3>
+        <ul class="boat-list">
+          {#each scene.boats as boat (boat.id)}
+            <li class="boat-row">
+              <label class="boat-swatch-wrap" title="Hull color">
+                <input
+                  type="color"
+                  class="boat-color-picker"
+                  value={hullHex(boat.hullColor)}
+                  oninput={(e) => setBoatColor(boat.id, (e.target as HTMLInputElement).value)}
+                />
+                <span class="boat-swatch" style="background:{hullHex(boat.hullColor)}"></span>
+              </label>
+              <span class="boat-name">{boat.label}</span>
+              <button class="boat-remove" onclick={() => removeBoat(boat.id)} aria-label="Remove {boat.label}">×</button>
+            </li>
+          {/each}
+        </ul>
+        <button class="add-boat-btn" onclick={addBoat}>+ Add Boat</button>
       </section>
 
       <section class="tool-section hint">
@@ -231,25 +269,6 @@
     margin: 0;
   }
 
-  /* Wind slider */
-  .wind-control {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-  }
-
-  .wind-slider {
-    flex: 1;
-    accent-color: var(--accent);
-  }
-
-  .wind-label {
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    min-width: 2.5rem;
-    text-align: right;
-  }
 
   /* Toggles */
   .toggles {
@@ -273,6 +292,83 @@
     height: 14px;
     cursor: pointer;
   }
+
+  /* Boats */
+  .boat-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .boat-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.85rem;
+    color: var(--text);
+  }
+
+  .boat-swatch-wrap {
+    position: relative;
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  .boat-color-picker {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    padding: 0;
+    border: none;
+  }
+
+  .boat-swatch {
+    display: block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.15);
+    pointer-events: none;
+  }
+
+  .boat-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .boat-remove {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0 2px;
+  }
+  .boat-remove:hover { color: var(--text); }
+
+  .add-boat-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--accent);
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: var(--space-1) var(--space-2);
+    text-align: center;
+    width: 100%;
+  }
+  .add-boat-btn:hover { background: var(--bg-hover, rgba(0,0,0,0.04)); }
 
   /* Hint */
   .tool-section.hint p {
