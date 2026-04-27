@@ -4,6 +4,9 @@ import adapter from '@sveltejs/adapter-static';
 export default {
   kit: {
     adapter: adapter(),
+    paths: {
+      base: process.env.GITHUB_ACTIONS ? '/RaceReady' : '',
+    },
     prerender: {
       handleHttpError: ({ path, message }) => {
         // Static assets (favicon, icons) are not served during prerendering
