@@ -2,7 +2,7 @@ import type { RenderContext, BoatState } from '../types.ts'
 import { worldToScreen } from './coords.ts'
 
 // ─── Constants shared with GameCanvas for hit-testing ────────────────────────
-/** Hull length in world units — must match boat.ts. */
+/** Hull length in world units - must match boat.ts. */
 export const HULL_LENGTH_M = 10
 /** Returns the screen-space position of the rotation handle for a given boat. */
 export function getHandleScreenPos(
@@ -113,7 +113,7 @@ export function drawLabels(rc: RenderContext): void {
     ctx.roundRect(bx, by, bw, bh, 4 * dpr)
     ctx.fill()
 
-    // Border — thicker/brighter for player
+    // Border - thicker/brighter for player
     ctx.strokeStyle = boat.isPlayer
       ? 'rgba(255,203,5,0.6)'
       : 'rgba(255,203,5,0.3)'
@@ -124,65 +124,6 @@ export function drawLabels(rc: RenderContext): void {
     ctx.fillStyle = boat.isPlayer ? '#FFCB05' : '#FFFFFF'
     ctx.fillText(label, screen.x, screen.y - labelOffY)
   }
-}
-
-// ─── Compass Rose ─────────────────────────────────────────────────────────────
-
-export function drawCompassRose(rc: RenderContext): void {
-  const { ctx, canvas, dpr } = rc
-  const r      = 28 * dpr
-  const inset  = 60 * dpr
-  const cx     = canvas.width  - inset
-  const cy     = canvas.height - inset
-
-  ctx.save()
-  ctx.translate(cx, cy)
-
-  // Background circle
-  ctx.beginPath()
-  ctx.arc(0, 0, r, 0, Math.PI * 2)
-  ctx.fillStyle   = 'rgba(0,26,53,0.6)'
-  ctx.fill()
-  ctx.strokeStyle = 'rgba(255,203,5,0.3)'
-  ctx.lineWidth   = 1 * dpr
-  ctx.stroke()
-
-  // Tick marks at 8 cardinal/intercardinal directions
-  const cardinals = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'] as const
-  for (let i = 0; i < 8; i++) {
-    const angle   = (i * 45 * Math.PI) / 180
-    const isCard  = i % 2 === 0   // N, E, S, W
-    const isNorth = i === 0
-    const inner   = isNorth ? r * 0.45 : isCard ? r * 0.55 : r * 0.65
-    const outer   = r * 0.85
-
-    const sin = Math.sin(angle)
-    const cos = Math.cos(angle)    // -cos so 0° is up
-    const neg = -Math.cos(angle)
-
-    ctx.beginPath()
-    ctx.moveTo(sin * inner, neg * inner)
-    ctx.lineTo(sin * outer, neg * outer)
-    ctx.strokeStyle = isNorth ? '#FFCB05' : isCard ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.3)'
-    ctx.lineWidth   = (isNorth ? 2 : 1) * dpr
-    ctx.stroke()
-  }
-
-  // Cardinal labels
-  const labelDist = r * 0.55
-  ctx.font         = `${7 * dpr}px Oswald, sans-serif`
-  ctx.textAlign    = 'center'
-  ctx.textBaseline = 'middle'
-
-  for (const [i, letter] of (['N', 'E', 'S', 'W'] as const).entries()) {
-    const angle = (i * 90 * Math.PI) / 180
-    const lx    =  Math.sin(angle) * labelDist
-    const ly    = -Math.cos(angle) * labelDist
-    ctx.fillStyle = letter === 'N' ? '#FFCB05' : 'rgba(255,255,255,0.55)'
-    ctx.fillText(letter, lx, ly)
-  }
-
-  ctx.restore()
 }
 
 // ─── Grid (Whiteboard mode) ───────────────────────────────────────────────────

@@ -2,7 +2,7 @@
   import GameCanvas from '$lib/canvas/GameCanvas.svelte'
   import type { SceneState } from '$lib/canvas/types.ts'
 
-  // Test scene — two boats on opposite tacks converging
+  // Test scene - two boats on opposite tacks converging
   const testScene: SceneState = {
     worldSize: { x: 200, y: 150 },
     wind: { directionDeg: 0, speedKnots: 12 },
@@ -50,8 +50,8 @@
     <div class="container">
       <h1>Starboard Showdown</h1>
       <p class="page-subtitle">
-        Two boats. One scenario. Who has right of way? Fast, buzzer-style answers
-        that get harder as you advance.
+        Two boats approaching each other. Who has right of way? Quick-fire scenarios
+        that drill the rules that come up most in real racing.
       </p>
     </div>
   </div>

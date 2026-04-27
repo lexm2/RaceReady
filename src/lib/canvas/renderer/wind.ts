@@ -6,7 +6,7 @@ export function drawWindIndicator(rc: RenderContext): void {
   const { ctx, canvas, scene, dpr } = rc
   const r   = WIDGET_RADIUS * dpr
   const inset = 16 * dpr
-  const cx  = canvas.width  - inset - r
+  const cx  = inset + r
   const cy  = inset + r
 
   ctx.save()

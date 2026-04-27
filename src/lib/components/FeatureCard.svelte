@@ -1,6 +1,8 @@
 <script lang="ts">
+  import type { Component } from 'svelte';
+
   interface Props {
-    icon: string
+    icon: Component
     title: string
     description: string
     items: string[]
@@ -8,7 +10,7 @@
     ctaHref: string
     accentColor?: string
   }
-  let { icon, title, description, items, ctaLabel, ctaHref, accentColor = 'maize' }: Props = $props();
+  let { icon: Icon, title, description, items, ctaLabel, ctaHref, accentColor = 'maize' }: Props = $props();
 
   const colorMap: Record<string, string> = {
     maize:  'var(--michigan-maize)',
@@ -25,7 +27,7 @@
 
 <div class="feature-card" style="--card-accent: {accent}">
   <div class="card-icon-wrap">
-    <span class="card-icon">{icon}</span>
+    <span class="card-icon"><Icon size={24} /></span>
   </div>
 
   <h3 class="card-title">{title}</h3>
@@ -87,8 +89,10 @@
   }
 
   .card-icon {
-    font-size: 24px;
-    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--card-accent);
   }
 
   .card-title {

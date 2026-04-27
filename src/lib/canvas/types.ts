@@ -30,7 +30,7 @@ export interface BoatState {
   /** Degrees, 0 = pointing up (north), increases clockwise. */
   heading: number
   tack: Tack
-  /** Knots — used only to scale wake intensity. */
+  /** Knots - used only to scale wake intensity. */
   speed: number
   hullColor: ColorValue
   sailColor: ColorValue
@@ -61,9 +61,8 @@ export interface DisplayToggles {
   showLabels: boolean
   showWake: boolean
   showWindStreaks: boolean
-  showCompassRose: boolean
   showWindIndicator: boolean
-  /** Whiteboard mode — draws a world-space grid. */
+  /** Whiteboard mode - draws a world-space grid. */
   showGrid: boolean
 }
 
@@ -112,7 +111,7 @@ export interface AnimationClip {
   easing?: EasingFn
 }
 
-/** Internal playback state — owned by GameCanvas, not exposed to callers. */
+/** Internal playback state - owned by GameCanvas, not exposed to callers. */
 export interface AnimationPlayback {
   clip: AnimationClip
   playing: boolean
@@ -136,7 +135,7 @@ export interface RenderContext {
   timestamp: number
   /** Seconds into the current animation clip (0 when no clip is active). */
   animTime: number
-  /** ID of the currently selected boat — renderer draws selection ring + handle. */
+  /** ID of the currently selected boat - renderer draws selection ring + handle. */
   selectedBoatId?: string
 }
 

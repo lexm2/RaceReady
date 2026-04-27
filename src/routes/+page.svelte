@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-  <title>RaceReady — Master the Rules. Win the Race.</title>
+  <title>Learn to Race | RaceReady</title>
 </svelte:head>
 
 <HomePage />

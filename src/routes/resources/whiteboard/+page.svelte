@@ -2,6 +2,6 @@
   import WhiteboardPage from '$lib/pages/resources/WhiteboardPage.svelte';
 </script>
 
-<svelte:head><title>Whiteboard — RaceReady</title></svelte:head>
+<svelte:head><title>Whiteboard | RaceReady</title></svelte:head>
 
 <WhiteboardPage />

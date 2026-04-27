@@ -148,7 +148,7 @@ function drawSail(
   const awa = normalizeAngle(rc.scene.wind.directionDeg - boat.heading)
 
   // Sail fills on the leeward side (opposite from where wind comes from).
-  // If wind comes from starboard (awa 0–180), sail fills to port (negative x).
+  // If wind comes from starboard (awa 0-180), sail fills to port (negative x).
   const sign = awa >= 0 && awa < 180 ? -1 : 1
 
   const mastX = 0

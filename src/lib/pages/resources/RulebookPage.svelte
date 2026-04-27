@@ -93,7 +93,7 @@
   <div class="rulebook-header">
     <div class="container">
       <h1>Racing Rules of Sailing</h1>
-      <p class="rulebook-subtitle">2025–2028 Edition · World Sailing</p>
+      <p class="rulebook-subtitle">2025-2028 Edition · World Sailing</p>
     </div>
   </div>
 

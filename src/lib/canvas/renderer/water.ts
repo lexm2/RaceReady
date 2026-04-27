@@ -23,35 +23,34 @@ function drawGradient(rc: RenderContext): void {
 function drawWindStreaks(rc: RenderContext): void {
   const { ctx, canvas, scene, timestamp, dpr } = rc
 
-  // Wind streaks scroll in the downwind direction (wind blows FROM directionDeg,
-  // so streaks move toward directionDeg + 180).
-  const downwindRad = ((scene.wind.directionDeg + 180) * Math.PI) / 180
+  // Wind streaks scroll in the downwind direction. Rotating by directionDeg aligns
+  // the canvas +y axis with the downwind direction in screen space.
+  const downwindRad = (scene.wind.directionDeg * Math.PI) / 180
 
   const cx = canvas.width  / 2
   const cy = canvas.height / 2
 
-  // Number of streaks and their spacing in the rotated frame.
-  const COUNT   = 25
-  const SPACING = canvas.height / COUNT
+  const SPACING = canvas.height / 25
 
-  // Scroll offset — moves streaks in the downwind direction over time.
+  // Scroll offset - moves streaks in the downwind direction over time.
   const offset = (timestamp * 0.025 * dpr) % SPACING
 
   ctx.save()
   ctx.translate(cx, cy)
   ctx.rotate(downwindRad)
 
-  // Draw in a region large enough to cover the canvas at any rotation.
+  // halfDiag covers the canvas at any rotation angle.
+  // COUNT is derived from it so lines always fill the full rotated extent.
   const halfDiag = Math.ceil(Math.hypot(canvas.width, canvas.height) / 2) + SPACING
+  const COUNT    = Math.ceil(2 * halfDiag / SPACING) + 1
 
   ctx.strokeStyle = 'rgba(255,255,255,0.055)'
   ctx.lineWidth   = 0.5 * dpr
 
-  // Stable per-line length variation using a simple deterministic seed.
-  for (let i = 0; i < COUNT * 2; i++) {
+  for (let i = 0; i < COUNT; i++) {
     const y = -halfDiag + i * SPACING + offset
-    // Vary length ±20% using a simple hash of line index.
-    const lengthFactor = 0.8 + 0.4 * ((Math.sin(i * 127.1 + 311.7) + 1) / 2)
+    // Vary length above halfDiag (minimum 1.0×) so lines always reach the canvas edge.
+    const lengthFactor = 1.0 + 0.4 * ((Math.sin(i * 127.1 + 311.7) + 1) / 2)
     const halfLen = halfDiag * lengthFactor
 
     ctx.beginPath()

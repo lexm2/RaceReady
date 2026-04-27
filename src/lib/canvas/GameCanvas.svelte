@@ -52,7 +52,7 @@
     if (cssW === 0 || cssH === 0) {
       return { center: { x: worldSize.x / 2, y: worldSize.y / 2 }, zoom: 8 }
     }
-    // zoom in physical px/m — canvas dimensions are in physical px
+    // zoom in physical px/m - canvas dimensions are in physical px
     const physW = cssW  * _dpr
     const physH = cssH  * _dpr
     const zoom  = Math.min(physW / worldSize.x, physH / worldSize.y) * FILL

@@ -27,9 +27,6 @@
         <BurgeeLogo size={28} />
         <span class="brand-name">RaceReady</span>
       </a>
-      <p class="brand-tagline">
-        Your complete sailing race<br />education platform.
-      </p>
     </div>
 
     <div class="footer-links">
@@ -54,8 +51,7 @@
 
   <div class="footer-bottom">
     <div class="container footer-bottom-inner">
-      <p class="copyright">© {new Date().getFullYear()} RaceReady. All rights reserved.</p>
-      <p class="rules-note">Racing Rules of Sailing 2025–2028 · World Sailing</p>
+      <p class="rules-note">Racing Rules of Sailing 2025-2028 · World Sailing</p>
     </div>
   </div>
 </footer>
@@ -93,14 +89,6 @@
     color: var(--footer-text);
     font-family: var(--font-sans);
     letter-spacing: -0.02em;
-  }
-
-  .brand-tagline {
-    font-size: 13px;
-    color: var(--footer-text);
-    line-height: 1.65;
-    margin: 0;
-    opacity: 0.75;
   }
 
   .footer-links {
@@ -159,7 +147,6 @@
     flex-wrap: wrap;
   }
 
-  .copyright,
   .rules-note {
     font-size: 12px;
     color: var(--footer-text);

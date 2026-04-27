@@ -41,13 +41,12 @@
       showLabels:        true,
       showWake:          true,
       showWindStreaks:    true,
-      showCompassRose:   false,
       showWindIndicator: true,
       showGrid:          true,
     },
   })
 
-  // ── Drag handlers — parent owns scene state ────────────────────────
+  // ── Drag handlers - parent owns scene state ────────────────────────
   function onBoatDrag(boatId: string, pos: Vec2): void {
     scene = {
       ...scene,
@@ -147,7 +146,7 @@
     <div class="container">
       <h1>Whiteboard</h1>
       <p class="page-subtitle">
-        Plan race scenarios — drag boats and marks, set wind direction, and step through situations.
+        Plan race scenarios: drag boats and marks, set wind direction, and step through situations.
       </p>
     </div>
   </div>
@@ -179,11 +178,11 @@
         {#if panelOpen}
           <div class="panel-body">
             <section class="panel-section">
-              <h3>Wind</h3>
-              <div class="wind-control">
-                <input type="range" min="0" max="359" bind:value={scene.wind.directionDeg} class="wind-slider" />
+              <div class="section-header">
+                <h3>Wind</h3>
                 <span class="wind-label">{scene.wind.directionDeg}°</span>
               </div>
+              <input type="range" min="0" max="359" bind:value={scene.wind.directionDeg} class="wind-slider" />
             </section>
 
             <section class="panel-section">
@@ -194,7 +193,6 @@
                 <label class="toggle"><input type="checkbox" checked={scene.display.showWindStreaks}  onchange={() => toggle('showWindStreaks')}   />Wind streaks</label>
                 <label class="toggle"><input type="checkbox" checked={scene.display.showGrid}         onchange={() => toggle('showGrid')}          />Grid</label>
                 <label class="toggle"><input type="checkbox" checked={scene.display.showWindIndicator} onchange={() => toggle('showWindIndicator')} />Wind indicator</label>
-                <label class="toggle"><input type="checkbox" checked={scene.display.showCompassRose}  onchange={() => toggle('showCompassRose')}   />Compass rose</label>
               </div>
             </section>
 
@@ -308,14 +306,14 @@
   }
 
   /* Wind */
-  .wind-control {
+  .section-header {
     display: flex;
-    align-items: center;
-    gap: var(--space-2);
+    align-items: baseline;
+    justify-content: space-between;
   }
 
   .wind-slider {
-    flex: 1;
+    width: 100%;
     accent-color: var(--accent);
   }
 

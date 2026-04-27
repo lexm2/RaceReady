@@ -9,10 +9,13 @@
  *   3. The navbar switcher picks it up automatically
  */
 
+import { Moon, Sun } from 'lucide-svelte';
+import type { Component } from 'svelte';
+
 export interface Theme {
   id: string
   label: string
-  icon: string
+  icon: Component
 }
 
 export interface ThemeStore {
@@ -23,16 +26,8 @@ export interface ThemeStore {
 }
 
 export const THEMES: Theme[] = [
-  {
-    id: 'um-dark',
-    label: 'U-M Dark',
-    icon: '🌙',
-  },
-  {
-    id: 'um-light',
-    label: 'U-M Light',
-    icon: '☀️',
-  },
+  { id: 'um-dark',  label: 'U-M Dark',  icon: Moon },
+  { id: 'um-light', label: 'U-M Light', icon: Sun  },
 ]
 
 const STORAGE_KEY = 'raceready-theme'
@@ -47,7 +42,7 @@ function createThemeStore(): ThemeStore {
     try {
       localStorage.setItem(STORAGE_KEY, id)
     } catch {
-      // localStorage unavailable — silent fail
+      // localStorage unavailable - silent fail
     }
   }
 

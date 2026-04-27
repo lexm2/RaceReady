@@ -1,9 +1,10 @@
 <script lang="ts">
   import Hero from '../components/Hero.svelte';
   import FeatureCard from '../components/FeatureCard.svelte';
+  import { GraduationCap, BookMarked, Gamepad2 } from 'lucide-svelte';
 
   const studyItems = ['Racing Rules', 'Tactics & Strategy', 'Boat Knowledge', 'General Knowledge', 'Knots'];
-  const resourceItems = ['Full 2025–2028 Rulebook', 'Interactive Whiteboard'];
+  const resourceItems = ['Full 2025-2028 Rulebook', 'Interactive Whiteboard'];
   const gameItems = ['Starboard Showdown', 'Regatta Run'];
 </script>
 
@@ -12,34 +13,31 @@
 
   <section class="features-section">
     <div class="container">
-      <h2 class="section-heading">Everything You Need to Race Smarter</h2>
-      <p class="section-subheading">
-        From beginner drills to advanced rule scenarios — RaceReady has it all.
-      </p>
+      <h2 class="section-heading">Where do you want to start?</h2>
 
       <div class="feature-grid">
         <FeatureCard
-          icon="📚"
+          icon={GraduationCap}
           title="Study"
-          description="Build a solid foundation in racing rules, boat handling, and tactical decision-making across five structured topics."
+          description="Racing rules have a reputation for being complicated. Work through them by topic: right of way, mark roundings, starts, and protests, at your own pace."
           items={studyItems}
           ctaLabel="Start Studying"
           ctaHref="/study/racing-rules"
           accentColor="maize"
         />
         <FeatureCard
-          icon="📖"
+          icon={BookMarked}
           title="Resources"
-          description="Access the complete Racing Rules of Sailing with clickable references and a digital whiteboard for scenario planning."
+          description="Read the full 2025-2028 Racing Rules of Sailing in a clean, searchable format. Use the whiteboard to draw out a situation and work out who's in the wrong."
           items={resourceItems}
           ctaLabel="Open Rulebook"
           ctaHref="/resources/rulebook"
           accentColor="blue"
         />
         <FeatureCard
-          icon="🏆"
+          icon={Gamepad2}
           title="Games"
-          description="Test your knowledge under pressure. Fast-paced racing scenarios with timed responses and performance tracking."
+          description="Starboard Showdown puts you in a right-of-way situation and asks who has to keep clear. Good for drilling the rules you keep second-guessing."
           items={gameItems}
           ctaLabel="Play Now"
           ctaHref="/games/starboard"
@@ -52,8 +50,8 @@
   <section class="cta-section">
     <div class="container cta-inner">
       <div class="cta-content">
-        <h2 class="cta-heading">Ready to race smarter?</h2>
-        <p class="cta-desc">Start with the rules, sharpen your tactics, then test yourself under race pressure.</p>
+        <h2 class="cta-heading">The rules start clicking once you've seen them applied.</h2>
+        <p class="cta-desc">Start with the basics. Work through a topic. Then test yourself on the scenarios that come up most in real racing.</p>
       </div>
       <div class="cta-buttons">
         <a class="btn-primary" href="/study/racing-rules">Start Learning</a>

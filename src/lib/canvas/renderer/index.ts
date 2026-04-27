@@ -3,11 +3,11 @@ import { drawWater } from './water.ts'
 import { drawBoat, drawBoatWake } from './boat.ts'
 import { drawMark } from './mark.ts'
 import { drawWindIndicator } from './wind.ts'
-import { drawLabels, drawCompassRose, drawGrid, drawSelectionRing } from './ui.ts'
+import { drawLabels, drawGrid, drawSelectionRing } from './ui.ts'
 import { worldToScreen } from './coords.ts'
 
 /**
- * Master draw call — clears the canvas then issues all layers in painter's order.
+ * Master draw call - clears the canvas then issues all layers in painter's order.
  * Called once per rAF frame from GameCanvas.svelte.
  */
 export function renderScene(rc: RenderContext): void {
@@ -29,12 +29,12 @@ export function renderScene(rc: RenderContext): void {
     drawCourseLegs(rc)
   }
 
-  // 5. Marks — drawn below boats so boats pass over them visually
+  // 5. Marks - drawn below boats so boats pass over them visually
   for (const mark of rc.scene.marks) {
     drawMark(rc, mark)
   }
 
-  // 6. Wakes — behind hulls
+  // 6. Wakes - behind hulls
   if (rc.scene.display.showWake) {
     for (const boat of rc.scene.boats) {
       drawBoatWake(rc, boat)
@@ -60,9 +60,7 @@ export function renderScene(rc: RenderContext): void {
   if (rc.scene.display.showWindIndicator) {
     drawWindIndicator(rc)
   }
-  if (rc.scene.display.showCompassRose) {
-    drawCompassRose(rc)
-  }
+
 }
 
 // ─── Course leg lines ─────────────────────────────────────────────────────────

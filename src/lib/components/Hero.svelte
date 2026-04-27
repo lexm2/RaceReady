@@ -11,17 +11,17 @@
   <div class="container hero-content">
     <div class="hero-badge">
       <BurgeeLogo size={18} />
-      Racing Rules of Sailing 2025–2028
+      Racing Rules of Sailing 2025-2028
     </div>
 
     <h1 class="hero-title">
-      Master the Rules.<br />
-      <span class="title-accent">Win the Race.</span>
+      Learn to <span class="title-accent">Race.</span>
     </h1>
 
     <p class="hero-description">
-      Your complete sailing race education platform. Study the rules, learn tactics,
-      sharpen your boat knowledge, and test your skills with fast-paced games.
+      Racing rules can be confusing at first. This site breaks down the 2025-2028 rulebook
+      into the scenarios you'll actually see on the water: right of way, mark roundings,
+      starts, and protests.
     </p>
 
     <div class="hero-cta">
@@ -35,7 +35,7 @@
     </div>
 
     <div class="hero-stats">
-      {#snippet stat(value, label)}
+      {#snippet stat(value: string, label: string)}
         <div class="stat-item">
           <span class="stat-value">{value}</span>
           <span class="stat-label">{label}</span>

@@ -1,7 +1,7 @@
 import type { RenderContext, Mark } from '../types.ts'
 import { worldToScreen } from './coords.ts'
 
-const BUOY_RADIUS  = 6    // screen px (constant regardless of zoom — always legible)
+const BUOY_RADIUS  = 6    // screen px (constant regardless of zoom - always legible)
 /** Zone radius per RRS: 3 boat lengths. Boat length = 10 m → 30 m. */
 const ZONE_RADIUS_M = 30
 
@@ -54,12 +54,12 @@ function drawZoneRing(
 ): void {
   const zoneR = ZONE_RADIUS_M * zoom   // world metres → physical px
 
-  // Tinted fill — very subtle so it doesn't obscure boats
+  // Tinted fill - very subtle so it doesn't obscure boats
   const fillColor = mark.side === 'port'      ? 'rgba(216,96,24,0.06)'
                   : mark.side === 'starboard' ? 'rgba(34,197,94,0.06)'
                   :                             'rgba(255,203,5,0.06)'
 
-  // Dashed stroke — same hue as the buoy, more visible
+  // Dashed stroke - same hue as the buoy, more visible
   const strokeColor = mark.side === 'port'      ? 'rgba(216,96,24,0.45)'
                     : mark.side === 'starboard' ? 'rgba(34,197,94,0.45)'
                     :                             'rgba(255,203,5,0.45)'

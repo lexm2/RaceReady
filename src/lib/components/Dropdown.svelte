@@ -1,8 +1,10 @@
 <script lang="ts">
+  import type { Component } from 'svelte';
+
   interface DropdownItem {
     label: string
     href: string
-    icon?: string
+    icon?: Component
   }
   interface Props {
     label: string
@@ -34,7 +36,8 @@
         <li role="menuitem">
           <a class="dropdown-item" href={item.href} onclick={onClose}>
             {#if item.icon}
-              <span class="item-icon">{item.icon}</span>
+              {@const Icon = item.icon}
+              <span class="item-icon"><Icon size={15} /></span>
             {/if}
             {item.label}
           </a>
@@ -130,9 +133,11 @@
   }
 
   .item-icon {
-    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 20px;
-    text-align: center;
     flex-shrink: 0;
+    opacity: 0.7;
   }
 </style>

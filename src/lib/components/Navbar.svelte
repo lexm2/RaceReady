@@ -3,6 +3,7 @@
   import BurgeeLogo from './BurgeeLogo.svelte';
   import { THEMES } from '$lib/themes/theme.svelte.ts';
   import type { ThemeStore } from '$lib/themes/theme.svelte.ts';
+  import { Scale, Compass, Anchor, BookOpen, Link2, BookText, PenLine, Flag, Trophy } from 'lucide-svelte';
 
   interface Props {
     theme: ThemeStore
@@ -35,23 +36,24 @@
   let nextTheme = $derived(
     THEMES[(THEMES.findIndex(t => t.id === theme.current) + 1) % THEMES.length]
   );
+  let ThemeIcon = $derived(nextTheme.icon);
 
   const studyItems = [
-    { label: 'Racing Rules',        href: '/study/racing-rules',   icon: '⚖️' },
-    { label: 'Tactics & Strategy',  href: '/study/tactics',        icon: '🧭' },
-    { label: 'Boat Knowledge',      href: '/study/boat-knowledge', icon: '⛵' },
-    { label: 'General Knowledge',   href: '/study/general',        icon: '📚' },
-    { label: 'Knots',               href: '/study/knots',          icon: '🪢' },
+    { label: 'Racing Rules',        href: '/study/racing-rules',   icon: Scale    },
+    { label: 'Tactics & Strategy',  href: '/study/tactics',        icon: Compass  },
+    { label: 'Boat Knowledge',      href: '/study/boat-knowledge', icon: Anchor   },
+    { label: 'General Knowledge',   href: '/study/general',        icon: BookOpen },
+    { label: 'Knots',               href: '/study/knots',          icon: Link2    },
   ];
 
   const resourceItems = [
-    { label: 'Racing Rules of Sailing', href: '/resources/rulebook',   icon: '📖' },
-    { label: 'Whiteboard',              href: '/resources/whiteboard', icon: '🖊️' },
+    { label: 'Racing Rules of Sailing', href: '/resources/rulebook',   icon: BookText },
+    { label: 'Whiteboard',              href: '/resources/whiteboard', icon: PenLine  },
   ];
 
   const gameItems = [
-    { label: 'Starboard Showdown', href: '/games/starboard',   icon: '🏁' },
-    { label: 'Regatta Run',        href: '/games/regatta-run', icon: '🏆' },
+    { label: 'Starboard Showdown', href: '/games/starboard',   icon: Flag   },
+    { label: 'Regatta Run',        href: '/games/regatta-run', icon: Trophy },
   ];
 </script>
 
@@ -93,7 +95,7 @@
         title="Switch to {nextTheme.label} theme"
         aria-label="Switch to {nextTheme.label} theme"
       >
-        <span class="theme-icon">{nextTheme.icon}</span>
+        <span class="theme-icon"><ThemeIcon size={14} /></span>
         <span class="theme-label">{nextTheme.label}</span>
       </button>
 
@@ -182,8 +184,8 @@
   }
 
   .theme-icon {
-    font-size: 14px;
-    line-height: 1;
+    display: flex;
+    align-items: center;
   }
 
   .theme-label {
