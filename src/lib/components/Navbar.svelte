@@ -48,7 +48,7 @@
   ];
 
   const resourceItems = [
-    { label: 'Racing Rules of Sailing', href: `${base}/resources/rulebook`,   icon: BookText },
+    { label: 'Rules',                   href: `${base}/resources/rulebook`,   icon: BookText },
     { label: 'Whiteboard',              href: `${base}/resources/whiteboard`, icon: PenLine  },
   ];
 

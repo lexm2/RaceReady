@@ -11,7 +11,7 @@
   ];
 
   const resourceLinks = [
-    { label: 'Racing Rules of Sailing', href: `${base}/resources/rulebook` },
+    { label: 'Rules',                   href: `${base}/resources/rulebook` },
     { label: 'Whiteboard',              href: `${base}/resources/whiteboard` },
   ];
 
@@ -52,7 +52,7 @@
 
   <div class="footer-bottom">
     <div class="container footer-bottom-inner">
-      <p class="rules-note">Racing Rules of Sailing 2025-2028 · World Sailing</p>
+      <p class="rules-note">Racing Rules of Sailing 2025-2028</p>
     </div>
   </div>
 </footer>
