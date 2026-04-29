@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { base } from '$app/paths';
   import Hero from '../components/Hero.svelte';
   import FeatureCard from '../components/FeatureCard.svelte';
   import { GraduationCap, BookMarked, Gamepad2 } from 'lucide-svelte';
@@ -22,7 +23,7 @@
           description="Racing rules have a reputation for being complicated. Work through them by topic: right of way, mark roundings, starts, and protests, at your own pace."
           items={studyItems}
           ctaLabel="Start Studying"
-          ctaHref="/study/racing-rules"
+          ctaHref="{base}/study/racing-rules"
           accentColor="maize"
         />
         <FeatureCard
@@ -31,7 +32,7 @@
           description="Read the full 2025-2028 Racing Rules of Sailing in a clean, searchable format. Use the whiteboard to draw out a situation and work out who's in the wrong."
           items={resourceItems}
           ctaLabel="Open Rulebook"
-          ctaHref="/resources/rulebook"
+          ctaHref="{base}/resources/rulebook"
           accentColor="blue"
         />
         <FeatureCard
@@ -40,7 +41,7 @@
           description="Starboard Showdown puts you in a right-of-way situation and asks who has to keep clear. Good for drilling the rules you keep second-guessing."
           items={gameItems}
           ctaLabel="Play Now"
-          ctaHref="/games/starboard"
+          ctaHref="{base}/games/starboard"
           accentColor="orange"
         />
       </div>
@@ -54,8 +55,8 @@
         <p class="cta-desc">Start with the basics. Work through a topic. Then test yourself on the scenarios that come up most in real racing.</p>
       </div>
       <div class="cta-buttons">
-        <a class="btn-primary" href="/study/racing-rules">Start Learning</a>
-        <a class="btn-ghost cta-ghost" href="/games/starboard">Try Starboard Showdown</a>
+        <a class="btn-primary" href="{base}/study/racing-rules">Start Learning</a>
+        <a class="btn-ghost cta-ghost" href="{base}/games/starboard">Try Starboard Showdown</a>
       </div>
     </div>
   </section>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { base } from '$app/paths';
   import Dropdown from './Dropdown.svelte';
   import BurgeeLogo from './BurgeeLogo.svelte';
   import { THEMES } from '$lib/themes/theme.svelte.ts';
@@ -39,27 +40,27 @@
   let ThemeIcon = $derived(nextTheme.icon);
 
   const studyItems = [
-    { label: 'Racing Rules',        href: '/study/racing-rules',   icon: Scale    },
-    { label: 'Tactics & Strategy',  href: '/study/tactics',        icon: Compass  },
-    { label: 'Boat Knowledge',      href: '/study/boat-knowledge', icon: Anchor   },
-    { label: 'General Knowledge',   href: '/study/general',        icon: BookOpen },
-    { label: 'Knots',               href: '/study/knots',          icon: Link2    },
+    { label: 'Racing Rules',        href: `${base}/study/racing-rules`,   icon: Scale    },
+    { label: 'Tactics & Strategy',  href: `${base}/study/tactics`,        icon: Compass  },
+    { label: 'Boat Knowledge',      href: `${base}/study/boat-knowledge`, icon: Anchor   },
+    { label: 'General Knowledge',   href: `${base}/study/general`,        icon: BookOpen },
+    { label: 'Knots',               href: `${base}/study/knots`,          icon: Link2    },
   ];
 
   const resourceItems = [
-    { label: 'Racing Rules of Sailing', href: '/resources/rulebook',   icon: BookText },
-    { label: 'Whiteboard',              href: '/resources/whiteboard', icon: PenLine  },
+    { label: 'Racing Rules of Sailing', href: `${base}/resources/rulebook`,   icon: BookText },
+    { label: 'Whiteboard',              href: `${base}/resources/whiteboard`, icon: PenLine  },
   ];
 
   const gameItems = [
-    { label: 'Starboard Showdown', href: '/games/starboard',   icon: Flag   },
-    { label: 'Regatta Run',        href: '/games/regatta-run', icon: Trophy },
+    { label: 'Starboard Showdown', href: `${base}/games/starboard`,   icon: Flag   },
+    { label: 'Regatta Run',        href: `${base}/games/regatta-run`, icon: Trophy },
   ];
 </script>
 
 <nav class="navbar">
   <div class="nav-inner">
-    <a class="brand" href="/">
+    <a class="brand" href="{base}/">
       <BurgeeLogo size={34} />
       <span class="brand-name">RaceReady</span>
     </a>
@@ -99,7 +100,7 @@
         <span class="theme-label">{nextTheme.label}</span>
       </button>
 
-      <a class="btn-primary nav-cta" href="/games/starboard">Play Now</a>
+      <a class="btn-primary nav-cta" href="{base}/games/starboard">Play Now</a>
     </div>
   </div>
 </nav>

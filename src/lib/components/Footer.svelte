@@ -1,29 +1,30 @@
 <script lang="ts">
+  import { base } from '$app/paths';
   import BurgeeLogo from './BurgeeLogo.svelte';
 
   const studyLinks = [
-    { label: 'Racing Rules',       href: '/study/racing-rules' },
-    { label: 'Tactics & Strategy', href: '/study/tactics' },
-    { label: 'Boat Knowledge',     href: '/study/boat-knowledge' },
-    { label: 'General Knowledge',  href: '/study/general' },
-    { label: 'Knots',              href: '/study/knots' },
+    { label: 'Racing Rules',       href: `${base}/study/racing-rules` },
+    { label: 'Tactics & Strategy', href: `${base}/study/tactics` },
+    { label: 'Boat Knowledge',     href: `${base}/study/boat-knowledge` },
+    { label: 'General Knowledge',  href: `${base}/study/general` },
+    { label: 'Knots',              href: `${base}/study/knots` },
   ];
 
   const resourceLinks = [
-    { label: 'Racing Rules of Sailing', href: '/resources/rulebook' },
-    { label: 'Whiteboard',              href: '/resources/whiteboard' },
+    { label: 'Racing Rules of Sailing', href: `${base}/resources/rulebook` },
+    { label: 'Whiteboard',              href: `${base}/resources/whiteboard` },
   ];
 
   const gameLinks = [
-    { label: 'Starboard Showdown', href: '/games/starboard' },
-    { label: 'Regatta Run',        href: '/games/regatta-run' },
+    { label: 'Starboard Showdown', href: `${base}/games/starboard` },
+    { label: 'Regatta Run',        href: `${base}/games/regatta-run` },
   ];
 </script>
 
 <footer class="footer">
   <div class="container footer-inner">
     <div class="footer-brand">
-      <a class="brand-link" href="/">
+      <a class="brand-link" href="{base}/">
         <BurgeeLogo size={28} />
         <span class="brand-name">RaceReady</span>
       </a>

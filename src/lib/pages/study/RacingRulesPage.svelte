@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { base } from '$app/paths';
   import { Scale } from 'lucide-svelte';
 </script>
 
@@ -18,7 +19,7 @@
       <span class="stub-icon"><Scale size={48} /></span>
       <h2>Coming Soon</h2>
       <p>Interactive rule scenarios with beginner, intermediate, and advanced levels are on the way.</p>
-      <a class="btn-primary" href="/">Back to Home</a>
+      <a class="btn-primary" href="{base}/">Back to Home</a>
     </div>
   </div>
 </div>

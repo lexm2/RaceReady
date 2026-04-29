@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { base } from '$app/paths';
   import BurgeeLogo from './BurgeeLogo.svelte';
 </script>
 
@@ -25,13 +26,13 @@
     </p>
 
     <div class="hero-cta">
-      <a class="btn-primary cta-main" href="/study/racing-rules">
+      <a class="btn-primary cta-main" href="{base}/study/racing-rules">
         Start Studying
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
           <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </a>
-      <a class="cta-secondary" href="/games/starboard">Play a Game</a>
+      <a class="cta-secondary" href="{base}/games/starboard">Play a Game</a>
     </div>
 
     <div class="hero-stats">

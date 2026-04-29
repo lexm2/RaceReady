@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { base } from '$app/paths';
   import { Trophy } from 'lucide-svelte';
 </script>
 
@@ -18,7 +19,7 @@
       <span class="stub-icon"><Trophy size={48} /></span>
       <h2>Coming Soon</h2>
       <p>The race-format quiz game with customizable topic selection and real-time boat movement is coming soon.</p>
-      <a class="btn-primary" href="/">Back to Home</a>
+      <a class="btn-primary" href="{base}/">Back to Home</a>
     </div>
   </div>
 </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { base } from '$app/paths';
   import { Compass } from 'lucide-svelte';
 </script>
 
@@ -18,7 +19,7 @@
       <span class="stub-icon"><Compass size={48} /></span>
       <h2>Coming Soon</h2>
       <p>Verbal and diagram-based scenarios with multiple-choice tactical decisions are in development.</p>
-      <a class="btn-primary" href="/">Back to Home</a>
+      <a class="btn-primary" href="{base}/">Back to Home</a>
     </div>
   </div>
 </div>

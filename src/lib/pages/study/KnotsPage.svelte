@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { base } from '$app/paths';
   import { Link2 } from 'lucide-svelte';
 </script>
 
@@ -17,7 +18,7 @@
       <span class="stub-icon"><Link2 size={48} /></span>
       <h2>Coming Soon</h2>
       <p>A visual knot library with tying guides and use-case descriptions is being built.</p>
-      <a class="btn-primary" href="/">Back to Home</a>
+      <a class="btn-primary" href="{base}/">Back to Home</a>
     </div>
   </div>
 </div>

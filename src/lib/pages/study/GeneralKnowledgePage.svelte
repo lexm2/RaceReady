@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { base } from '$app/paths';
   import { BookOpen } from 'lucide-svelte';
 </script>
 
@@ -17,7 +18,7 @@
       <span class="stub-icon"><BookOpen size={48} /></span>
       <h2>Coming Soon</h2>
       <p>General sailing knowledge topics and quizzes are under construction.</p>
-      <a class="btn-primary" href="/">Back to Home</a>
+      <a class="btn-primary" href="{base}/">Back to Home</a>
     </div>
   </div>
 </div>
