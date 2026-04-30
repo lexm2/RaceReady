@@ -66,6 +66,15 @@ export interface DisplayToggles {
   showGrid: boolean
 }
 
+export interface Waypoint {
+  id: string
+  position: Vec2
+  /** Which boat this waypoint belongs to. */
+  boatId: string
+  /** Sequence index within this boat's route (0 = first). */
+  order: number
+}
+
 export interface SceneState {
   boats: BoatState[]
   marks: Mark[]
@@ -75,6 +84,8 @@ export interface SceneState {
   display: DisplayToggles
   /** Mark IDs defining course legs; renderer draws dashed lines between them. */
   courseLegs?: Array<{ from: string; to: string }>
+  /** Ordered waypoints for boat route planning. */
+  waypoints?: Waypoint[]
 }
 
 // ─── Camera ───────────────────────────────────────────────────────────────────
@@ -159,5 +170,7 @@ export interface GameCanvasProps {
   selectedBoatId?: string
   /** Fired when the user drags the rotation handle. New heading in degrees [0, 360). */
   onBoatRotate?: (boatId: string, heading: number) => void
+  onWaypointDrag?: (waypointId: string, pos: Vec2) => void
+  onCanvasContextMenu?: (worldPos: Vec2) => void
   class?: string
 }

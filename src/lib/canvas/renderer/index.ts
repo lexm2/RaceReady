@@ -4,6 +4,7 @@ import { drawBoat, drawBoatWake } from './boat.ts'
 import { drawMark } from './mark.ts'
 import { drawWindIndicator } from './wind.ts'
 import { drawLabels, drawGrid, drawSelectionRing } from './ui.ts'
+import { drawWaypoints } from './waypoint.ts'
 import { worldToScreen } from './coords.ts'
 
 /**
@@ -28,6 +29,9 @@ export function renderScene(rc: RenderContext): void {
   if (rc.scene.courseLegs?.length) {
     drawCourseLegs(rc)
   }
+
+  // 4.5 Waypoints (route arrows for boats)
+  if (rc.scene.waypoints?.length) drawWaypoints(rc)
 
   // 5. Marks - drawn below boats so boats pass over them visually
   for (const mark of rc.scene.marks) {

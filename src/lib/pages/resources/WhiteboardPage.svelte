@@ -1,6 +1,8 @@
 <script lang="ts">
   import GameCanvas from '$lib/canvas/GameCanvas.svelte'
-  import type { SceneState, BoatState, Mark, Vec2 } from '$lib/canvas/types.ts'
+  import type { SceneState, BoatState, Mark, Vec2, Waypoint, AnimationClip, AnimationKeyframe } from '$lib/canvas/types.ts'
+  import { calcLegSpeed } from '$lib/canvas/renderer/waypoint.ts'
+  import { Play, Square } from 'lucide-svelte'
 
   // ── Default scene ──────────────────────────────────────────────────
   let scene = $state<SceneState>({
@@ -44,6 +46,7 @@
       showWindIndicator: true,
       showGrid:          true,
     },
+    waypoints: [],
   })
 
   // ── Drag handlers - parent owns scene state ────────────────────────
@@ -137,6 +140,84 @@
     scene.boats = scene.boats.map(b => b.id === id ? { ...b, hullColor: hex } : b)
   }
 
+  // ── Waypoints ──────────────────────────────────────────────────────
+  function onWaypointDrag(waypointId: string, pos: Vec2): void {
+    scene = {
+      ...scene,
+      waypoints: (scene.waypoints ?? []).map(w =>
+        w.id === waypointId ? { ...w, position: pos } : w
+      ),
+    }
+  }
+
+  function onCanvasContextMenu(worldPos: Vec2): void {
+    if (!selectedBoatId) return
+    const boatWps = (scene.waypoints ?? []).filter(w => w.boatId === selectedBoatId)
+    scene = {
+      ...scene,
+      waypoints: [
+        ...(scene.waypoints ?? []),
+        {
+          id:       `wp-${Date.now()}`,
+          position: worldPos,
+          boatId:   selectedBoatId,
+          order:    boatWps.length,
+        } satisfies Waypoint,
+      ],
+    }
+  }
+
+  function clearWaypoints(boatId?: string): void {
+    scene = {
+      ...scene,
+      waypoints: boatId
+        ? (scene.waypoints ?? []).filter(w => w.boatId !== boatId)
+        : [],
+    }
+  }
+
+  // ── Route animation ────────────────────────────────────────────────
+  let currentAnimation = $state<AnimationClip | undefined>(undefined)
+  let sailingBoatId    = $state<string | undefined>(undefined)
+
+  function playRoute(boatId: string): void {
+    const boat = scene.boats.find(b => b.id === boatId)
+    if (!boat) return
+
+    const wps = (scene.waypoints ?? [])
+      .filter(w => w.boatId === boatId)
+      .sort((a, b) => a.order - b.order)
+    if (wps.length === 0) return
+
+    const keyframes: AnimationKeyframe[] = []
+    let t = 0
+
+    // Start from the boat's current position
+    keyframes.push({ time: 0, boats: [{ boatId, position: boat.position, heading: boat.heading }] })
+
+    let prevPos = boat.position
+    for (const wp of wps) {
+      const dx = wp.position.x - prevPos.x
+      const dy = wp.position.y - prevPos.y
+      const distM      = Math.hypot(dx, dy)
+      const bearing    = ((Math.atan2(dx, -dy) * 180) / Math.PI + 360) % 360
+      const speedKnots = calcLegSpeed(bearing, scene.wind.directionDeg)
+      const speedMs    = Math.max(speedKnots * 0.514444, 0.3)   // min 0.3 m/s so no-go zones still move
+      t += distM / speedMs
+
+      keyframes.push({ time: t, boats: [{ boatId, position: wp.position, heading: bearing }] })
+      prevPos = wp.position
+    }
+
+    currentAnimation = { keyframes, durationSec: t, loop: true }
+    sailingBoatId    = boatId
+  }
+
+  function stopRoute(): void {
+    currentAnimation = undefined
+    sailingBoatId    = undefined
+  }
+
   // ── Panel collapse ─────────────────────────────────────────────────
   let panelOpen = $state(true)
 </script>
@@ -157,12 +238,15 @@
       <GameCanvas
         {scene}
         interactive
+        animation={currentAnimation}
         {selectedBoatId}
         {onBoatClick}
         {onBoatDrag}
         {onMarkDrag}
         {onBoatRotate}
         {onBackgroundClick}
+        {onWaypointDrag}
+        {onCanvasContextMenu}
       />
 
       <!-- Floating overlay panel -->
@@ -216,6 +300,35 @@
                 {/each}
               </ul>
               <button class="add-boat-btn" onclick={addBoat}>+ Add Boat</button>
+            </section>
+
+            <section class="panel-section">
+              <h3>Routes</h3>
+              {#if (scene.waypoints ?? []).length === 0}
+                <p class="route-hint">Select a boat, then right-click to place waypoints.</p>
+              {:else}
+                <ul class="route-list">
+                  {#each scene.boats.filter(b => (scene.waypoints ?? []).some(w => w.boatId === b.id)) as boat (boat.id)}
+                    {@const count = (scene.waypoints ?? []).filter(w => w.boatId === boat.id).length}
+                    <li class="route-row">
+                      <span class="route-swatch" style="background:{hullHex(boat.hullColor)}"></span>
+                      <span class="route-name">{boat.label}</span>
+                      <span class="route-count">{count} pts</span>
+                      {#if sailingBoatId === boat.id}
+                        <button class="route-sail sailing" onclick={stopRoute} aria-label="Stop">
+                          <Square size={11} strokeWidth={2} />
+                        </button>
+                      {:else}
+                        <button class="route-sail" onclick={() => playRoute(boat.id)} aria-label="Sail route for {boat.label}">
+                          <Play size={11} strokeWidth={2} />
+                        </button>
+                      {/if}
+                      <button class="route-clear" onclick={() => { clearWaypoints(boat.id); if (sailingBoatId === boat.id) stopRoute() }} aria-label="Clear route for {boat.label}">×</button>
+                    </li>
+                  {/each}
+                </ul>
+                <button class="add-boat-btn" onclick={() => clearWaypoints()}>Clear All</button>
+              {/if}
             </section>
           </div>
         {/if}
@@ -425,6 +538,77 @@
     width: 100%;
   }
   .add-boat-btn:hover { background: var(--bg-hover, rgba(0,0,0,0.04)); }
+
+  /* Routes */
+  .route-hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .route-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .route-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.82rem;
+    color: var(--text);
+  }
+
+  .route-swatch {
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(0,0,0,0.15);
+  }
+
+  .route-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .route-count {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .route-sail {
+    background: none;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    padding: 0 2px;
+    opacity: 0.8;
+    display: flex;
+    align-items: center;
+  }
+  .route-sail:hover   { opacity: 1; }
+  .route-sail.sailing { color: #ff6060; opacity: 1; }
+
+  .route-clear {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0 2px;
+  }
+  .route-clear:hover { color: var(--text); }
 
   /* ── Responsive ──────────────────────────────────────────────────── */
   @media (max-width: 768px) {

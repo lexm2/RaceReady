@@ -23,6 +23,8 @@
     onBoatDrag,
     onMarkDrag,
     onBoatRotate,
+    onWaypointDrag,
+    onCanvasContextMenu,
     onBackgroundClick,
     class: className = '',
   }: GameCanvasProps = $props()
@@ -200,6 +202,7 @@
   // ── Hit-testing ───────────────────────────────────────────────────────────────
   const BOAT_HIT_M       = 6    // world-space metres
   const MARK_HIT_M       = 4
+  const WAYPOINT_HIT_M   = 5
   const HANDLE_HIT_PX    = 10   // screen-space CSS px
 
   function eventToScreen(e: MouseEvent): Vec2 | null {
@@ -242,6 +245,14 @@
     return null
   }
 
+  function hitWaypoint(worldPos: Vec2): string | null {
+    for (const wp of (scene.waypoints ?? [])) {
+      const d = Math.hypot(wp.position.x - worldPos.x, wp.position.y - worldPos.y)
+      if (d < WAYPOINT_HIT_M) return wp.id
+    }
+    return null
+  }
+
   function headingFromScreenPos(boatId: string, screenPx: Vec2): number | null {
     if (!canvasEl) return null
     const boat = scene.boats.find(b => b.id === boatId)
@@ -267,7 +278,7 @@
   }
 
   // ── Drag ─────────────────────────────────────────────────────────────────────
-  let dragTarget = $state<{ type: 'boat' | 'mark' | 'rotate'; id: string } | null>(null)
+  let dragTarget = $state<{ type: 'boat' | 'mark' | 'rotate' | 'waypoint'; id: string } | null>(null)
 
   function handleMouseDown(e: MouseEvent): void {
     if (!interactive) return
@@ -284,6 +295,9 @@
     const world = screenToWorld(screen, camera, canvasEl!)
     const boatId = hitBoat(world)
     if (boatId) { dragTarget = { type: 'boat', id: boatId }; return }
+
+    const waypointId = hitWaypoint(world)
+    if (waypointId) { dragTarget = { type: 'waypoint', id: waypointId }; return }
 
     const markId = hitMark(world)
     if (markId) { dragTarget = { type: 'mark', id: markId }; return }
@@ -302,8 +316,17 @@
 
     const world = eventToWorld(e)
     if (!world) return
-    if (dragTarget.type === 'boat') onBoatDrag?.(dragTarget.id, world)
-    else                            onMarkDrag?.(dragTarget.id, world)
+    if (dragTarget.type === 'boat')     onBoatDrag?.(dragTarget.id, world)
+    else if (dragTarget.type === 'mark') onMarkDrag?.(dragTarget.id, world)
+    else if (dragTarget.type === 'waypoint') onWaypointDrag?.(dragTarget.id, world)
+  }
+
+  function handleContextMenu(e: MouseEvent): void {
+    e.preventDefault()
+    if (!interactive) return
+    const world = eventToWorld(e)
+    if (!world) return
+    onCanvasContextMenu?.(world)
   }
 
   function handleMouseUp(): void {
@@ -323,6 +346,7 @@
     onmousemove={handleMouseMove}
     onmouseup={handleMouseUp}
     onmouseleave={handleMouseUp}
+    oncontextmenu={handleContextMenu}
     role={interactive ? 'application' : 'img'}
     aria-label="Sailing scenario diagram"
   ></canvas>
