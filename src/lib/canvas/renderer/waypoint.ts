@@ -5,8 +5,8 @@ import { worldToScreen } from './coords.ts'
 
 /** Returns approximate boat speed (knots) for a given leg bearing and wind direction. */
 export function calcLegSpeed(legBearingDeg: number, windFromDeg: number): number {
-  const twa = ((legBearingDeg - windFromDeg + 540) % 360)
-  const sym = twa > 180 ? 360 - twa : twa   // symmetric 0–180
+  const twa = ((legBearingDeg - windFromDeg + 360) % 360)
+  const sym = twa > 180 ? 360 - twa : twa   // symmetric 0–180, 0=head-to-wind 180=downwind
   if (sym < 30) return 0                     // no-go zone (head to wind)
   const t = sym / 180
   // Peaks ~120° TWA (broad reach), tapers at 0° and 180°
@@ -14,7 +14,7 @@ export function calcLegSpeed(legBearingDeg: number, windFromDeg: number): number
 }
 
 function speedColor(legBearingDeg: number, windFromDeg: number): string {
-  const twa = ((legBearingDeg - windFromDeg + 540) % 360)
+  const twa = ((legBearingDeg - windFromDeg + 360) % 360)
   const sym = twa > 180 ? 360 - twa : twa
   if (sym < 60)  return 'rgba(255,150,0,0.95)'   // upwind — orange
   if (sym < 120) return 'rgba(80,220,100,0.95)'  // reach — green

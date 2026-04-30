@@ -192,8 +192,12 @@
     const keyframes: AnimationKeyframe[] = []
     let t = 0
 
-    // Start from the boat's current position
-    keyframes.push({ time: 0, boats: [{ boatId, position: boat.position, heading: boat.heading }] })
+    // First leg bearing so the boat faces its direction of travel from the start
+    const firstDx = wps[0]!.position.x - boat.position.x
+    const firstDy = wps[0]!.position.y - boat.position.y
+    const firstBearing = ((Math.atan2(firstDx, -firstDy) * 180) / Math.PI + 360) % 360
+
+    keyframes.push({ time: 0, boats: [{ boatId, position: boat.position, heading: firstBearing }] })
 
     let prevPos = boat.position
     for (const wp of wps) {
