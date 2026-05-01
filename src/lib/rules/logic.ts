@@ -189,6 +189,75 @@ export function applyRule22(a: BoatState, b: BoatState): string | null {
   return aImpaired ? b.id : a.id
 }
 
+/**
+ * Compute the keep-clear boat for a pair under the priority chain used by
+ * `evaluateScene` (excluding parallel rules like 14 and 17). Used by rules 15
+ * and 16 to determine the right-of-way relationship at a given instant.
+ */
+export function computeKeepClear(
+  a: BoatState,
+  b: BoatState,
+  wind: WindState,
+  marks: Mark[],
+): string | null {
+  const r22 = applyRule22(a, b);                if (r22) return r22
+  const r18 = applyRule18(a, b, wind, marks);   if (r18) return r18.keepClearId
+  const r13 = applyRule13(a, b, wind);          if (r13) return r13
+  const r10 = applyRule10(a, b, wind);          if (r10) return r10
+  const r11 = applyRule11(a, b, wind);          if (r11) return r11
+  const r12 = applyRule12(a, b, wind);          if (r12) return r12
+  return null
+}
+
+/** Smallest signed difference (in degrees) from `a` to `b`, in [-180, 180]. */
+function angularDelta(a: number, b: number): number {
+  return ((b - a + 540) % 360) - 180
+}
+
+/**
+ * Rule 15 — Acquiring right of way. Fires on the boat that just gained ROW
+ * (so this boat is not currently the keep-clear boat, but it has a residual
+ * obligation to give the other boat room). If the boat that gained ROW also
+ * changed heading significantly between prev and current, we assume it
+ * gained ROW through its own action — Rule 15 then does NOT apply.
+ */
+export function applyRule15(
+  curA: BoatState, curB: BoatState,
+  prevA: BoatState, prevB: BoatState,
+  wind: WindState, marks: Mark[],
+): string | null {
+  const curKC  = computeKeepClear(curA,  curB,  wind, marks)
+  const prevKC = computeKeepClear(prevA, prevB, wind, marks)
+  if (!curKC || !prevKC) return null
+  if (curKC === prevKC) return null
+  // ROW transferred: the boat that was previously keep-clear now has ROW.
+  const acquirerId = prevKC
+  const acquirerCur  = acquirerId === curA.id  ? curA  : curB
+  const acquirerPrev = acquirerId === prevA.id ? prevA : prevB
+  // Self-induced acquisition (e.g. tacked, gybed) → exonerated under R15.
+  if (Math.abs(angularDelta(acquirerPrev.heading, acquirerCur.heading)) > 15) return null
+  return acquirerId
+}
+
+/**
+ * Rule 16 — Changing course. The right-of-way boat must give the other boat
+ * room to keep clear. Fires when the current ROW boat changed heading by
+ * more than `HEADING_CHANGE_THRESHOLD_DEG` between prev and current.
+ */
+export function applyRule16(
+  curA: BoatState, curB: BoatState,
+  prevA: BoatState, prevB: BoatState,
+  wind: WindState, marks: Mark[],
+): string | null {
+  const curKC = computeKeepClear(curA, curB, wind, marks)
+  if (!curKC) return null
+  const rowId = curKC === curA.id ? curB.id : curA.id
+  const rowCur  = rowId === curA.id  ? curA  : curB
+  const rowPrev = rowId === prevA.id ? prevA : prevB
+  const delta = Math.abs(angularDelta(rowPrev.heading, rowCur.heading))
+  return delta >= HEADING_CHANGE_THRESHOLD_DEG ? rowId : null
+}
+
 export function applyRule18(
   a: BoatState,
   b: BoatState,
@@ -226,6 +295,7 @@ const PROXIMITY_ADVISORY_M = 40   // rule applies, comfortable separation
 const PROXIMITY_WARNING_M = 18    // boats getting close
 const PROXIMITY_VIOLATION_M = 8   // collision-imminent
 const CONTACT_IMMINENT_M    = 6   // Rule 14 — both boats must avoid contact
+const HEADING_CHANGE_THRESHOLD_DEG = 12   // Rule 16 — heading delta over the lookback window
 
 function severityFromDistance(distM: number): RuleViolation['severity'] | null {
   if (distM <= PROXIMITY_VIOLATION_M) return 'violation'
@@ -240,6 +310,8 @@ const RULE_DESCRIPTIONS: Record<EncodedRuleId, string> = {
   rule_12: 'Boat clear astern must keep clear of boat clear ahead (same tack)',
   rule_13: 'Boat tacking must keep clear of a boat on a tack',
   rule_14: 'Contact imminent — both boats must avoid contact',
+  rule_15: 'Boat acquiring right of way must initially give room to keep clear',
+  rule_16: 'Right-of-way boat changing course must give room to keep clear',
   rule_17: 'Leeward boat may be sailing above proper course while overlapped',
   rule_18: 'Outside boat must give mark-room to inside overlapped boat',
   rule_19: 'Outside boat must give room to pass the obstruction',
@@ -249,10 +321,18 @@ const RULE_DESCRIPTIONS: Record<EncodedRuleId, string> = {
 /**
  * Evaluate the entire scene: returns the strongest applicable rule violation
  * for each pair of boats.
+ *
+ * If `prevScene` is provided (sampled some seconds earlier on the animation
+ * timeline), rules 15 and 16 — which depend on right-of-way transfers and
+ * course changes — are also evaluated.
  */
-export function evaluateScene(scene: SceneState): RuleViolation[] {
+export function evaluateScene(scene: SceneState, prevScene?: SceneState): RuleViolation[] {
   const violations: RuleViolation[] = []
   const { boats, wind, marks } = scene
+
+  // Map prev boats by id for quick lookup; missing entries (e.g. a boat added
+  // after the prev sample) make change-based rules skip that pair.
+  const prevById = prevScene ? new Map(prevScene.boats.map(b => [b.id, b])) : null
 
   for (let i = 0; i < boats.length; i++) {
     for (let j = i + 1; j < boats.length; j++) {
@@ -289,6 +369,36 @@ export function evaluateScene(scene: SceneState): RuleViolation[] {
           severity: sev === 'violation' ? 'warning' : 'advisory',
           description: RULE_DESCRIPTIONS.rule_17,
         })
+      }
+
+      // Rules 15 / 16 — both compare current state to a prior sample of the
+      // same animation. They impose obligations on the right-of-way boat,
+      // so they fire in parallel with whatever pair rule applies.
+      if (prevById) {
+        const prevA = prevById.get(a.id)
+        const prevB = prevById.get(b.id)
+        if (prevA && prevB) {
+          const r15 = applyRule15(a, b, prevA, prevB, wind, marks)
+          if (r15) {
+            violations.push({
+              ruleId: 'rule_15',
+              violatorBoatId: r15,
+              rightOfWayBoatId: r15 === a.id ? b.id : a.id,
+              severity: sev === 'violation' ? 'warning' : 'advisory',
+              description: RULE_DESCRIPTIONS.rule_15,
+            })
+          }
+          const r16 = applyRule16(a, b, prevA, prevB, wind, marks)
+          if (r16) {
+            violations.push({
+              ruleId: 'rule_16',
+              violatorBoatId: r16,
+              rightOfWayBoatId: r16 === a.id ? b.id : a.id,
+              severity: sev === 'violation' ? 'warning' : 'advisory',
+              description: RULE_DESCRIPTIONS.rule_16,
+            })
+          }
+        }
       }
 
       // Try rules in priority order:

@@ -39,6 +39,9 @@
   // Cached previous violation list — used to fire onViolationsChanged only on change.
   let prevViolationsKey = ''
 
+  /** Seconds to look back when sampling prior animation state for rules 15/16. */
+  const RULE_LOOKBACK_SEC = 1.2
+
   // ── Element refs ─────────────────────────────────────────────────────────────
   let canvasEl  = $state<HTMLCanvasElement | null>(null)
   let wrapperEl = $state<HTMLDivElement | null>(null)
@@ -160,9 +163,20 @@
       ? applyAnimation(scene, playback, animTime)
       : scene
 
+    // For change-based rules (15, 16) sample the same animation a moment in
+    // the past so the evaluator can compare the right-of-way relationship.
+    // Skipped if no animation, paused, or we'd cross the loop boundary.
+    let prevScene: SceneState | undefined
+    if (playback && !animationPaused) {
+      const lookbackTarget = animTime - RULE_LOOKBACK_SEC
+      if (lookbackTarget >= 0) {
+        prevScene = applyAnimation(scene, playback, lookbackTarget)
+      }
+    }
+
     // Run rule evaluator (if any) against the interpolated scene.
     const violations: RuleViolation[] = ruleEvaluator
-      ? ruleEvaluator(resolvedScene)
+      ? ruleEvaluator(resolvedScene, prevScene)
       : []
 
     // Fire onViolationsChanged only when the set / severity actually changes.

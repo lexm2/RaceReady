@@ -414,6 +414,10 @@
               <p class="violation-body">
                 {#if card.ruleId === 'rule_14'}
                   <strong>{card.violator}</strong> must avoid contact.
+                {:else if card.ruleId === 'rule_15'}
+                  <strong>{card.violator}</strong> just acquired right of way — give <strong>{card.rightOfWay}</strong> room to keep clear.
+                {:else if card.ruleId === 'rule_16'}
+                  <strong>{card.violator}</strong> is changing course — give <strong>{card.rightOfWay}</strong> room to keep clear.
                 {:else if card.ruleId === 'rule_17'}
                   <strong>{card.violator}</strong> may be sailing above proper course.
                 {:else}

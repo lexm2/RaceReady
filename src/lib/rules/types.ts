@@ -15,6 +15,8 @@ export type EncodedRuleId =
   | 'rule_12'
   | 'rule_13'
   | 'rule_14'
+  | 'rule_15'
+  | 'rule_16'
   | 'rule_17'
   | 'rule_18'
   | 'rule_19'

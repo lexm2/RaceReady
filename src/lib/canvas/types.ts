@@ -96,8 +96,13 @@ export interface RuleViolation {
   description: string
 }
 
-/** Pure function: scene → list of currently-active rule situations. */
-export type RuleEvaluator = (scene: SceneState) => RuleViolation[]
+/**
+ * Pure function: scene (+ optional prior scene) → currently-active rule situations.
+ * `prevScene` is the same scene sampled `LOOKBACK_SEC` earlier on the animation
+ * timeline; rules 15 and 16 use it to detect right-of-way transfers and course
+ * changes by the right-of-way boat.
+ */
+export type RuleEvaluator = (scene: SceneState, prevScene?: SceneState) => RuleViolation[]
 
 export interface Waypoint {
   id: string
