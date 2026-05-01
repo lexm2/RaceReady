@@ -147,6 +147,24 @@
     scene.boats = scene.boats.map(b => b.id === id ? { ...b, hullColor: hex } : b)
   }
 
+  /** Cycle through boat conditions for Rule 22. */
+  const CONDITION_CYCLE = ['normal', 'capsized', 'anchored', 'aground'] as const
+  type Condition = (typeof CONDITION_CYCLE)[number]
+  const CONDITION_LABEL: Record<Condition, string> = {
+    normal: 'Normal', capsized: 'Capsized', anchored: 'Anchored', aground: 'Aground',
+  }
+  const CONDITION_ICON: Record<Condition, string> = {
+    normal: '○', capsized: 'C', anchored: 'A', aground: 'G',
+  }
+  function cycleBoatCondition(id: string): void {
+    scene.boats = scene.boats.map(b => {
+      if (b.id !== id) return b
+      const cur = (b.condition ?? 'normal') as Condition
+      const next = CONDITION_CYCLE[(CONDITION_CYCLE.indexOf(cur) + 1) % CONDITION_CYCLE.length]!
+      return { ...b, condition: next }
+    })
+  }
+
   // ── Waypoints ──────────────────────────────────────────────────────
   function onWaypointDrag(waypointId: string, pos: Vec2): void {
     scene = {
@@ -394,7 +412,13 @@
                 <span class="violation-rule">{card.ruleTitle}</span>
               </div>
               <p class="violation-body">
-                <strong>{card.violator}</strong> must keep clear{#if card.rightOfWay} of <strong>{card.rightOfWay}</strong>{/if}.
+                {#if card.ruleId === 'rule_14'}
+                  <strong>{card.violator}</strong> must avoid contact.
+                {:else if card.ruleId === 'rule_17'}
+                  <strong>{card.violator}</strong> may be sailing above proper course.
+                {:else}
+                  <strong>{card.violator}</strong> must keep clear{#if card.rightOfWay} of <strong>{card.rightOfWay}</strong>{/if}.
+                {/if}
               </p>
               <a class="violation-link" href="{base}/resources/rulebook?rule={card.ruleId}">
                 View rule →
@@ -439,6 +463,7 @@
               <h3>Boats</h3>
               <ul class="boat-list">
                 {#each scene.boats as boat (boat.id)}
+                  {@const condition = (boat.condition ?? 'normal') as Condition}
                   <li class="boat-row">
                     <label class="boat-swatch-wrap" title="Hull color">
                       <input
@@ -450,6 +475,13 @@
                       <span class="boat-swatch" style="background:{hullHex(boat.hullColor)}"></span>
                     </label>
                     <span class="boat-name">{boat.label}</span>
+                    <button
+                      class="boat-condition"
+                      class:boat-condition--active={condition !== 'normal'}
+                      title="Condition: {CONDITION_LABEL[condition]} (click to cycle)"
+                      onclick={() => cycleBoatCondition(boat.id)}
+                      aria-label="Cycle condition for {boat.label}"
+                    >{CONDITION_ICON[condition]}</button>
                     <button class="boat-remove" onclick={() => removeBoat(boat.id)} aria-label="Remove {boat.label}">×</button>
                   </li>
                 {/each}
@@ -840,6 +872,29 @@
     padding: 0 2px;
   }
   .boat-remove:hover { color: var(--text); }
+
+  .boat-condition {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    width: 18px;
+    height: 18px;
+    line-height: 1;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .boat-condition:hover { color: var(--text); }
+  .boat-condition--active {
+    color: rgba(239, 68, 68, 1);
+    border-color: rgba(239, 68, 68, 0.6);
+    font-weight: 600;
+  }
 
   .add-boat-btn {
     background: none;

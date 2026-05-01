@@ -14,8 +14,11 @@ export type EncodedRuleId =
   | 'rule_11'
   | 'rule_12'
   | 'rule_13'
+  | 'rule_14'
+  | 'rule_17'
   | 'rule_18'
   | 'rule_19'
+  | 'rule_22'
 
 // ─── Scenario shape consumed by games / whiteboard ────────────────────────────
 

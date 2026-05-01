@@ -11,6 +11,12 @@ export interface Vec2 {
 export type Tack = 'port' | 'starboard'
 
 /**
+ * Boat operational state for Rule 22 (capsized/anchored/aground/rescuing).
+ * Defaults to 'normal'. Anything else means other boats must keep clear.
+ */
+export type BoatCondition = 'normal' | 'capsized' | 'anchored' | 'aground'
+
+/**
  * Accepts U-M palette aliases ('maize', 'blue', …) or any raw CSS hex string.
  * Resolved to hex by resolveColor() in boat.ts.
  */
@@ -36,6 +42,8 @@ export interface BoatState {
   sailColor: ColorValue
   label: string
   isPlayer: boolean
+  /** Operational state for Rule 22. Defaults to 'normal'. */
+  condition?: BoatCondition
 }
 
 export type MarkType = 'buoy' | 'committee_boat' | 'pin_end' | 'gate_buoy'
