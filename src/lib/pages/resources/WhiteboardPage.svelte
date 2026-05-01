@@ -1,7 +1,8 @@
 <script lang="ts">
   import GameCanvas from '$lib/canvas/GameCanvas.svelte'
-  import type { SceneState, BoatState, Mark, Vec2, Waypoint, AnimationClip, AnimationKeyframe } from '$lib/canvas/types.ts'
+  import type { SceneState, BoatState, Mark, Vec2, Waypoint, AnimationClip, AnimationKeyframe, BoatKeyframeData } from '$lib/canvas/types.ts'
   import { calcLegSpeed } from '$lib/canvas/renderer/waypoint.ts'
+  import { lerpAngle } from '$lib/canvas/renderer/coords.ts'
   import { Play, Square } from 'lucide-svelte'
 
   // ── Default scene ──────────────────────────────────────────────────
@@ -179,47 +180,116 @@
   // ── Route animation ────────────────────────────────────────────────
   let currentAnimation = $state<AnimationClip | undefined>(undefined)
   let sailingBoatId    = $state<string | undefined>(undefined)
+  let playingAll       = $state(false)
 
-  function playRoute(boatId: string): void {
+  const TURN_RATE = 60   // degrees per second
+
+  function legBearing(from: Vec2, to: Vec2): number {
+    return ((Math.atan2(to.x - from.x, -(to.y - from.y)) * 180) / Math.PI + 360) % 360
+  }
+
+  interface RouteFrame { time: number; data: BoatKeyframeData }
+
+  function buildBoatRoute(boatId: string): RouteFrame[] | null {
     const boat = scene.boats.find(b => b.id === boatId)
-    if (!boat) return
-
+    if (!boat) return null
     const wps = (scene.waypoints ?? [])
       .filter(w => w.boatId === boatId)
       .sort((a, b) => a.order - b.order)
-    if (wps.length === 0) return
+    if (wps.length === 0) return null
 
-    const keyframes: AnimationKeyframe[] = []
+    const frames: RouteFrame[] = []
     let t = 0
 
-    // First leg bearing so the boat faces its direction of travel from the start
-    const firstDx = wps[0]!.position.x - boat.position.x
-    const firstDy = wps[0]!.position.y - boat.position.y
-    const firstBearing = ((Math.atan2(firstDx, -firstDy) * 180) / Math.PI + 360) % 360
+    function push(heading: number, position: Vec2) {
+      frames.push({ time: t, data: { boatId, position, heading } })
+    }
+    function rotate(pos: Vec2, fromH: number, toH: number) {
+      const turn = Math.abs(((toH - fromH + 540) % 360) - 180)
+      if (turn < 1) return
+      t += turn / TURN_RATE
+      push(toH, pos)
+    }
 
-    keyframes.push({ time: 0, boats: [{ boatId, position: boat.position, heading: firstBearing }] })
+    const firstBearing = legBearing(boat.position, wps[0]!.position)
+    push(boat.heading, boat.position)
+    rotate(boat.position, boat.heading, firstBearing)
 
     let prevPos = boat.position
-    for (const wp of wps) {
-      const dx = wp.position.x - prevPos.x
-      const dy = wp.position.y - prevPos.y
-      const distM      = Math.hypot(dx, dy)
-      const bearing    = ((Math.atan2(dx, -dy) * 180) / Math.PI + 360) % 360
-      const speedKnots = calcLegSpeed(bearing, scene.wind.directionDeg)
-      const speedMs    = Math.max(speedKnots * 0.514444, 0.3)   // min 0.3 m/s so no-go zones still move
+    for (let i = 0; i < wps.length; i++) {
+      const wp      = wps[i]!
+      const bearing = legBearing(prevPos, wp.position)
+      const distM   = Math.hypot(wp.position.x - prevPos.x, wp.position.y - prevPos.y)
+      const speedMs = Math.max(calcLegSpeed(bearing, scene.wind.directionDeg) * 0.514444, 0.3)
       t += distM / speedMs
+      push(bearing, wp.position)
 
-      keyframes.push({ time: t, boats: [{ boatId, position: wp.position, heading: bearing }] })
+      const nextPos     = i < wps.length - 1 ? wps[i + 1]!.position : boat.position
+      const nextBearing = legBearing(wp.position, nextPos)
+      rotate(wp.position, bearing, nextBearing)
       prevPos = wp.position
     }
 
-    currentAnimation = { keyframes, durationSec: t, loop: true }
+    return frames
+  }
+
+  function sampleBoatAt(frames: RouteFrame[], t: number): BoatKeyframeData {
+    const clamped = Math.max(0, Math.min(t, frames.at(-1)!.time))
+    let ai = 0
+    for (let i = 0; i < frames.length - 1; i++) if (clamped >= frames[i]!.time) ai = i
+    const a = frames[ai]!
+    const b = frames[Math.min(ai + 1, frames.length - 1)]!
+    const seg = b.time - a.time
+    const raw = seg === 0 ? 0 : (clamped - a.time) / seg
+    return {
+      boatId: a.data.boatId,
+      position: {
+        x: a.data.position.x + (b.data.position.x - a.data.position.x) * raw,
+        y: a.data.position.y + (b.data.position.y - a.data.position.y) * raw,
+      },
+      heading: lerpAngle(a.data.heading, b.data.heading, raw),
+    }
+  }
+
+  function buildClip(routeMap: Map<string, RouteFrame[]>): AnimationClip {
+    const allTimes = new Set<number>()
+    let maxDuration = 0
+    for (const frames of routeMap.values()) {
+      frames.forEach(f => allTimes.add(f.time))
+      maxDuration = Math.max(maxDuration, frames.at(-1)!.time)
+    }
+    const sortedTimes = [...allTimes].sort((a, b) => a - b)
+    const keyframes: AnimationKeyframe[] = sortedTimes.map(t => ({
+      time: t,
+      boats: [...routeMap.entries()].map(([, frames]) => sampleBoatAt(frames, t)),
+    }))
+    return { keyframes, durationSec: maxDuration, loop: true }
+  }
+
+  function playRoute(boatId: string): void {
+    const frames = buildBoatRoute(boatId)
+    if (!frames) return
+    currentAnimation = buildClip(new Map([[boatId, frames]]))
     sailingBoatId    = boatId
+    playingAll       = false
+  }
+
+  function playAllRoutes(): void {
+    const routeMap = new Map<string, RouteFrame[]>()
+    for (const boat of scene.boats) {
+      const frames = buildBoatRoute(boat.id)
+      if (frames) routeMap.set(boat.id, frames)
+    }
+    if (routeMap.size === 0) return
+    currentAnimation = buildClip(routeMap)
+    sailingBoatId    = undefined
+    playingAll       = true
   }
 
   function stopRoute(): void {
     currentAnimation = undefined
     sailingBoatId    = undefined
+    playingAll       = false
   }
 
   // ── Panel collapse ─────────────────────────────────────────────────
@@ -307,7 +377,20 @@
             </section>
 
             <section class="panel-section">
-              <h3>Routes</h3>
+              <div class="section-header">
+                <h3>Routes</h3>
+                {#if (scene.waypoints ?? []).length > 0}
+                  {#if playingAll}
+                    <button class="route-sail sailing" onclick={stopRoute} aria-label="Stop all">
+                      <Square size={11} strokeWidth={2} />
+                    </button>
+                  {:else}
+                    <button class="route-sail" onclick={playAllRoutes} aria-label="Play all routes">
+                      <Play size={11} strokeWidth={2} />
+                    </button>
+                  {/if}
+                {/if}
+              </div>
               {#if (scene.waypoints ?? []).length === 0}
                 <p class="route-hint">Select a boat, then right-click to place waypoints.</p>
               {:else}
@@ -318,7 +401,7 @@
                       <span class="route-swatch" style="background:{hullHex(boat.hullColor)}"></span>
                       <span class="route-name">{boat.label}</span>
                       <span class="route-count">{count} pts</span>
-                      {#if sailingBoatId === boat.id}
+                      {#if sailingBoatId === boat.id && !playingAll}
                         <button class="route-sail sailing" onclick={stopRoute} aria-label="Stop">
                           <Square size={11} strokeWidth={2} />
                         </button>
@@ -327,11 +410,11 @@
                           <Play size={11} strokeWidth={2} />
                         </button>
                       {/if}
-                      <button class="route-clear" onclick={() => { clearWaypoints(boat.id); if (sailingBoatId === boat.id) stopRoute() }} aria-label="Clear route for {boat.label}">×</button>
+                      <button class="route-clear" onclick={() => { clearWaypoints(boat.id); if (sailingBoatId === boat.id || playingAll) stopRoute() }} aria-label="Clear route for {boat.label}">×</button>
                     </li>
                   {/each}
                 </ul>
-                <button class="add-boat-btn" onclick={() => clearWaypoints()}>Clear All</button>
+                <button class="add-boat-btn" onclick={() => { clearWaypoints(); stopRoute() }}>Clear All</button>
               {/if}
             </section>
           </div>
