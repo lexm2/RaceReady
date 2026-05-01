@@ -64,7 +64,32 @@ export interface DisplayToggles {
   showWindIndicator: boolean
   /** Whiteboard mode - draws a world-space grid. */
   showGrid: boolean
+  /** Optional compass rose overlay (currently no-op renderer; kept for forward-compat). */
+  showCompassRose?: boolean
 }
+
+// ─── Rule evaluation ──────────────────────────────────────────────────────────
+
+export type RuleSeverity = 'advisory' | 'warning' | 'violation'
+
+export interface RuleViolation {
+  /** Encoded rule id, e.g. 'rule_10'. */
+  ruleId: string
+  /** Boat that must keep clear (the one drawn with a warning ring). */
+  violatorBoatId: string
+  /** Boat that has right of way, if applicable. */
+  rightOfWayBoatId?: string
+  /**
+   * Severity: 'advisory' = rule applies, ample room.
+   *           'warning' = boats getting close.
+   *           'violation' = collision-imminent / contact.
+   */
+  severity: RuleSeverity
+  description: string
+}
+
+/** Pure function: scene → list of currently-active rule situations. */
+export type RuleEvaluator = (scene: SceneState) => RuleViolation[]
 
 export interface Waypoint {
   id: string
@@ -148,6 +173,8 @@ export interface RenderContext {
   animTime: number
   /** ID of the currently selected boat - renderer draws selection ring + handle. */
   selectedBoatId?: string
+  /** Active rule violations / advisories - renderer draws warning rings. */
+  violations?: RuleViolation[]
 }
 
 // ─── Component props ──────────────────────────────────────────────────────────
@@ -176,5 +203,16 @@ export interface GameCanvasProps {
   onBoatRotate?: (boatId: string, heading: number) => void
   onWaypointDrag?: (waypointId: string, pos: Vec2) => void
   onCanvasContextMenu?: (worldPos: Vec2) => void
+  /** Optional rule evaluator run on each interpolated frame. */
+  ruleEvaluator?: RuleEvaluator
+  /** Fires when the violation list changes (added/removed/severity). */
+  onViolationsChanged?: (violations: RuleViolation[]) => void
+  /** Fires every frame with the interpolated scene + animation time. */
+  onFrameUpdate?: (scene: SceneState, animTime: number) => void
+  /**
+   * Bindable: current playback time in seconds (0..durationSec).
+   * Canvas writes the advancing time each frame; parent may write to seek.
+   */
+  animationTime?: number
   class?: string
 }

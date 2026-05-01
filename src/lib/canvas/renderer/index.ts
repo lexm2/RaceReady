@@ -5,6 +5,7 @@ import { drawMark } from './mark.ts'
 import { drawWindIndicator } from './wind.ts'
 import { drawLabels, drawGrid, drawSelectionRing } from './ui.ts'
 import { drawWaypoints } from './waypoint.ts'
+import { drawViolations } from './violations.ts'
 import { worldToScreen } from './coords.ts'
 
 /**
@@ -43,6 +44,11 @@ export function renderScene(rc: RenderContext): void {
     for (const boat of rc.scene.boats) {
       drawBoatWake(rc, boat)
     }
+  }
+
+  // 6.5 Violation / advisory rings - drawn under hulls so the boat sits on top
+  if (rc.violations && rc.violations.length > 0) {
+    drawViolations(rc)
   }
 
   // 7. Hulls + sails

@@ -5,12 +5,19 @@
   // Vite requires import.meta.glob at module scope with a static string literal
   const ruleFiles = import.meta.glob('/rules/**/*.md', { query: '?raw', import: 'default' })
 
+  // Read ?rule=<id> from the URL so other pages can deep-link to a specific rule.
+  function initialRuleId(): string {
+    if (typeof window === 'undefined') return 'introduction'
+    const requested = new URLSearchParams(window.location.search).get('rule')
+    return requested && RULES_BY_ID[requested] ? requested : 'introduction'
+  }
+
   // ── State ────────────────────────────────────────────────────────
-  let selectedId    = $state('introduction')
+  let selectedId    = $state(initialRuleId())
   let contentHtml   = $state('')
   let isLoading     = $state(false)
   let loadError     = $state<string | null>(null)
-  let expandedParts = $state(new Set(['part1']))
+  let expandedParts = $state(new Set([findParentPartId(selectedId) ?? 'part1']))
   let sidebarOpen   = $state(false)
   let searchQuery   = $state('')
 

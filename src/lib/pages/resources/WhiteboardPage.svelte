@@ -1,8 +1,11 @@
 <script lang="ts">
   import GameCanvas from '$lib/canvas/GameCanvas.svelte'
-  import type { SceneState, BoatState, Mark, Vec2, Waypoint, AnimationClip, AnimationKeyframe, BoatKeyframeData } from '$lib/canvas/types.ts'
+  import type { SceneState, BoatState, Mark, Vec2, Waypoint, AnimationClip, AnimationKeyframe, BoatKeyframeData, RuleViolation } from '$lib/canvas/types.ts'
   import { calcLegSpeed } from '$lib/canvas/renderer/waypoint.ts'
   import { lerpAngle } from '$lib/canvas/renderer/coords.ts'
+  import { evaluateScene } from '$lib/rules/logic.ts'
+  import { RULES_BY_ID } from '$lib/data/rulesIndex.ts'
+  import { base } from '$app/paths'
   import { Play, Square, Pause } from 'lucide-svelte'
 
   // ── Default scene ──────────────────────────────────────────────────
@@ -17,10 +20,13 @@
       { from: 'mark-2', to: 'mark-1' },
     ],
     boats: [
+      // Default scene is a Rule 10 (port-starboard) crossing — boats on
+      // opposite tacks, ~16 m apart, on a converging upwind course. The
+      // rule evaluator should ring Boat B (port tack) as the keep-clear boat.
       {
         id: 'boat-a',
-        position:   { x: 120, y: 130 },
-        heading:    330,
+        position:   { x: 158, y: 120 },
+        heading:    315,           // NW, close-hauled starboard with wind from N
         tack:       'starboard',
         speed:      6,
         hullColor:  'maize',
@@ -30,8 +36,8 @@
       },
       {
         id: 'boat-b',
-        position:   { x: 180, y: 140 },
-        heading:    20,
+        position:   { x: 142, y: 120 },
+        heading:    45,            // NE, close-hauled port with wind from N
         tack:       'port',
         speed:      5,
         hullColor:  'orange',
@@ -182,7 +188,8 @@
   let sailingBoatId    = $state<string | undefined>(undefined)
   let playingAll       = $state(false)
   let paused           = $state(false)
-  let timeScale        = $state(1)
+  let timeScale        = $state(7)
+  let playbackTime     = $state(0)
 
   const TURN_RATE = 60   // degrees per second
 
@@ -301,6 +308,48 @@
 
   // ── Panel collapse ─────────────────────────────────────────────────
   let panelOpen = $state(true)
+
+  // ── Rule violations ────────────────────────────────────────────────
+  let liveViolations = $state<RuleViolation[]>([])
+
+  function onViolationsChanged(violations: RuleViolation[]): void {
+    liveViolations = violations
+  }
+
+  /** Severity ordering helper. */
+  const SEVERITY_RANK = { violation: 3, warning: 2, advisory: 1 } as const
+
+  interface ViolationCard {
+    key: string
+    severity: RuleViolation['severity']
+    ruleId: string
+    ruleTitle: string
+    violator: string
+    rightOfWay: string | null
+  }
+
+  let violationCards = $derived.by<ViolationCard[]>(() => {
+    // De-dup: keep the strongest severity per (ruleId, violatorBoatId) pair.
+    const strongest = new Map<string, RuleViolation>()
+    for (const v of liveViolations) {
+      const key = `${v.ruleId}|${v.violatorBoatId}`
+      const cur = strongest.get(key)
+      if (!cur || SEVERITY_RANK[v.severity] > SEVERITY_RANK[cur.severity]) {
+        strongest.set(key, v)
+      }
+    }
+    const labelOf = (id: string) => scene.boats.find(b => b.id === id)?.label ?? id
+    return [...strongest.entries()]
+      .map(([key, v]): ViolationCard => ({
+        key,
+        severity: v.severity,
+        ruleId: v.ruleId,
+        ruleTitle: RULES_BY_ID[v.ruleId]?.title ?? v.ruleId,
+        violator: labelOf(v.violatorBoatId),
+        rightOfWay: v.rightOfWayBoatId ? labelOf(v.rightOfWayBoatId) : null,
+      }))
+      .sort((a, b) => SEVERITY_RANK[b.severity] - SEVERITY_RANK[a.severity])
+  })
 </script>
 
 <div class="page-container">
@@ -330,7 +379,30 @@
         {onBackgroundClick}
         {onWaypointDrag}
         {onCanvasContextMenu}
+        ruleEvaluator={evaluateScene}
+        {onViolationsChanged}
+        bind:animationTime={playbackTime}
       />
+
+      <!-- Rule violation notifications (top-left) -->
+      {#if violationCards.length > 0}
+        <div class="violations-overlay" role="status" aria-live="polite">
+          {#each violationCards as card (card.key)}
+            <div class="violation-card violation-card--{card.severity}">
+              <div class="violation-head">
+                <span class="violation-sev">{card.severity}</span>
+                <span class="violation-rule">{card.ruleTitle}</span>
+              </div>
+              <p class="violation-body">
+                <strong>{card.violator}</strong> must keep clear{#if card.rightOfWay} of <strong>{card.rightOfWay}</strong>{/if}.
+              </p>
+              <a class="violation-link" href="{base}/resources/rulebook?rule={card.ruleId}">
+                View rule →
+              </a>
+            </div>
+          {/each}
+        </div>
+      {/if}
 
       <!-- Floating overlay panel -->
       <aside class="overlay-panel" class:open={panelOpen}>
@@ -437,10 +509,29 @@
               {/if}
               {#if currentAnimation}
                 <div class="section-header" style="margin-top: var(--space-2)">
-                  <h3>Speed</h3>
-                  <span class="wind-label">{timeScale}×</span>
+                  <h3>Playback</h3>
+                  <label class="speed-edit">
+                    <input
+                      type="number"
+                      min="0.1"
+                      max="10"
+                      step="0.5"
+                      bind:value={timeScale}
+                      class="speed-input"
+                      aria-label="Playback speed multiplier"
+                    />
+                    <span class="speed-suffix">×</span>
+                  </label>
                 </div>
-                <input type="range" min="1" max="10" step="0.5" bind:value={timeScale} class="wind-slider" />
+                <input
+                  type="range"
+                  min="0"
+                  max={currentAnimation.durationSec}
+                  step="0.05"
+                  bind:value={playbackTime}
+                  class="wind-slider"
+                  aria-label="Playback position"
+                />
               {/if}
             </section>
           </div>
@@ -464,6 +555,84 @@
     overflow: hidden;
     box-shadow: var(--shadow-card);
   }
+
+  /* ── Violation notifications ─────────────────────────────────────── */
+  .violations-overlay {
+    position: absolute;
+    top: var(--space-3);
+    left: var(--space-3);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    max-width: 280px;
+    pointer-events: none;
+  }
+
+  .violation-card {
+    pointer-events: auto;
+    background: color-mix(in srgb, var(--bg-card) 92%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    border-left-width: 3px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    padding: var(--space-2) var(--space-3);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .violation-card--advisory { border-left-color: rgba(255, 203, 5, 0.85); }
+  .violation-card--warning  { border-left-color: rgba(255, 140, 0, 0.95); }
+  .violation-card--violation { border-left-color: rgba(239, 68, 68, 1); }
+
+  .violation-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .violation-sev {
+    font-family: var(--font-heading);
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    color: var(--bg-card);
+    background: var(--text-muted);
+  }
+  .violation-card--advisory  .violation-sev { background: rgba(255, 203, 5, 0.95); color: #1a1a1a; }
+  .violation-card--warning   .violation-sev { background: rgba(255, 140, 0, 0.98); color: #1a1a1a; }
+  .violation-card--violation .violation-sev { background: rgba(239, 68, 68, 1);    color: #fff;     }
+
+  .violation-rule {
+    font-family: var(--font-heading);
+    font-size: 0.78rem;
+    color: var(--text);
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .violation-body {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--text);
+    line-height: 1.35;
+  }
+
+  .violation-link {
+    align-self: flex-start;
+    font-size: 0.75rem;
+    color: var(--accent);
+    text-decoration: none;
+    margin-top: 2px;
+  }
+  .violation-link:hover { text-decoration: underline; }
 
   /* ── Overlay panel ───────────────────────────────────────────────── */
   .overlay-panel {
@@ -549,6 +718,39 @@
     color: var(--text-muted);
     min-width: 2.5rem;
     text-align: right;
+  }
+
+  /* Editable speed (used in Playback section) */
+  .speed-edit {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 1px;
+  }
+  .speed-input {
+    width: 2.6rem;
+    padding: 1px 4px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    text-align: right;
+    -moz-appearance: textfield;
+  }
+  .speed-input::-webkit-outer-spin-button,
+  .speed-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .speed-input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .speed-suffix {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
   }
 
   /* Toggles */

@@ -6,6 +6,7 @@
     SceneState,
     AnimationPlayback,
     Vec2,
+    RuleViolation,
   } from './types.ts'
   import { renderScene } from './renderer/index.ts'
   import { worldToScreen, screenToWorld, lerpVec2, lerpAngle, normalizeAngle } from './renderer/coords.ts'
@@ -28,8 +29,15 @@
     onWaypointDrag,
     onCanvasContextMenu,
     onBackgroundClick,
+    ruleEvaluator,
+    onViolationsChanged,
+    onFrameUpdate,
+    animationTime = $bindable(0),
     class: className = '',
   }: GameCanvasProps = $props()
+
+  // Cached previous violation list — used to fire onViolationsChanged only on change.
+  let prevViolationsKey = ''
 
   // ── Element refs ─────────────────────────────────────────────────────────────
   let canvasEl  = $state<HTMLCanvasElement | null>(null)
@@ -40,7 +48,6 @@
   let rafId          = $state(0)
   let playback       = $state<AnimationPlayback | null>(null)
   let canvasSize     = $state({ w: 0, h: 0 })  // CSS px; used by autoFitCamera
-  let virtualAnimTime = 0   // accumulated animation time in seconds (speed-scaled)
   let lastRafTs       = 0   // wall timestamp of previous rAF frame
 
   // ── Derived camera ───────────────────────────────────────────────────────────
@@ -93,14 +100,14 @@
   // ── Animation setup ──────────────────────────────────────────────────────────
   $effect(() => {
     if (!animation) {
-      playback         = null
-      virtualAnimTime  = 0
-      lastRafTs        = 0
+      playback        = null
+      animationTime   = 0
+      lastRafTs       = 0
       return
     }
-    playback         = { clip: animation, playing: true, currentTime: 0, startWallTime: performance.now() }
-    virtualAnimTime  = 0
-    lastRafTs        = 0
+    playback        = { clip: animation, playing: true, currentTime: 0, startWallTime: performance.now() }
+    animationTime   = 0
+    lastRafTs       = 0
   })
 
   // ── rAF loop ─────────────────────────────────────────────────────────────────
@@ -127,29 +134,50 @@
     const ctx = canvasEl.getContext('2d')
     if (!ctx) return
 
-    // Advance animation clock via delta-time so speed changes never cause a jump
-    let animTime = 0
+    // Advance animation clock via delta-time so speed changes never cause a jump.
+    // animationTime is bindable: parent can seek by writing to it; we advance it here.
+    let animTime = animationTime
     if (playback?.playing) {
       const dt = lastRafTs > 0 ? (timestamp - lastRafTs) / 1000 : 0
-      if (!animationPaused) virtualAnimTime += dt * animationSpeed
+      let next = animationTime
+      if (!animationPaused) next += dt * animationSpeed
 
       if (playback.clip.loop) {
-        animTime = virtualAnimTime % playback.clip.durationSec
+        next = ((next % playback.clip.durationSec) + playback.clip.durationSec) % playback.clip.durationSec
       } else {
-        animTime = Math.min(virtualAnimTime, playback.clip.durationSec)
-        if (virtualAnimTime >= playback.clip.durationSec) {
+        next = Math.max(0, Math.min(next, playback.clip.durationSec))
+        if (next >= playback.clip.durationSec) {
           playback = { ...playback, playing: false, currentTime: playback.clip.durationSec }
         }
       }
-      if (playback.playing) {
-        playback = { ...playback, currentTime: animTime }
-      }
+      if (next !== animationTime) animationTime = next
+      animTime = next
+      if (playback.playing) playback = { ...playback, currentTime: animTime }
     }
     lastRafTs = timestamp
 
     const resolvedScene: SceneState = playback
       ? applyAnimation(scene, playback, animTime)
       : scene
+
+    // Run rule evaluator (if any) against the interpolated scene.
+    const violations: RuleViolation[] = ruleEvaluator
+      ? ruleEvaluator(resolvedScene)
+      : []
+
+    // Fire onViolationsChanged only when the set / severity actually changes.
+    if (onViolationsChanged) {
+      const key = violations
+        .map(v => `${v.ruleId}|${v.violatorBoatId}|${v.severity}`)
+        .sort()
+        .join(',')
+      if (key !== prevViolationsKey) {
+        prevViolationsKey = key
+        onViolationsChanged(violations)
+      }
+    }
+
+    onFrameUpdate?.(resolvedScene, animTime)
 
     const rc: RenderContext = {
       ctx,
@@ -160,6 +188,7 @@
       timestamp,
       animTime,
       selectedBoatId,
+      violations,
     }
 
     renderScene(rc)
