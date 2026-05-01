@@ -181,6 +181,7 @@
   let currentAnimation = $state<AnimationClip | undefined>(undefined)
   let sailingBoatId    = $state<string | undefined>(undefined)
   let playingAll       = $state(false)
+  let timeScale        = $state(1)
 
   const TURN_RATE = 60   // degrees per second
 
@@ -313,6 +314,7 @@
         {scene}
         interactive
         animation={currentAnimation}
+        animationSpeed={timeScale}
         {selectedBoatId}
         {onBoatClick}
         {onBoatDrag}
@@ -415,6 +417,12 @@
                   {/each}
                 </ul>
                 <button class="add-boat-btn" onclick={() => { clearWaypoints(); stopRoute() }}>Clear All</button>
+              {/if}
+              {#if currentAnimation}
+                <div class="section-header" style="margin-top: var(--space-2)">
+                  <span class="wind-label">{timeScale}×</span>
+                  <input type="range" min="1" max="10" step="0.5" bind:value={timeScale} class="wind-slider" style="flex:1" />
+                </div>
               {/if}
             </section>
           </div>

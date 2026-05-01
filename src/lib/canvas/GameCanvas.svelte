@@ -16,6 +16,7 @@
     scene,
     camera: cameraProp,
     animation,
+    animationSpeed = 1,
     interactive = false,
     selectedBoatId,
     onBoatClick,
@@ -34,10 +35,12 @@
   let wrapperEl = $state<HTMLDivElement | null>(null)
 
   // ── Internal state ───────────────────────────────────────────────────────────
-  let dpr        = $state(window.devicePixelRatio || 1)
-  let rafId      = $state(0)
-  let playback   = $state<AnimationPlayback | null>(null)
-  let canvasSize = $state({ w: 0, h: 0 })  // CSS px; used by autoFitCamera
+  let dpr            = $state(window.devicePixelRatio || 1)
+  let rafId          = $state(0)
+  let playback       = $state<AnimationPlayback | null>(null)
+  let canvasSize     = $state({ w: 0, h: 0 })  // CSS px; used by autoFitCamera
+  let virtualAnimTime = 0   // accumulated animation time in seconds (speed-scaled)
+  let lastRafTs       = 0   // wall timestamp of previous rAF frame
 
   // ── Derived camera ───────────────────────────────────────────────────────────
   let camera = $derived<Camera>(
@@ -89,15 +92,14 @@
   // ── Animation setup ──────────────────────────────────────────────────────────
   $effect(() => {
     if (!animation) {
-      playback = null
+      playback         = null
+      virtualAnimTime  = 0
+      lastRafTs        = 0
       return
     }
-    playback = {
-      clip:          animation,
-      playing:       true,
-      currentTime:   0,
-      startWallTime: performance.now(),
-    }
+    playback         = { clip: animation, playing: true, currentTime: 0, startWallTime: performance.now() }
+    virtualAnimTime  = 0
+    lastRafTs        = 0
   })
 
   // ── rAF loop ─────────────────────────────────────────────────────────────────
@@ -124,15 +126,17 @@
     const ctx = canvasEl.getContext('2d')
     if (!ctx) return
 
-    // Advance animation clock
+    // Advance animation clock via delta-time so speed changes never cause a jump
     let animTime = 0
     if (playback?.playing) {
-      const elapsed = (timestamp - playback.startWallTime) / 1000
+      const dt = lastRafTs > 0 ? (timestamp - lastRafTs) / 1000 : 0
+      virtualAnimTime += dt * animationSpeed
+
       if (playback.clip.loop) {
-        animTime = elapsed % playback.clip.durationSec
+        animTime = virtualAnimTime % playback.clip.durationSec
       } else {
-        animTime = Math.min(elapsed, playback.clip.durationSec)
-        if (elapsed >= playback.clip.durationSec) {
+        animTime = Math.min(virtualAnimTime, playback.clip.durationSec)
+        if (virtualAnimTime >= playback.clip.durationSec) {
           playback = { ...playback, playing: false, currentTime: playback.clip.durationSec }
         }
       }
@@ -140,6 +144,7 @@
         playback = { ...playback, currentTime: animTime }
       }
     }
+    lastRafTs = timestamp
 
     const resolvedScene: SceneState = playback
       ? applyAnimation(scene, playback, animTime)

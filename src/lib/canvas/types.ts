@@ -157,6 +157,8 @@ export interface GameCanvasProps {
   /** If omitted, camera auto-fits to worldSize with 88% fill. */
   camera?: Camera
   animation?: AnimationClip
+  /** Playback speed multiplier for animation (default 1, max 10). */
+  animationSpeed?: number
   /** Enables drag and click interaction (used by Whiteboard). */
   interactive?: boolean
   onBoatClick?: (boatId: string) => void
