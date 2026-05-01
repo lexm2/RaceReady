@@ -159,6 +159,8 @@ export interface GameCanvasProps {
   animation?: AnimationClip
   /** Playback speed multiplier for animation (default 1, max 10). */
   animationSpeed?: number
+  /** Pauses animation advancement without clearing the clip. */
+  animationPaused?: boolean
   /** Enables drag and click interaction (used by Whiteboard). */
   interactive?: boolean
   onBoatClick?: (boatId: string) => void

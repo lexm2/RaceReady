@@ -3,7 +3,7 @@
   import type { SceneState, BoatState, Mark, Vec2, Waypoint, AnimationClip, AnimationKeyframe, BoatKeyframeData } from '$lib/canvas/types.ts'
   import { calcLegSpeed } from '$lib/canvas/renderer/waypoint.ts'
   import { lerpAngle } from '$lib/canvas/renderer/coords.ts'
-  import { Play, Square } from 'lucide-svelte'
+  import { Play, Square, Pause } from 'lucide-svelte'
 
   // ── Default scene ──────────────────────────────────────────────────
   let scene = $state<SceneState>({
@@ -181,6 +181,7 @@
   let currentAnimation = $state<AnimationClip | undefined>(undefined)
   let sailingBoatId    = $state<string | undefined>(undefined)
   let playingAll       = $state(false)
+  let paused           = $state(false)
   let timeScale        = $state(1)
 
   const TURN_RATE = 60   // degrees per second
@@ -291,6 +292,11 @@
     currentAnimation = undefined
     sailingBoatId    = undefined
     playingAll       = false
+    paused           = false
+  }
+
+  function togglePause(): void {
+    paused = !paused
   }
 
   // ── Panel collapse ─────────────────────────────────────────────────
@@ -315,6 +321,7 @@
         interactive
         animation={currentAnimation}
         animationSpeed={timeScale}
+        animationPaused={paused}
         {selectedBoatId}
         {onBoatClick}
         {onBoatDrag}
@@ -383,9 +390,14 @@
                 <h3>Routes</h3>
                 {#if (scene.waypoints ?? []).length > 0}
                   {#if playingAll}
-                    <button class="route-sail sailing" onclick={stopRoute} aria-label="Stop all">
-                      <Square size={11} strokeWidth={2} />
-                    </button>
+                    <div class="route-controls">
+                      <button class="route-sail" onclick={togglePause} aria-label={paused ? 'Resume' : 'Pause'}>
+                        {#if paused}<Play size={11} strokeWidth={2} />{:else}<Pause size={11} strokeWidth={2} />{/if}
+                      </button>
+                      <button class="route-sail sailing" onclick={stopRoute} aria-label="Stop all">
+                        <Square size={11} strokeWidth={2} />
+                      </button>
+                    </div>
                   {:else}
                     <button class="route-sail" onclick={playAllRoutes} aria-label="Play all routes">
                       <Play size={11} strokeWidth={2} />
@@ -404,9 +416,14 @@
                       <span class="route-name">{boat.label}</span>
                       <span class="route-count">{count} pts</span>
                       {#if sailingBoatId === boat.id && !playingAll}
-                        <button class="route-sail sailing" onclick={stopRoute} aria-label="Stop">
-                          <Square size={11} strokeWidth={2} />
-                        </button>
+                        <div class="route-controls">
+                          <button class="route-sail" onclick={togglePause} aria-label={paused ? 'Resume' : 'Pause'}>
+                            {#if paused}<Play size={11} strokeWidth={2} />{:else}<Pause size={11} strokeWidth={2} />{/if}
+                          </button>
+                          <button class="route-sail sailing" onclick={stopRoute} aria-label="Stop">
+                            <Square size={11} strokeWidth={2} />
+                          </button>
+                        </div>
                       {:else}
                         <button class="route-sail" onclick={() => playRoute(boat.id)} aria-label="Sail route for {boat.label}">
                           <Play size={11} strokeWidth={2} />
@@ -420,9 +437,10 @@
               {/if}
               {#if currentAnimation}
                 <div class="section-header" style="margin-top: var(--space-2)">
+                  <h3>Speed</h3>
                   <span class="wind-label">{timeScale}×</span>
-                  <input type="range" min="1" max="10" step="0.5" bind:value={timeScale} class="wind-slider" style="flex:1" />
                 </div>
+                <input type="range" min="1" max="10" step="0.5" bind:value={timeScale} class="wind-slider" />
               {/if}
             </section>
           </div>
@@ -679,6 +697,12 @@
     font-family: var(--font-mono);
     font-size: 0.75rem;
     color: var(--text-muted);
+  }
+
+  .route-controls {
+    display: flex;
+    align-items: center;
+    gap: 2px;
   }
 
   .route-sail {

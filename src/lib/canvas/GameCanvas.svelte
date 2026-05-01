@@ -17,6 +17,7 @@
     camera: cameraProp,
     animation,
     animationSpeed = 1,
+    animationPaused = false,
     interactive = false,
     selectedBoatId,
     onBoatClick,
@@ -130,7 +131,7 @@
     let animTime = 0
     if (playback?.playing) {
       const dt = lastRafTs > 0 ? (timestamp - lastRafTs) / 1000 : 0
-      virtualAnimTime += dt * animationSpeed
+      if (!animationPaused) virtualAnimTime += dt * animationSpeed
 
       if (playback.clip.loop) {
         animTime = virtualAnimTime % playback.clip.durationSec
