@@ -1,10 +1,12 @@
 <script lang="ts">
+  import { onMount } from 'svelte'
   import GameCanvas from '$lib/canvas/GameCanvas.svelte'
   import type { SceneState, BoatState, Mark, Vec2, Waypoint, AnimationClip, AnimationKeyframe, BoatKeyframeData, RuleViolation } from '$lib/canvas/types.ts'
   import { calcLegSpeed } from '$lib/canvas/renderer/waypoint.ts'
   import { lerpAngle } from '$lib/canvas/renderer/coords.ts'
   import { evaluateScene } from '$lib/rules/logic.ts'
   import { RULES_BY_ID } from '$lib/data/rulesIndex.ts'
+  import { PRESETS_BY_ID } from '$lib/whiteboardPresets.ts'
   import { base } from '$app/paths'
   import { Play, Square, Pause } from 'lucide-svelte'
 
@@ -346,6 +348,24 @@
     rightOfWay: string | null
   }
 
+  // ── Preset loading (?preset=<id> query param) ─────────────────────
+  let activePresetTitle = $state<string | null>(null)
+  let activePresetHint  = $state<string | null>(null)
+
+  onMount(() => {
+    const id = new URLSearchParams(window.location.search).get('preset')
+    if (!id) return
+    const preset = PRESETS_BY_ID[id]
+    if (!preset) return
+    scene = preset.scene
+    activePresetTitle = preset.title
+    activePresetHint  = preset.hint
+    if (preset.autoPlay) {
+      // Wait a tick so the canvas picks up the new scene before we build the clip.
+      setTimeout(() => playAllRoutes(), 50)
+    }
+  })
+
   let violationCards = $derived.by<ViolationCard[]>(() => {
     // De-dup: keep the strongest severity per (ruleId, violatorBoatId) pair.
     const strongest = new Map<string, RuleViolation>()
@@ -373,7 +393,7 @@
 <div class="page-container">
   <div class="page-header">
     <div class="container">
-      <h1>Whiteboard</h1>
+      <h1>Whiteboard{activePresetTitle ? ` — ${activePresetTitle}` : ''}</h1>
       <p class="page-subtitle">
         Plan race scenarios: drag boats and marks, set wind direction, and step through situations.
       </p>
@@ -401,6 +421,12 @@
         {onViolationsChanged}
         bind:animationTime={playbackTime}
       />
+
+      {#if activePresetHint}
+        <div class="preset-hint" role="note">
+          {activePresetHint}
+        </div>
+      {/if}
 
       <!-- Rule violation notifications (top-left) -->
       {#if violationCards.length > 0}
@@ -590,6 +616,27 @@
     border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: var(--shadow-card);
+  }
+
+  /* ── Preset hint banner ──────────────────────────────────────────── */
+  .preset-hint {
+    position: absolute;
+    bottom: var(--space-3);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    max-width: min(560px, calc(100% - var(--space-6)));
+    padding: var(--space-2) var(--space-3);
+    background: color-mix(in srgb, var(--bg-card) 92%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    color: var(--text);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    text-align: center;
   }
 
   /* ── Violation notifications ─────────────────────────────────────── */
