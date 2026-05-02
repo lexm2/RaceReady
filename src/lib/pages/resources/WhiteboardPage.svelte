@@ -673,16 +673,21 @@
     position: absolute;
     top: var(--space-3);
     left: var(--space-3);
+    /* Cap to the canvas width minus margins on the right + the controls panel. */
+    max-width: calc(100% - var(--space-3) * 2 - 240px);
     z-index: 10;
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: var(--space-2);
-    max-width: 280px;
     pointer-events: none;
   }
 
   .violation-card {
     pointer-events: auto;
+    /* Size to content; cap so a long boat label can't push us off-screen. */
+    width: max-content;
+    max-width: min(380px, 100%);
     background: color-mix(in srgb, var(--bg-card) 92%, transparent);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -704,9 +709,11 @@
     display: flex;
     align-items: center;
     gap: var(--space-2);
+    flex-wrap: wrap;
   }
 
   .violation-sev {
+    flex-shrink: 0;
     font-family: var(--font-heading);
     font-size: 0.62rem;
     text-transform: uppercase;
@@ -725,9 +732,8 @@
     font-size: 0.78rem;
     color: var(--text);
     font-weight: 600;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    line-height: 1.25;
+    word-break: break-word;
   }
 
   .violation-body {
@@ -735,6 +741,7 @@
     font-size: 0.8rem;
     color: var(--text);
     line-height: 1.35;
+    word-break: break-word;
   }
 
   .violation-link {
