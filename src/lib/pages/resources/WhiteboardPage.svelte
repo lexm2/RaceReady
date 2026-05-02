@@ -8,7 +8,7 @@
   import { RULES_BY_ID } from '$lib/data/rulesIndex.ts'
   import { PRESETS_BY_ID } from '$lib/whiteboardPresets.ts'
   import { base } from '$app/paths'
-  import { Play, Square, Pause } from 'lucide-svelte'
+  import { Play, Square, Pause, SkipBack, SkipForward } from 'lucide-svelte'
 
   // ── Default scene ──────────────────────────────────────────────────
   let scene = $state<SceneState>({
@@ -224,8 +224,9 @@
   }
 
   interface RouteFrame { time: number; data: BoatKeyframeData }
+  interface BoatRoute { frames: RouteFrame[]; waypointTimes: number[] }
 
-  function buildBoatRoute(boatId: string): RouteFrame[] | null {
+  function buildBoatRoute(boatId: string): BoatRoute | null {
     const boat = scene.boats.find(b => b.id === boatId)
     if (!boat) return null
     const wps = (scene.waypoints ?? [])
@@ -234,6 +235,7 @@
     if (wps.length === 0) return null
 
     const frames: RouteFrame[] = []
+    const waypointTimes: number[] = []
     let t = 0
 
     function push(heading: number, position: Vec2) {
@@ -282,13 +284,14 @@
       const speedMs = Math.max(calcLegSpeed(bearing, scene.wind.directionDeg) * 0.514444, 0.3)
       t += distM / speedMs
       push(bearing, wp.position)
+      waypointTimes.push(t)
 
       const nextPos     = i < wps.length - 1 ? wps[i + 1]!.position : boat.position
       const nextBearing = legBearing(wp.position, nextPos)
       prevPos = rotate(wp.position, bearing, nextBearing)
     }
 
-    return frames
+    return { frames, waypointTimes }
   }
 
   function sampleBoatAt(frames: RouteFrame[], t: number): BoatKeyframeData {
@@ -324,22 +327,37 @@
     return { keyframes, durationSec: maxDuration, loop: true }
   }
 
+  /** Sorted, unique time bookmarks (start, each waypoint, end) for skip controls. */
+  let bookmarks = $state<number[]>([])
+
+  function buildBookmarks(routes: BoatRoute[], duration: number): number[] {
+    const set = new Set<number>([0, duration])
+    for (const r of routes) for (const t of r.waypointTimes) set.add(t)
+    return [...set].sort((a, b) => a - b)
+  }
+
   function playRoute(boatId: string): void {
-    const frames = buildBoatRoute(boatId)
-    if (!frames) return
-    currentAnimation = buildClip(new Map([[boatId, frames]]))
+    const route = buildBoatRoute(boatId)
+    if (!route) return
+    currentAnimation = buildClip(new Map([[boatId, route.frames]]))
+    bookmarks        = buildBookmarks([route], currentAnimation.durationSec)
     sailingBoatId    = boatId
     playingAll       = false
   }
 
   function playAllRoutes(): void {
     const routeMap = new Map<string, RouteFrame[]>()
+    const routes: BoatRoute[] = []
     for (const boat of scene.boats) {
-      const frames = buildBoatRoute(boat.id)
-      if (frames) routeMap.set(boat.id, frames)
+      const route = buildBoatRoute(boat.id)
+      if (route) {
+        routeMap.set(boat.id, route.frames)
+        routes.push(route)
+      }
     }
     if (routeMap.size === 0) return
     currentAnimation = buildClip(routeMap)
+    bookmarks        = buildBookmarks(routes, currentAnimation.durationSec)
     sailingBoatId    = undefined
     playingAll       = true
   }
@@ -349,6 +367,19 @@
     sailingBoatId    = undefined
     playingAll       = false
     paused           = false
+    bookmarks        = []
+  }
+
+  function skipForward(): void {
+    if (!currentAnimation) return
+    const next = bookmarks.find(t => t > playbackTime + 0.05)
+    playbackTime = next ?? currentAnimation.durationSec
+  }
+
+  function skipBackward(): void {
+    if (!currentAnimation) return
+    const prev = [...bookmarks].reverse().find(t => t < playbackTime - 0.05)
+    playbackTime = prev ?? 0
   }
 
   function togglePause(): void {
@@ -460,12 +491,35 @@
         {/if}
         {#if currentAnimation}
           <div class="playback-island" role="group" aria-label="Playback controls">
-            <button class="pb-btn" onclick={togglePause} aria-label={paused ? 'Resume' : 'Pause'}>
-              {#if paused}<Play size={14} strokeWidth={2.5} />{:else}<Pause size={14} strokeWidth={2.5} />{/if}
-            </button>
-            <button class="pb-btn pb-btn--stop" onclick={stopRoute} aria-label="Stop">
-              <Square size={14} strokeWidth={2.5} />
-            </button>
+            <div class="pb-controls">
+              <span class="pb-time">{playbackTime.toFixed(1)} / {currentAnimation.durationSec.toFixed(1)}s</span>
+              <div class="pb-buttons">
+                <button class="pb-btn" onclick={skipBackward} aria-label="Previous waypoint">
+                  <SkipBack size={14} strokeWidth={2.5} />
+                </button>
+                <button class="pb-btn pb-btn--play" onclick={togglePause} aria-label={paused ? 'Resume' : 'Pause'}>
+                  {#if paused}<Play size={16} strokeWidth={2.5} />{:else}<Pause size={16} strokeWidth={2.5} />{/if}
+                </button>
+                <button class="pb-btn" onclick={skipForward} aria-label="Next waypoint">
+                  <SkipForward size={14} strokeWidth={2.5} />
+                </button>
+                <button class="pb-btn pb-btn--stop" onclick={stopRoute} aria-label="Stop">
+                  <Square size={14} strokeWidth={2.5} />
+                </button>
+              </div>
+              <label class="pb-speed">
+                <input
+                  type="number"
+                  min="0.1"
+                  max="10"
+                  step="0.5"
+                  bind:value={timeScale}
+                  class="speed-input"
+                  aria-label="Playback speed multiplier"
+                />
+                <span class="speed-suffix">×</span>
+              </label>
+            </div>
             <input
               type="range"
               class="pb-slider"
@@ -475,19 +529,6 @@
               bind:value={playbackTime}
               aria-label="Playback position"
             />
-            <span class="pb-time">{playbackTime.toFixed(1)} / {currentAnimation.durationSec.toFixed(1)}s</span>
-            <label class="pb-speed">
-              <input
-                type="number"
-                min="0.1"
-                max="10"
-                step="0.5"
-                bind:value={timeScale}
-                class="speed-input"
-                aria-label="Playback speed multiplier"
-              />
-              <span class="speed-suffix">×</span>
-            </label>
           </div>
         {/if}
       </div>
@@ -666,54 +707,120 @@
   }
 
   .playback-island {
-    width: 100%;
+    width: min(520px, 100%);
     display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 18px 10px;
+    background: rgba(0, 0, 0, 0.78);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    /* Pill-shaped: full-circle ends, flat top/bottom. */
+    border-radius: 9999px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  }
+
+  .pb-controls {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
     gap: var(--space-2);
-    padding: var(--space-2) var(--space-3);
-    background: color-mix(in srgb, var(--bg-card) 94%, transparent);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-card);
+  }
+  .pb-controls > .pb-time     { justify-self: start;  }
+  .pb-controls > .pb-buttons  { justify-self: center; }
+  .pb-controls > .pb-speed    { justify-self: end;    }
+
+  .pb-buttons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .pb-btn {
     background: none;
     border: none;
-    color: var(--accent);
+    color: rgba(255, 255, 255, 0.7);
     cursor: pointer;
-    padding: 4px 6px;
-    border-radius: var(--radius-sm);
+    padding: 4px 5px;
+    border-radius: 999px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
   }
-  .pb-btn:hover { background: rgba(255, 255, 255, 0.06); }
-  .pb-btn--stop { color: #ff6060; }
+  .pb-btn:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+  .pb-btn--play { color: #fff; padding: 5px 7px; }
+  .pb-btn--play:hover { background: rgba(255, 255, 255, 0.14); }
+  .pb-btn--stop { color: rgba(255, 96, 96, 0.85); }
+  .pb-btn--stop:hover { background: rgba(255, 96, 96, 0.15); color: #ff6060; }
 
+  /* Thin slider track, subtle thumb that grows on hover. */
   .pb-slider {
-    flex: 1;
-    min-width: 100px;
-    accent-color: var(--accent);
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 14px;       /* hit target; track is drawn smaller below */
+    background: transparent;
+    outline: none;
+    margin: 0;
+    cursor: pointer;
   }
+  .pb-slider::-webkit-slider-runnable-track {
+    height: 2px;
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 2px;
+  }
+  .pb-slider::-moz-range-track {
+    height: 2px;
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 2px;
+  }
+  .pb-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 6px;
+    height: 6px;
+    margin-top: -2px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.7);
+    border: none;
+    transition: transform 0.15s, background 0.15s;
+  }
+  .pb-slider::-moz-range-thumb {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.7);
+    border: none;
+    transition: transform 0.15s, background 0.15s;
+  }
+  .pb-slider:hover::-webkit-slider-thumb,
+  .pb-slider:active::-webkit-slider-thumb { transform: scale(1.6); background: #fff; }
+  .pb-slider:hover::-moz-range-thumb,
+  .pb-slider:active::-moz-range-thumb     { transform: scale(1.6); background: #fff; }
 
   .pb-time {
     font-family: var(--font-mono);
-    font-size: 0.78rem;
-    color: var(--text-muted);
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.7);
     white-space: nowrap;
-    flex-shrink: 0;
   }
 
   .pb-speed {
     display: inline-flex;
     align-items: baseline;
     gap: 1px;
-    flex-shrink: 0;
+    color: rgba(255, 255, 255, 0.7);
   }
+  .pb-speed .speed-input {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.18);
+    background: transparent;
+  }
+  .pb-speed .speed-input:focus { border-color: rgba(255, 255, 255, 0.5); }
+  .pb-speed .speed-suffix { color: rgba(255, 255, 255, 0.6); }
 
   /* ── Violation notifications ─────────────────────────────────────── */
   .violations-overlay {
