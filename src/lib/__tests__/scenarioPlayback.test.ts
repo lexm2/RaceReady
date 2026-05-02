@@ -63,13 +63,16 @@ describe('Whiteboard preset playback', () => {
       it('keeps every boat moving for the full duration (no boat freezes early)', () => {
         const dt = duration / MOTION_SAMPLES
         const stalls: string[] = []
+        // Capsized / anchored / aground boats are intentionally stationary —
+        // skip them so they don't trip the no-stall check.
+        const mobileBoats = preset.scene.boats.filter(b => (b.condition ?? 'normal') === 'normal')
 
         for (let i = 0; i < MOTION_SAMPLES; i++) {
           const t0 = i * dt
           const t1 = t0 + dt
           const a = sampleSceneAt(preset.scene, clip, t0)
           const b = sampleSceneAt(preset.scene, clip, t1)
-          for (const boat of preset.scene.boats) {
+          for (const boat of mobileBoats) {
             const aBoat = a.boats.find(x => x.id === boat.id)!
             const bBoat = b.boats.find(x => x.id === boat.id)!
             const moved = Math.hypot(
@@ -110,6 +113,28 @@ describe('Whiteboard preset playback', () => {
               )
             }`,
         ).toBeGreaterThan(0)
+      })
+
+      it('keeps capsized / anchored / aground boats locked at their starting position', () => {
+        const immobile = preset.scene.boats.filter(b => (b.condition ?? 'normal') !== 'normal')
+        if (immobile.length === 0) return // nothing to assert for this preset
+
+        for (let i = 0; i <= 30; i++) {
+          const t = (duration * i) / 30
+          const sampled = sampleSceneAt(preset.scene, clip, t)
+          for (const boat of immobile) {
+            const got = sampled.boats.find(x => x.id === boat.id)!
+            const drift = Math.hypot(
+              got.position.x - boat.position.x,
+              got.position.y - boat.position.y,
+            )
+            expect(
+              drift,
+              `${boat.id} (${boat.condition}) drifted ${drift.toFixed(3)}m at t=${t.toFixed(2)}s — ` +
+                `non-normal boats must hold their starting position`,
+            ).toBeLessThan(0.01)
+          }
+        }
       })
 
       it('exposes setup context (samples at midpoint show both boats interacting)', () => {

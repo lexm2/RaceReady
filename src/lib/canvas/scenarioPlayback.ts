@@ -126,7 +126,12 @@ function buildBoatRoute(boat: BoatState, waypoints: Waypoint[], windDirDeg: numb
 
   push(boat.heading, boat.position)
 
-  if (wps.length === 0) {
+  // Capsized / anchored / aground boats can't sail — emit a single keyframe
+  // and bail before any waypoint following or in-place pivoting. (The page
+  // already drops their waypoints on condition change, but guard anyway so
+  // any straggler waypoints don't put the boat into motion.)
+  const immobile = (boat.condition ?? 'normal') !== 'normal'
+  if (immobile || wps.length === 0) {
     return { boatId: boat.id, frames, waypointTimes, naturalDurationSec: 0 }
   }
 
@@ -284,15 +289,17 @@ function extendRouteToDuration(route: BoatRoute, scene: SceneState, clipDuration
 
   const boat = scene.boats.find(b => b.id === route.boatId)!
   const heading = last.data.heading
-  const speedMs = legSpeedMs(heading, scene.wind.directionDeg)
+
+  // Capsized / anchored / aground boats can't sail — hold position for the
+  // remainder of the clip instead of drifting forward at the last heading.
+  const immobile = (boat.condition ?? 'normal') !== 'normal'
+  const speedMs = immobile ? 0 : legSpeedMs(heading, scene.wind.directionDeg)
   const remainingSec = clipDurationSec - last.time
   const v = headingVec(heading)
   const endPos: Vec2 = {
     x: last.data.position.x + v.x * speedMs * remainingSec,
     y: last.data.position.y + v.y * speedMs * remainingSec,
   }
-  // Suppress unused warning for boat — we only needed it to assert it exists.
-  void boat
   route.frames.push({
     time: clipDurationSec,
     data: { boatId: route.boatId, position: endPos, heading },

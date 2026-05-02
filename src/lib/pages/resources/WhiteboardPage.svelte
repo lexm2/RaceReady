@@ -163,7 +163,18 @@
   let conditionMenuPos = $state<{ top: number; right: number } | undefined>(undefined)
 
   function setBoatCondition(id: string, next: Condition): void {
-    scene.boats = scene.boats.map(b => (b.id === id ? { ...b, condition: next } : b))
+    // Capsized / anchored / aground boats can't sail, so a planned route on
+    // one no longer makes sense — drop the boat's waypoints when it leaves
+    // the normal state. (Going back to normal leaves an empty path; the user
+    // can re-plot waypoints if they want.)
+    const dropWaypoints = next !== 'normal'
+    scene = {
+      ...scene,
+      boats: scene.boats.map(b => (b.id === id ? { ...b, condition: next } : b)),
+      waypoints: dropWaypoints
+        ? (scene.waypoints ?? []).filter(w => w.boatId !== id)
+        : scene.waypoints,
+    }
     openConditionBoatId = undefined
     conditionMenuPos = undefined
   }
@@ -445,6 +456,13 @@
     }
   })
 
+  // Playback-island derived state — drives disabled / icon switching when the
+  // island is rendered with no active animation.
+  let hasAnyWaypoints = $derived((scene.waypoints ?? []).length > 0)
+  let playDisabled    = $derived(!currentAnimation && !hasAnyWaypoints)
+  let navDisabled     = $derived(!currentAnimation)
+  let showPlayIcon    = $derived(!currentAnimation || paused)
+
   let violationCards = $derived.by<ViolationCard[]>(() => {
     // De-dup: keep the strongest severity per (ruleId, violatorBoatId) pair.
     const strongest = new Map<string, RuleViolation>()
@@ -501,8 +519,8 @@
         bind:animationTime={playbackTime}
       />
 
-      <!-- Bottom-left controls: fullscreen + play routes -->
-      <div class="canvas-corner canvas-corner--bl">
+      <!-- Bottom-right control: fullscreen -->
+      <div class="canvas-corner canvas-corner--br">
         <button
           class="corner-btn"
           onclick={toggleFullscreen}
@@ -511,16 +529,6 @@
         >
           {#if isFullscreen}<Minimize2 size={16} strokeWidth={2} />{:else}<Maximize2 size={16} strokeWidth={2} />{/if}
         </button>
-        {#if !currentAnimation && (scene.waypoints ?? []).length > 0}
-          <button
-            class="corner-btn corner-btn--play"
-            onclick={playAllRoutes}
-            aria-label="Play routes"
-            title="Play routes"
-          >
-            <Play size={16} strokeWidth={2} />
-          </button>
-        {/if}
       </div>
 
       <!-- Top-center: preset hint -->
@@ -530,62 +538,68 @@
         </div>
       {/if}
 
-      <!-- Bottom-center: playback island -->
+      <!-- Bottom-center: playback island (always visible) -->
       <div class="bottom-stack">
-        {#if currentAnimation}
-          <div class="playback-island" role="group" aria-label="Playback controls">
-            <div class="pb-controls">
-              <span class="pb-time">{playbackTime.toFixed(1)} / {currentAnimation.durationSec.toFixed(1)}s</span>
-              <div class="pb-buttons">
-                <button class="pb-btn" onclick={skipBackward} aria-label="Previous waypoint">
-                  <SkipBack size={14} strokeWidth={2.5} />
-                </button>
-                <button class="pb-btn pb-btn--play" onclick={togglePause} aria-label={paused ? 'Resume' : 'Pause'}>
-                  {#if paused}<Play size={16} strokeWidth={2.5} />{:else}<Pause size={16} strokeWidth={2.5} />{/if}
-                </button>
-                <button class="pb-btn" onclick={skipForward} aria-label="Next waypoint">
-                  <SkipForward size={14} strokeWidth={2.5} />
-                </button>
-                <button class="pb-btn pb-btn--stop" onclick={stopRoute} aria-label="Stop">
-                  <Square size={14} strokeWidth={2.5} />
-                </button>
-              </div>
-              <div class="pb-right">
-                <button
-                  class="pb-btn pb-btn--toggle"
-                  class:pb-btn--toggle-on={autoPauseOnViolation}
-                  onclick={() => autoPauseOnViolation = !autoPauseOnViolation}
-                  aria-pressed={autoPauseOnViolation}
-                  aria-label="Auto-pause on rule violation"
-                  title="Auto-pause on each new rule violation ({autoPauseOnViolation ? 'on' : 'off'})"
-                >
-                  {#if autoPauseOnViolation}<BellRing size={14} strokeWidth={2.5} />{:else}<BellOff size={14} strokeWidth={2.5} />{/if}
-                </button>
-                <label class="pb-speed">
-                  <input
-                    type="number"
-                    min="0.1"
-                    max="10"
-                    step="0.5"
-                    bind:value={timeScale}
-                    class="speed-input"
-                    aria-label="Playback speed multiplier"
-                  />
-                  <span class="speed-suffix">×</span>
-                </label>
-              </div>
+        <div class="playback-island" role="group" aria-label="Playback controls">
+          <div class="pb-controls">
+            <span class="pb-time">
+              {playbackTime.toFixed(1)} / {(currentAnimation?.durationSec ?? 0).toFixed(1)}s
+            </span>
+            <div class="pb-buttons">
+              <button class="pb-btn" onclick={skipBackward} disabled={navDisabled} aria-label="Previous waypoint">
+                <SkipBack size={14} strokeWidth={2.5} />
+              </button>
+              <button
+                class="pb-btn pb-btn--play"
+                onclick={currentAnimation ? togglePause : playAllRoutes}
+                disabled={playDisabled}
+                aria-label={currentAnimation ? (paused ? 'Resume' : 'Pause') : 'Play routes'}
+              >
+                {#if showPlayIcon}<Play size={16} strokeWidth={2.5} />{:else}<Pause size={16} strokeWidth={2.5} />{/if}
+              </button>
+              <button class="pb-btn" onclick={skipForward} disabled={navDisabled} aria-label="Next waypoint">
+                <SkipForward size={14} strokeWidth={2.5} />
+              </button>
+              <button class="pb-btn pb-btn--stop" onclick={stopRoute} disabled={navDisabled} aria-label="Stop">
+                <Square size={14} strokeWidth={2.5} />
+              </button>
             </div>
-            <input
-              type="range"
-              class="pb-slider"
-              min="0"
-              max={currentAnimation.durationSec}
-              step="0.05"
-              bind:value={playbackTime}
-              aria-label="Playback position"
-            />
+            <div class="pb-right">
+              <button
+                class="pb-btn pb-btn--toggle"
+                class:pb-btn--toggle-on={autoPauseOnViolation}
+                onclick={() => autoPauseOnViolation = !autoPauseOnViolation}
+                aria-pressed={autoPauseOnViolation}
+                aria-label="Auto-pause on rule violation"
+                title="Auto-pause on each new rule violation ({autoPauseOnViolation ? 'on' : 'off'})"
+              >
+                {#if autoPauseOnViolation}<BellRing size={14} strokeWidth={2.5} />{:else}<BellOff size={14} strokeWidth={2.5} />{/if}
+              </button>
+              <label class="pb-speed">
+                <input
+                  type="number"
+                  min="0.1"
+                  max="10"
+                  step="0.5"
+                  bind:value={timeScale}
+                  class="speed-input"
+                  aria-label="Playback speed multiplier"
+                />
+                <span class="speed-suffix">×</span>
+              </label>
+            </div>
           </div>
-        {/if}
+          <input
+            type="range"
+            class="pb-slider"
+            min="0"
+            max={currentAnimation?.durationSec ?? 1}
+            step="0.05"
+            bind:value={playbackTime}
+            disabled={navDisabled}
+            aria-label="Playback position"
+          />
+        </div>
       </div>
 
       <!-- Rule violation notifications (top-left) -->
@@ -823,6 +837,12 @@
     transition: background 0.15s, color 0.15s;
   }
   .pb-btn:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+  .pb-btn:disabled {
+    color: rgba(255, 255, 255, 0.25);
+    cursor: not-allowed;
+    background: none;
+  }
+  .pb-btn:disabled:hover { background: none; color: rgba(255, 255, 255, 0.25); }
   .pb-btn--play { color: #fff; padding: 5px 7px; }
   .pb-btn--play:hover { background: rgba(255, 255, 255, 0.14); }
   .pb-btn--stop { color: rgba(255, 96, 96, 0.85); }
@@ -910,7 +930,7 @@
     display: flex;
     gap: var(--space-2);
   }
-  .canvas-corner--bl { bottom: var(--space-3); left: var(--space-3); }
+  .canvas-corner--br { bottom: var(--space-3); right: var(--space-3); }
 
   .corner-btn {
     width: 32px;
@@ -932,8 +952,6 @@
     color: var(--text);
     background: color-mix(in srgb, var(--bg-card) 96%, transparent);
   }
-  .corner-btn--play { color: var(--accent); }
-  .corner-btn--play:hover { color: var(--accent); }
 
   /* ── Violation notifications ─────────────────────────────────────── */
   .violations-overlay {
