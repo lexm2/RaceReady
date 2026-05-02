@@ -8,7 +8,7 @@
   import { RULES_BY_ID } from '$lib/data/rulesIndex.ts'
   import { PRESETS_BY_ID } from '$lib/whiteboardPresets.ts'
   import { base } from '$app/paths'
-  import { Play, Square, Pause, SkipBack, SkipForward, Maximize2, Minimize2, BellRing, BellOff } from 'lucide-svelte'
+  import { Play, Square, Pause, SkipBack, SkipForward, Maximize2, Minimize2, BellRing, BellOff, Sailboat, LifeBuoy, Anchor, Mountain } from 'lucide-svelte'
 
   // ── Default scene ──────────────────────────────────────────────────
   let scene = $state<SceneState>({
@@ -149,22 +149,34 @@
     scene.boats = scene.boats.map(b => b.id === id ? { ...b, hullColor: hex } : b)
   }
 
-  /** Cycle through boat conditions for Rule 22. */
-  const CONDITION_CYCLE = ['normal', 'capsized', 'anchored', 'aground'] as const
-  type Condition = (typeof CONDITION_CYCLE)[number]
+  /** Per-boat condition for Rule 22. */
+  const CONDITIONS = ['normal', 'capsized', 'anchored', 'aground'] as const
+  type Condition = (typeof CONDITIONS)[number]
   const CONDITION_LABEL: Record<Condition, string> = {
     normal: 'Normal', capsized: 'Capsized', anchored: 'Anchored', aground: 'Aground',
   }
-  const CONDITION_ICON: Record<Condition, string> = {
-    normal: '○', capsized: 'C', anchored: 'A', aground: 'G',
+  const CONDITION_ICON: Record<Condition, any> = {
+    normal: Sailboat, capsized: LifeBuoy, anchored: Anchor, aground: Mountain,
   }
-  function cycleBoatCondition(id: string): void {
-    scene.boats = scene.boats.map(b => {
-      if (b.id !== id) return b
-      const cur = (b.condition ?? 'normal') as Condition
-      const next = CONDITION_CYCLE[(CONDITION_CYCLE.indexOf(cur) + 1) % CONDITION_CYCLE.length]!
-      return { ...b, condition: next }
-    })
+
+  let openConditionBoatId = $state<string | undefined>(undefined)
+  let conditionMenuPos = $state<{ top: number; right: number } | undefined>(undefined)
+
+  function setBoatCondition(id: string, next: Condition): void {
+    scene.boats = scene.boats.map(b => (b.id === id ? { ...b, condition: next } : b))
+    openConditionBoatId = undefined
+    conditionMenuPos = undefined
+  }
+
+  function toggleConditionMenu(id: string, triggerEl: HTMLButtonElement): void {
+    if (openConditionBoatId === id) {
+      openConditionBoatId = undefined
+      conditionMenuPos = undefined
+      return
+    }
+    const r = triggerEl.getBoundingClientRect()
+    conditionMenuPos = { top: r.bottom + 4, right: window.innerWidth - r.right }
+    openConditionBoatId = id
   }
 
   // ── Waypoints ──────────────────────────────────────────────────────
@@ -270,8 +282,12 @@
 
   $effect(() => {
     // Stop active playback the moment any path-relevant scene field changes.
+    // Also drop the preset hint at this point — the user has edited the
+    // canonical setup and the hint's instructions ("Press play. Boat B starts
+    // clear astern…") no longer describe what's on screen.
     if (currentAnimation && playbackBaseScene && isPlaybackPathInvalidated(playbackBaseScene, scene)) {
       stopRoute()
+      activePresetHint = null
     }
   })
 
@@ -311,6 +327,35 @@
     const onChange = () => { isFullscreen = document.fullscreenElement === canvasWrapEl }
     document.addEventListener('fullscreenchange', onChange)
     return () => document.removeEventListener('fullscreenchange', onChange)
+  })
+
+  onMount(() => {
+    function close(): void {
+      openConditionBoatId = undefined
+      conditionMenuPos = undefined
+    }
+    function onPointerDown(e: PointerEvent): void {
+      if (!openConditionBoatId) return
+      const target = e.target as HTMLElement | null
+      if (target?.closest('.condition-wrap, .condition-menu')) return
+      close()
+    }
+    function onKey(e: KeyboardEvent): void {
+      if (e.key === 'Escape') close()
+    }
+    function onReflow(): void {
+      if (openConditionBoatId) close()
+    }
+    window.addEventListener('pointerdown', onPointerDown)
+    window.addEventListener('keydown', onKey)
+    window.addEventListener('scroll', onReflow, true)
+    window.addEventListener('resize', onReflow)
+    return () => {
+      window.removeEventListener('pointerdown', onPointerDown)
+      window.removeEventListener('keydown', onKey)
+      window.removeEventListener('scroll', onReflow, true)
+      window.removeEventListener('resize', onReflow)
+    }
   })
 
   // ── Rule violations ────────────────────────────────────────────────
@@ -609,6 +654,7 @@
               <ul class="boat-list">
                 {#each scene.boats as boat (boat.id)}
                   {@const condition = (boat.condition ?? 'normal') as Condition}
+                  {@const TriggerIcon = CONDITION_ICON[condition]}
                   <li class="boat-row">
                     <label class="boat-swatch-wrap" title="Hull color">
                       <input
@@ -620,13 +666,19 @@
                       <span class="boat-swatch" style="background:{hullHex(boat.hullColor)}"></span>
                     </label>
                     <span class="boat-name">{boat.label}</span>
-                    <button
-                      class="boat-condition"
-                      class:boat-condition--active={condition !== 'normal'}
-                      title="Condition: {CONDITION_LABEL[condition]} (click to cycle)"
-                      onclick={() => cycleBoatCondition(boat.id)}
-                      aria-label="Cycle condition for {boat.label}"
-                    >{CONDITION_ICON[condition]}</button>
+                    <span class="condition-wrap">
+                      <button
+                        class="boat-condition"
+                        class:boat-condition--active={condition !== 'normal'}
+                        title="Condition: {CONDITION_LABEL[condition]}"
+                        onclick={(e) => toggleConditionMenu(boat.id, e.currentTarget)}
+                        aria-haspopup="menu"
+                        aria-expanded={openConditionBoatId === boat.id}
+                        aria-label="Condition for {boat.label}: {CONDITION_LABEL[condition]}"
+                      >
+                        <TriggerIcon size={12} strokeWidth={2} />
+                      </button>
+                    </span>
                     <button class="boat-remove" onclick={() => removeBoat(boat.id)} aria-label="Remove {boat.label}">×</button>
                   </li>
                 {/each}
@@ -639,6 +691,33 @@
       </aside>
     </div>
   </div>
+
+  {#if openConditionBoatId && conditionMenuPos}
+    {@const openBoat = scene.boats.find(b => b.id === openConditionBoatId)}
+    {@const openCondition = (openBoat?.condition ?? 'normal') as Condition}
+    <ul
+      class="condition-menu"
+      role="menu"
+      aria-label="Boat condition"
+      style="top: {conditionMenuPos.top}px; right: {conditionMenuPos.right}px;"
+    >
+      {#each CONDITIONS as cond}
+        {@const Icon = CONDITION_ICON[cond]}
+        <li role="none">
+          <button
+            class="condition-menu-item"
+            class:condition-menu-item--selected={openCondition === cond}
+            role="menuitemradio"
+            aria-checked={openCondition === cond}
+            onclick={() => setBoatCondition(openConditionBoatId!, cond)}
+          >
+            <Icon size={14} strokeWidth={2} />
+            <span>{CONDITION_LABEL[cond]}</span>
+          </button>
+        </li>
+      {/each}
+    </ul>
+  {/if}
 </div>
 
 <style>
@@ -1148,16 +1227,19 @@
   }
   .boat-remove:hover { color: var(--text); }
 
+  .condition-wrap {
+    position: relative;
+    display: inline-flex;
+  }
+
   .boat-condition {
     background: none;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     color: var(--text-muted);
     cursor: pointer;
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     line-height: 1;
     padding: 0;
     display: inline-flex;
@@ -1168,8 +1250,40 @@
   .boat-condition--active {
     color: rgba(239, 68, 68, 1);
     border-color: rgba(239, 68, 68, 0.6);
-    font-weight: 600;
   }
+
+  .condition-menu {
+    position: fixed;
+    z-index: 100;
+    list-style: none;
+    margin: 0;
+    padding: 4px;
+    min-width: 132px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .condition-menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: 100%;
+    background: none;
+    border: none;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--text);
+    font-size: 0.78rem;
+    text-align: left;
+  }
+  .condition-menu-item:hover { background: var(--bg-hover, rgba(0, 0, 0, 0.04)); }
+  .condition-menu-item--selected { color: var(--accent); font-weight: 600; }
 
   .add-boat-btn {
     background: none;
