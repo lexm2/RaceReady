@@ -165,9 +165,12 @@
 
     // For change-based rules (15, 16) sample the same animation a moment in
     // the past so the evaluator can compare the right-of-way relationship.
-    // Skipped if no animation, paused, or we'd cross the loop boundary.
+    // Lookback is in animation time, not wall time, so it stays valid while
+    // paused — important for the auto-pause-on-violation flow, which would
+    // otherwise drop the rule that triggered the pause as soon as the pause
+    // took effect.
     let prevScene: SceneState | undefined
-    if (playback && !animationPaused) {
+    if (playback) {
       const lookbackTarget = animTime - RULE_LOOKBACK_SEC
       if (lookbackTarget >= 0) {
         prevScene = applyAnimation(scene, playback, lookbackTarget)

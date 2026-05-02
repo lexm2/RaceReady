@@ -5,6 +5,7 @@ import {
   buildScenarioPlayback,
   sampleSceneAt,
 } from '../canvas/scenarioPlayback.ts'
+import { ViolationPauseGate } from '../canvas/violationPauseGate.ts'
 
 /**
  * Match GameCanvas's RULE_LOOKBACK_SEC: rules 15 and 16 need a prior scene
@@ -121,6 +122,112 @@ describe('Whiteboard preset playback', () => {
           expect(boat.position.y).toBeGreaterThan(-50)
           expect(boat.position.y).toBeLessThan(preset.scene.worldSize.y + 50)
         }
+      })
+
+      /**
+       * End-to-end sim of what the WhiteboardPage actually shows the user.
+       * Models the full play-start sequence including:
+       *
+       *   - GameCanvas's dedup of `onViolationsChanged` (only fires when the
+       *     `ruleId|violatorBoatId|severity` set changes), with prevKey state
+       *     that persists across the static-scene preview and into playback.
+       *   - The "static fire before animation starts" callback that the page
+       *     receives but ignores because `currentAnimation` is undefined.
+       *   - The page's manual gate-seed at play-start (so the dedup'd first
+       *     animation frame doesn't get swallowed and leave the gate empty).
+       *   - The gate's pause decision on each subsequent change.
+       *
+       * Two paths count as "visible to the user":
+       *   1. The rule is in the *initial* violation set (static rules like
+       *      R10/R11/etc.) — the page's seed picks it up; the card is up from
+       *      frame 1 and stays put while the rule keeps firing.
+       *   2. The rule fires later and the gate auto-pauses on the same frame
+       *      (change-based rules like R15/R16) — the pause holds the card.
+       *
+       * Failing this means the production wiring would let the named rule
+       * appear on screen too briefly (or never) for the user to read.
+       */
+      it(`shows ${preset.ruleId} to the user (seed or auto-pause)`, () => {
+        const gate = new ViolationPauseGate()
+        let paused = false
+        let prevDedupKey = ''
+        let onChangeCalls: RuleViolation[][] = []
+        let pauseFiredWithRule = false
+
+        function dedupKey(vs: RuleViolation[]): string {
+          return vs
+            .map(v => `${v.ruleId}|${v.violatorBoatId}|${v.severity}`)
+            .sort()
+            .join(',')
+        }
+
+        function deliverViolations(vs: RuleViolation[], currentAnimationActive: boolean) {
+          const key = dedupKey(vs)
+          if (key === prevDedupKey) return
+          prevDedupKey = key
+          onChangeCalls.push(vs)
+          // Mirror WhiteboardPage.onViolationsChanged exactly:
+          if (!currentAnimationActive || paused) return
+          if (gate.noteViolations(vs)) paused = true
+        }
+
+        // Phase 1: static-scene preview — GameCanvas evaluates once before
+        // the animation starts. The page's handler returns early because no
+        // animation is active. This populates GameCanvas's prevDedupKey but
+        // not the gate.
+        const staticViolations: RuleViolation[] = []
+        // (Use the t=0 sample as a stand-in for the no-animation static eval.)
+        for (const v of evaluateAt(preset, clip, 0)) staticViolations.push(v)
+        deliverViolations(staticViolations, /* currentAnimationActive */ false)
+
+        // Phase 2: play-start. Mirrors WhiteboardPage.playAllRoutes:
+        //   reset gate, then seed it from evaluateScene(scene) so the
+        //   dedup-swallowed first animation frame can't leave the gate empty.
+        gate.reset()
+        gate.noteViolations(staticViolations)
+        const seededWithRule = staticViolations.some(v => v.ruleId === preset.ruleId)
+
+        // Phase 3: animation frames at ~30 fps.
+        const stepSec = 1 / 30
+        const steps = Math.ceil(duration / stepSec) + 1
+        for (let i = 0; i <= steps; i++) {
+          if (paused) {
+            pauseFiredWithRule =
+              onChangeCalls.at(-1)?.some(v => v.ruleId === preset.ruleId) ?? false
+            break
+          }
+          const t = Math.min(i * stepSec, duration)
+          deliverViolations(evaluateAt(preset, clip, t), true)
+        }
+
+        // Static-rule path: rule was in the seed; verify it stays on screen
+        // (the card persists only while the rule keeps firing).
+        if (seededWithRule) {
+          let alwaysVisible = true
+          for (let i = 0; i <= 30; i++) {
+            const t = (duration * i) / 30
+            const vs = evaluateAt(preset, clip, t)
+            if (!vs.some(v => v.ruleId === preset.ruleId)) {
+              alwaysVisible = false
+              break
+            }
+          }
+          expect(
+            alwaysVisible,
+            `${preset.ruleId} fires at t=0 (in the gate seed) but disappears later — ` +
+              `the user would see the card briefly and lose it`,
+          ).toBe(true)
+          return
+        }
+
+        // Change-based-rule path: the gate must auto-pause on a frame that
+        // contains the preset's rule, so the card stays on screen.
+        expect(
+          pauseFiredWithRule,
+          `${preset.ruleId} either never fired during the playback, or fired on ` +
+            `a frame that did not trigger the auto-pause gate — the user would ` +
+            `not have a chance to read its card`,
+        ).toBe(true)
       })
     })
   }

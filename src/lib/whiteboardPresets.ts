@@ -91,12 +91,12 @@ export const PRESETS: WhiteboardPreset[] = [
     id: 'rule_14', ruleId: 'rule_14',
     title: 'Rule 14 — Avoiding Contact',
     summary: 'Both boats must avoid contact when collision is imminent.',
-    hint: 'Boats are within 6 m. Both get a Rule 14 violation, plus the underlying Rule 10.',
+    hint: 'Both boats pinching head-to-wind on opposite tacks, locked within 6 m. Rule 14 fires on both, with Rule 10 keeping the port-tack boat clear.',
     scene: {
       ...baseScene,
       boats: [
-        A({ position: { x: 153, y: 120 } }),
-        B({ position: { x: 148, y: 120 } }),
+        A({ position: { x: 153, y: 120 }, heading: 350, tack: 'starboard' }),
+        B({ position: { x: 148, y: 120 }, heading: 10,  tack: 'port' }),
       ],
       waypoints: [],
     },

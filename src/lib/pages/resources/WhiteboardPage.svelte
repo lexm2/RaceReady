@@ -3,6 +3,7 @@
   import GameCanvas from '$lib/canvas/GameCanvas.svelte'
   import type { SceneState, Vec2, Waypoint, AnimationClip, RuleViolation } from '$lib/canvas/types.ts'
   import { buildScenarioPlayback } from '$lib/canvas/scenarioPlayback.ts'
+  import { ViolationPauseGate } from '$lib/canvas/violationPauseGate.ts'
   import { evaluateScene } from '$lib/rules/logic.ts'
   import { RULES_BY_ID } from '$lib/data/rulesIndex.ts'
   import { PRESETS_BY_ID } from '$lib/whiteboardPresets.ts'
@@ -229,6 +230,7 @@
     playingAll       = false
     paused           = false
     resetViolationGate()
+    seedPauseGateFromCurrentScene()
   }
 
   function playAllRoutes(): void {
@@ -242,6 +244,7 @@
     playingAll       = true
     paused           = false
     resetViolationGate()
+    seedPauseGateFromCurrentScene()
   }
 
   function stopRoute(): void {
@@ -294,35 +297,33 @@
   // ── Rule violations ────────────────────────────────────────────────
   let liveViolations = $state<RuleViolation[]>([])
 
-  /**
-   * Cumulative set of (ruleId|violatorBoatId) keys we've already paused on
-   * during the current playback. Cleared on play-start / stop so a re-run can
-   * re-trigger the same violations. Resume from auto-pause keeps these keys,
-   * so the same violation re-firing on the very next frame doesn't immediately
-   * re-pause.
-   */
-  let seenViolationKeys = new Set<string>()
-
-  function violationKey(v: RuleViolation): string {
-    return `${v.ruleId}|${v.violatorBoatId}`
-  }
+  // Auto-pause on each new (ruleId, violatorBoatId) pair so the user can read
+  // the violation card before the scene moves on. See ViolationPauseGate for
+  // the exact rules; reset on every play-start / stop.
+  const pauseGate = new ViolationPauseGate()
 
   function resetViolationGate(): void {
-    seenViolationKeys = new Set()
+    pauseGate.reset()
+  }
+
+  /**
+   * Seed the gate with the current scene's static violations the moment
+   * playback starts. Without this seed, GameCanvas's onViolationsChanged
+   * dedup ("only fire when the violation set changes") can swallow the
+   * initial t=0 callback during a play-start — the static set was already
+   * delivered while the page was still showing the static scene — leaving
+   * the gate uninitialised. The first new violation that *does* arrive
+   * (e.g. R15 at the ROW transfer) would then be treated as the seed
+   * instead of as a pause-trigger, and the user would never get a pause.
+   */
+  function seedPauseGateFromCurrentScene(): void {
+    pauseGate.noteViolations(evaluateScene(scene))
   }
 
   function onViolationsChanged(violations: RuleViolation[]): void {
     liveViolations = violations
     if (!currentAnimation || paused) return
-    let hasNew = false
-    for (const v of violations) {
-      const k = violationKey(v)
-      if (!seenViolationKeys.has(k)) {
-        seenViolationKeys.add(k)
-        hasNew = true
-      }
-    }
-    if (hasNew) paused = true
+    if (pauseGate.noteViolations(violations)) paused = true
   }
 
   /** Severity ordering helper. */
