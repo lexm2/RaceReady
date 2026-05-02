@@ -12,9 +12,11 @@ import { calcLegSpeed } from './renderer/waypoint.ts'
 
 const KNOT_TO_MS = 0.514444
 const TURN_RATE_DEG_PER_S = 60      // degrees per second of heading change
-const TURN_SPEED_MUL = 0.4          // boats slow to ~40% of leg speed during a turn
 const MIN_LEG_SPEED_KNOTS = 0.3     // floor so no-go-zone legs still progress
-const MIN_TURN_SPEED_MS = 0.2
+const ARC_DEG_PER_STEP = 10         // arc sample density along each rounded corner
+const MIN_ARC_RADIUS_M = 0.05       // below this, treat corner as a snap (no arc)
+const COLLINEAR_DEG = 1             // deflection below this is treated as straight
+const TIGHT_TURN_DEG = 175          // above this, fall back to in-place pivot
 
 interface RouteFrame {
   time: number
@@ -65,11 +67,34 @@ function legSpeedMs(bearingDeg: number, windDirDeg: number): number {
   return knots * KNOT_TO_MS
 }
 
+interface CornerInfo {
+  /** True when this waypoint is rounded with an arc (interior + non-degenerate). */
+  isCorner: boolean
+  /** +1 = right turn (CW in y-down screen coords), -1 = left turn. */
+  sign: 1 | -1 | 0
+  /** Magnitude of heading deflection in degrees, [0, 180]. */
+  alphaDeg: number
+  /** Arc radius (m), 0 if no arc. */
+  R: number
+  /** Tangent distance from corner along each adjacent leg (m), 0 if no arc. */
+  dTan: number
+}
+
 /**
  * Build a continuous-motion route for a single boat. If the boat has waypoints,
- * follow them; if it doesn't, sail straight ahead at its current heading. The
- * returned `naturalDurationSec` is the time of the boat's last waypoint (or 0
- * if there are no waypoints).
+ * follow them; if it doesn't, sail straight ahead at its current heading.
+ *
+ * Corner handling: each interior waypoint is rounded with a circular arc of
+ * radius R = v / ω (boat-leg speed over turn rate), tangent to both adjacent
+ * legs at distance d = R·tan(α/2) from the corner. The boat begins turning
+ * BEFORE the waypoint and exits past it, tracing a curve rather than pivoting
+ * in place. Heading sweeps continuously along the arc.
+ *
+ * `waypointTimes` records the **arc-entry time** ("the moment the boat begins
+ * rounding the mark"). For the last waypoint, no arc → entry equals the
+ * waypoint itself, so the bookmark is consistent.
+ *
+ * `naturalDurationSec` is the time of the last emitted frame (0 if no waypoints).
  */
 function buildBoatRoute(boat: BoatState, waypoints: Waypoint[], windDirDeg: number): BoatRoute {
   const wps = waypoints
@@ -84,33 +109,19 @@ function buildBoatRoute(boat: BoatState, waypoints: Waypoint[], windDirDeg: numb
     frames.push({ time: t, data: { boatId: boat.id, position, heading } })
   }
 
-  /**
-   * Curve through a heading change instead of pivoting in place. Samples the
-   * turn in small angular steps; at each step, the boat advances forward
-   * along the mid-step heading at a reduced speed.
-   */
-  function rotate(pos: Vec2, fromH: number, toH: number): Vec2 {
+  /** Spin in place at `pos` from `fromH` to `toH`. Used for the initial
+   *  heading-vs-firstBearing alignment and for tight-U-turn fallbacks. */
+  function pivotInPlace(pos: Vec2, fromH: number, toH: number): void {
     const turn = Math.abs(((toH - fromH + 540) % 360) - 180)
-    if (turn < 1) return pos
-
+    if (turn < COLLINEAR_DEG) return
     const turnDuration = turn / TURN_RATE_DEG_PER_S
-    const turnSpeedMs = Math.max(boat.speed * KNOT_TO_MS * TURN_SPEED_MUL, MIN_TURN_SPEED_MS)
-    const steps = Math.max(4, Math.ceil(turn / 10))
+    const steps = Math.max(4, Math.ceil(turn / ARC_DEG_PER_STEP))
     const dt = turnDuration / steps
-    const dDist = turnSpeedMs * dt
-
-    let curPos = pos
-    let curH = fromH
     for (let k = 1; k <= steps; k++) {
-      const nextH = lerpAngle(fromH, toH, k / steps)
-      const midH = lerpAngle(curH, nextH, 0.5)
-      const v = headingVec(midH)
-      curPos = { x: curPos.x + v.x * dDist, y: curPos.y + v.y * dDist }
+      const h = lerpAngle(fromH, toH, k / steps)
       t += dt
-      push(nextH, curPos)
-      curH = nextH
+      push(h, pos)
     }
-    return curPos
   }
 
   push(boat.heading, boat.position)
@@ -119,20 +130,138 @@ function buildBoatRoute(boat: BoatState, waypoints: Waypoint[], windDirDeg: numb
     return { boatId: boat.id, frames, waypointTimes, naturalDurationSec: 0 }
   }
 
-  const firstBearing = legBearing(boat.position, wps[0]!.position)
-  let prevPos = rotate(boat.position, boat.heading, firstBearing)
+  const omega = (TURN_RATE_DEG_PER_S * Math.PI) / 180
 
-  for (let i = 0; i < wps.length; i++) {
+  // Pre-compute leg geometry. P[0] = boat position, P[i+1] = wps[i].position.
+  const N = wps.length
+  const P: Vec2[] = [boat.position, ...wps.map(w => w.position)]
+  const bearings: number[] = []
+  const lengths: number[] = []
+  for (let i = 0; i < N; i++) {
+    bearings.push(legBearing(P[i]!, P[i + 1]!))
+    lengths.push(Math.hypot(P[i + 1]!.x - P[i]!.x, P[i + 1]!.y - P[i]!.y))
+  }
+
+  // corners[i] describes the turn AT wps[i] (uses bearings[i] in, bearings[i+1] out).
+  // Last waypoint has no outbound leg, so it's not a corner.
+  const corners: CornerInfo[] = []
+  for (let i = 0; i < N; i++) {
+    if (i === N - 1) {
+      corners.push({ isCorner: false, sign: 0, alphaDeg: 0, R: 0, dTan: 0 })
+      continue
+    }
+    const inB = bearings[i]!
+    const outB = bearings[i + 1]!
+    const defl = ((outB - inB + 540) % 360) - 180
+    const alphaDeg = Math.abs(defl)
+    if (alphaDeg < COLLINEAR_DEG || alphaDeg > TIGHT_TURN_DEG) {
+      corners.push({ isCorner: false, sign: 0, alphaDeg, R: 0, dTan: 0 })
+      continue
+    }
+    const v = legSpeedMs(inB, windDirDeg)
+    const Rraw = v / omega
+    const halfTan = Math.tan((alphaDeg * Math.PI) / 360)
+    let dTan = Rraw * halfTan
+    // Per-side cap: don't consume more than half the shorter adjacent leg.
+    const halfShort = Math.min(lengths[i]!, lengths[i + 1]!) * 0.5
+    if (dTan > halfShort) dTan = halfShort
+    corners.push({
+      isCorner: true,
+      sign: defl > 0 ? 1 : -1,
+      alphaDeg,
+      R: dTan / halfTan,
+      dTan,
+    })
+  }
+
+  // Second pass: prevent adjacent corners' tangents from overlapping on a
+  // shared leg. Leg between wps[i] and wps[i+1] has length lengths[i+1];
+  // it absorbs corners[i].dTan from one end and corners[i+1].dTan from the other.
+  for (let i = 0; i < N - 2; i++) {
+    const a = corners[i]!
+    const b = corners[i + 1]!
+    if (!a.isCorner && !b.isCorner) continue
+    const sumD = a.dTan + b.dTan
+    const legLen = lengths[i + 1]!
+    if (sumD > legLen) {
+      const scale = legLen / sumD
+      a.dTan *= scale
+      b.dTan *= scale
+      if (a.isCorner) a.R = a.dTan / Math.tan((a.alphaDeg * Math.PI) / 360)
+      if (b.isCorner) b.R = b.dTan / Math.tan((b.alphaDeg * Math.PI) / 360)
+    }
+  }
+
+  // Initial in-place pivot to align heading with the first leg. The boat has
+  // no inbound leg here — there's nothing to round into — so we simply spin.
+  pivotInPlace(boat.position, boat.heading, bearings[0]!)
+  let prevExit: Vec2 = boat.position
+
+  for (let i = 0; i < N; i++) {
     const wp = wps[i]!
-    const bearing = legBearing(prevPos, wp.position)
-    const distM = Math.hypot(wp.position.x - prevPos.x, wp.position.y - prevPos.y)
-    t += distM / legSpeedMs(bearing, windDirDeg)
-    push(bearing, wp.position)
+    const inB = bearings[i]!
+    const c = corners[i]!
+    const v = legSpeedMs(inB, windDirDeg)
+    const inVec = headingVec(inB)
+
+    // Sail from prevExit toward wp; stop at the entry tangent (or at wp itself
+    // if there's no arc).
+    const segDist = Math.hypot(wp.position.x - prevExit.x, wp.position.y - prevExit.y)
+    const useArc = c.isCorner && c.R > MIN_ARC_RADIUS_M
+    const entryDist = Math.max(0, segDist - (useArc ? c.dTan : 0))
+    const entry: Vec2 = useArc
+      ? {
+          x: prevExit.x + inVec.x * entryDist,
+          y: prevExit.y + inVec.y * entryDist,
+        }
+      : wp.position
+
+    if (entryDist > 1e-6) t += entryDist / v
+    push(inB, entry)
     waypointTimes.push(t)
 
-    if (i < wps.length - 1) {
-      const nextBearing = legBearing(wp.position, wps[i + 1]!.position)
-      prevPos = rotate(wp.position, bearing, nextBearing)
+    if (useArc) {
+      const outB = bearings[i + 1]!
+      const sign = c.sign as 1 | -1
+      // Perpendicular to inVec pointing toward arc center (right of inVec for
+      // a right turn, left for a left turn).
+      const perp: Vec2 = { x: -inVec.y * sign, y: inVec.x * sign }
+      const center: Vec2 = { x: entry.x + perp.x * c.R, y: entry.y + perp.y * c.R }
+
+      const alphaRad = (c.alphaDeg * Math.PI) / 180
+      const arcDur = c.alphaDeg / TURN_RATE_DEG_PER_S
+      const steps = Math.max(4, Math.ceil(c.alphaDeg / ARC_DEG_PER_STEP))
+      const dx = entry.x - center.x
+      const dy = entry.y - center.y
+      const dt = arcDur / steps
+
+      for (let k = 1; k <= steps; k++) {
+        const frac = k / steps
+        const θ = sign * alphaRad * frac
+        const cosθ = Math.cos(θ)
+        const sinθ = Math.sin(θ)
+        const p: Vec2 = {
+          x: center.x + dx * cosθ - dy * sinθ,
+          y: center.y + dx * sinθ + dy * cosθ,
+        }
+        const h = lerpAngle(inB, outB, frac)
+        t += dt
+        push(h, p)
+      }
+
+      // Exit tangent: dTan past wp along outBearing.
+      const outVec = headingVec(outB)
+      prevExit = {
+        x: wp.position.x + outVec.x * c.dTan,
+        y: wp.position.y + outVec.y * c.dTan,
+      }
+    } else {
+      // No arc: collinear, last waypoint, or tight U-turn fallback. For tight
+      // U-turns we still need the heading to rotate, so pivot in place.
+      if (i < N - 1 && c.alphaDeg >= COLLINEAR_DEG) {
+        pivotInPlace(wp.position, inB, bearings[i + 1]!)
+      }
+      prevExit = wp.position
     }
   }
 
