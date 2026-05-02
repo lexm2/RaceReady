@@ -211,10 +211,16 @@
   let timeScale        = $state(7)
   let playbackTime     = $state(0)
 
-  const TURN_RATE = 60   // degrees per second
+  const TURN_RATE     = 60     // degrees per second of heading change
+  const TURN_SPEED_MUL = 0.4   // boats slow to ~40% of leg speed during a turn
 
   function legBearing(from: Vec2, to: Vec2): number {
     return ((Math.atan2(to.x - from.x, -(to.y - from.y)) * 180) / Math.PI + 360) % 360
+  }
+
+  function headingVec(deg: number): Vec2 {
+    const r = (deg * Math.PI) / 180
+    return { x: Math.sin(r), y: -Math.cos(r) }
   }
 
   interface RouteFrame { time: number; data: BoatKeyframeData }
@@ -233,18 +239,42 @@
     function push(heading: number, position: Vec2) {
       frames.push({ time: t, data: { boatId, position, heading } })
     }
-    function rotate(pos: Vec2, fromH: number, toH: number) {
+
+    /**
+     * Curve through a heading change instead of pivoting in place. Samples the
+     * turn in small angular steps; at each step, the boat advances forward
+     * along the mid-step heading at a reduced speed. Returns the final
+     * position (offset from the pivot, so the next leg starts from there).
+     */
+    function rotate(pos: Vec2, fromH: number, toH: number): Vec2 {
       const turn = Math.abs(((toH - fromH + 540) % 360) - 180)
-      if (turn < 1) return
-      t += turn / TURN_RATE
-      push(toH, pos)
+      if (turn < 1) return pos
+
+      const turnDuration = turn / TURN_RATE
+      const turnSpeedMs = Math.max(boat!.speed * 0.514444 * TURN_SPEED_MUL, 0.2)
+      // ~10° per sample, but at least 4 samples for short turns.
+      const steps = Math.max(4, Math.ceil(turn / 10))
+      const dt    = turnDuration / steps
+      const dDist = turnSpeedMs * dt
+
+      let curPos = pos
+      let curH   = fromH
+      for (let k = 1; k <= steps; k++) {
+        const nextH = lerpAngle(fromH, toH, k / steps)
+        const midH  = lerpAngle(curH, nextH, 0.5)
+        const v     = headingVec(midH)
+        curPos = { x: curPos.x + v.x * dDist, y: curPos.y + v.y * dDist }
+        t += dt
+        push(nextH, curPos)
+        curH = nextH
+      }
+      return curPos
     }
 
     const firstBearing = legBearing(boat.position, wps[0]!.position)
     push(boat.heading, boat.position)
-    rotate(boat.position, boat.heading, firstBearing)
+    let prevPos = rotate(boat.position, boat.heading, firstBearing)
 
-    let prevPos = boat.position
     for (let i = 0; i < wps.length; i++) {
       const wp      = wps[i]!
       const bearing = legBearing(prevPos, wp.position)
@@ -255,8 +285,7 @@
 
       const nextPos     = i < wps.length - 1 ? wps[i + 1]!.position : boat.position
       const nextBearing = legBearing(wp.position, nextPos)
-      rotate(wp.position, bearing, nextBearing)
-      prevPos = wp.position
+      prevPos = rotate(wp.position, bearing, nextBearing)
     }
 
     return frames
