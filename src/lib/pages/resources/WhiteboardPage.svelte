@@ -451,11 +451,46 @@
         bind:animationTime={playbackTime}
       />
 
-      {#if activePresetHint}
-        <div class="preset-hint" role="note">
-          {activePresetHint}
-        </div>
-      {/if}
+      <!-- Bottom-center stack: preset hint + playback island -->
+      <div class="bottom-stack">
+        {#if activePresetHint}
+          <div class="preset-hint" role="note">
+            {activePresetHint}
+          </div>
+        {/if}
+        {#if currentAnimation}
+          <div class="playback-island" role="group" aria-label="Playback controls">
+            <button class="pb-btn" onclick={togglePause} aria-label={paused ? 'Resume' : 'Pause'}>
+              {#if paused}<Play size={14} strokeWidth={2.5} />{:else}<Pause size={14} strokeWidth={2.5} />{/if}
+            </button>
+            <button class="pb-btn pb-btn--stop" onclick={stopRoute} aria-label="Stop">
+              <Square size={14} strokeWidth={2.5} />
+            </button>
+            <input
+              type="range"
+              class="pb-slider"
+              min="0"
+              max={currentAnimation.durationSec}
+              step="0.05"
+              bind:value={playbackTime}
+              aria-label="Playback position"
+            />
+            <span class="pb-time">{playbackTime.toFixed(1)} / {currentAnimation.durationSec.toFixed(1)}s</span>
+            <label class="pb-speed">
+              <input
+                type="number"
+                min="0.1"
+                max="10"
+                step="0.5"
+                bind:value={timeScale}
+                class="speed-input"
+                aria-label="Playback speed multiplier"
+              />
+              <span class="speed-suffix">×</span>
+            </label>
+          </div>
+        {/if}
+      </div>
 
       <!-- Rule violation notifications (top-left) -->
       {#if violationCards.length > 0}
@@ -552,20 +587,9 @@
               <div class="section-header">
                 <h3>Routes</h3>
                 {#if (scene.waypoints ?? []).length > 0}
-                  {#if playingAll}
-                    <div class="route-controls">
-                      <button class="route-sail" onclick={togglePause} aria-label={paused ? 'Resume' : 'Pause'}>
-                        {#if paused}<Play size={11} strokeWidth={2} />{:else}<Pause size={11} strokeWidth={2} />{/if}
-                      </button>
-                      <button class="route-sail sailing" onclick={stopRoute} aria-label="Stop all">
-                        <Square size={11} strokeWidth={2} />
-                      </button>
-                    </div>
-                  {:else}
-                    <button class="route-sail" onclick={playAllRoutes} aria-label="Play all routes">
-                      <Play size={11} strokeWidth={2} />
-                    </button>
-                  {/if}
+                  <button class="route-sail" onclick={playAllRoutes} aria-label="Play all routes">
+                    <Play size={11} strokeWidth={2} />
+                  </button>
                 {/if}
               </div>
               {#if (scene.waypoints ?? []).length === 0}
@@ -578,51 +602,14 @@
                       <span class="route-swatch" style="background:{hullHex(boat.hullColor)}"></span>
                       <span class="route-name">{boat.label}</span>
                       <span class="route-count">{count} pts</span>
-                      {#if sailingBoatId === boat.id && !playingAll}
-                        <div class="route-controls">
-                          <button class="route-sail" onclick={togglePause} aria-label={paused ? 'Resume' : 'Pause'}>
-                            {#if paused}<Play size={11} strokeWidth={2} />{:else}<Pause size={11} strokeWidth={2} />{/if}
-                          </button>
-                          <button class="route-sail sailing" onclick={stopRoute} aria-label="Stop">
-                            <Square size={11} strokeWidth={2} />
-                          </button>
-                        </div>
-                      {:else}
-                        <button class="route-sail" onclick={() => playRoute(boat.id)} aria-label="Sail route for {boat.label}">
-                          <Play size={11} strokeWidth={2} />
-                        </button>
-                      {/if}
+                      <button class="route-sail" onclick={() => playRoute(boat.id)} aria-label="Sail route for {boat.label}">
+                        <Play size={11} strokeWidth={2} />
+                      </button>
                       <button class="route-clear" onclick={() => { clearWaypoints(boat.id); if (sailingBoatId === boat.id || playingAll) stopRoute() }} aria-label="Clear route for {boat.label}">×</button>
                     </li>
                   {/each}
                 </ul>
                 <button class="add-boat-btn" onclick={() => { clearWaypoints(); stopRoute() }}>Clear All</button>
-              {/if}
-              {#if currentAnimation}
-                <div class="section-header" style="margin-top: var(--space-2)">
-                  <h3>Playback</h3>
-                  <label class="speed-edit">
-                    <input
-                      type="number"
-                      min="0.1"
-                      max="10"
-                      step="0.5"
-                      bind:value={timeScale}
-                      class="speed-input"
-                      aria-label="Playback speed multiplier"
-                    />
-                    <span class="speed-suffix">×</span>
-                  </label>
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max={currentAnimation.durationSec}
-                  step="0.05"
-                  bind:value={playbackTime}
-                  class="wind-slider"
-                  aria-label="Playback position"
-                />
               {/if}
             </section>
           </div>
@@ -647,14 +634,24 @@
     box-shadow: var(--shadow-card);
   }
 
-  /* ── Preset hint banner ──────────────────────────────────────────── */
-  .preset-hint {
+  /* ── Bottom-center stack (preset hint + playback island) ─────────── */
+  .bottom-stack {
     position: absolute;
     bottom: var(--space-3);
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
-    max-width: min(560px, calc(100% - var(--space-6)));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    width: min(640px, calc(100% - var(--space-6)));
+    pointer-events: none;
+  }
+  .bottom-stack > * { pointer-events: auto; }
+
+  .preset-hint {
+    max-width: 100%;
     padding: var(--space-2) var(--space-3);
     background: color-mix(in srgb, var(--bg-card) 92%, transparent);
     backdrop-filter: blur(8px);
@@ -666,6 +663,56 @@
     font-size: 0.85rem;
     line-height: 1.4;
     text-align: center;
+  }
+
+  .playback-island {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: color-mix(in srgb, var(--bg-card) 94%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+  }
+
+  .pb-btn {
+    background: none;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .pb-btn:hover { background: rgba(255, 255, 255, 0.06); }
+  .pb-btn--stop { color: #ff6060; }
+
+  .pb-slider {
+    flex: 1;
+    min-width: 100px;
+    accent-color: var(--accent);
+  }
+
+  .pb-time {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .pb-speed {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 1px;
+    flex-shrink: 0;
   }
 
   /* ── Violation notifications ─────────────────────────────────────── */
