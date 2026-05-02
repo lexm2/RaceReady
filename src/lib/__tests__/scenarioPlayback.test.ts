@@ -232,3 +232,110 @@ describe('Whiteboard preset playback', () => {
     })
   }
 })
+
+/**
+ * Helpers that mirror the WhiteboardPage's wiring closely enough to test the
+ * page-level auto-pause behaviour without needing a DOM. `playOnce` simulates
+ * a single pass through the playback (resume → advance → maybe pause). The
+ * page-level $effect that resets the gate on loop wrap is modelled by calling
+ * `gate.reset()` + re-seed between passes, exactly like the production code.
+ */
+const CHANGE_BASED_PRESETS = PRESETS.filter(p => p.ruleId === 'rule_15' || p.ruleId === 'rule_16')
+
+function dedupKey(vs: ReturnType<typeof evaluateScene>): string {
+  return vs
+    .map(v => `${v.ruleId}|${v.violatorBoatId}|${v.severity}`)
+    .sort()
+    .join(',')
+}
+
+interface PassResult {
+  paused: boolean
+  pauseTime: number | null
+  pauseRuleIds: string[]
+}
+
+function playOnce(
+  preset: WhiteboardPreset,
+  clip: ReturnType<typeof buildScenarioPlayback>['clip'],
+  gate: ViolationPauseGate,
+  opts: { autoPauseEnabled: boolean; startKey: string },
+): PassResult & { lastDedupKey: string } {
+  const stepSec = 1 / 30
+  const steps = Math.ceil(clip.durationSec / stepSec) + 1
+  let prevDedupKey = opts.startKey
+  let paused = false
+  let pauseTime: number | null = null
+  let pauseRuleIds: string[] = []
+
+  for (let i = 0; i <= steps; i++) {
+    const t = Math.min(i * stepSec, clip.durationSec)
+    const vs = evaluateAt(preset, clip, t)
+    const k = dedupKey(vs)
+    if (k === prevDedupKey) continue
+    prevDedupKey = k
+    if (paused || !opts.autoPauseEnabled) continue
+    if (gate.noteViolations(vs)) {
+      paused = true
+      pauseTime = t
+      pauseRuleIds = vs.map(v => v.ruleId)
+      break
+    }
+  }
+  return { paused, pauseTime, pauseRuleIds, lastDedupKey: prevDedupKey }
+}
+
+describe('Auto-pause on each loop pass', () => {
+  for (const preset of CHANGE_BASED_PRESETS) {
+    it(`${preset.id}: pauses again on the next loop pass after a wrap-reset`, () => {
+      const { clip } = buildScenarioPlayback(preset.scene, { minDurationSec: MIN_DURATION_SEC })
+      const gate = new ViolationPauseGate()
+      const staticVs = evaluateAt(preset, clip, 0)
+
+      // Play-start: seed the gate from the static scene (mirrors the page).
+      gate.reset()
+      gate.noteViolations(staticVs)
+
+      const first = playOnce(preset, clip, gate, {
+        autoPauseEnabled: true,
+        startKey: dedupKey(staticVs),
+      })
+      expect(first.paused, `first pass did not pause for ${preset.ruleId}`).toBe(true)
+      expect(first.pauseRuleIds).toContain(preset.ruleId)
+
+      // Production: when playbackTime wraps from ~duration → ~0, the page's
+      // $effect resets the gate and re-seeds it. Mirror that here.
+      gate.reset()
+      gate.noteViolations(staticVs)
+
+      const second = playOnce(preset, clip, gate, {
+        autoPauseEnabled: true,
+        startKey: dedupKey(staticVs),
+      })
+      expect(
+        second.paused,
+        `${preset.ruleId} paused on the first pass but not on the second — ` +
+          `the loop-wrap gate reset isn't recovering the seen-keys correctly`,
+      ).toBe(true)
+      expect(second.pauseRuleIds).toContain(preset.ruleId)
+    })
+
+    it(`${preset.id}: never auto-pauses when autoPauseOnViolation is off`, () => {
+      const { clip } = buildScenarioPlayback(preset.scene, { minDurationSec: MIN_DURATION_SEC })
+      const gate = new ViolationPauseGate()
+      const staticVs = evaluateAt(preset, clip, 0)
+
+      gate.reset()
+      gate.noteViolations(staticVs)
+
+      const result = playOnce(preset, clip, gate, {
+        autoPauseEnabled: false,
+        startKey: dedupKey(staticVs),
+      })
+      expect(
+        result.paused,
+        `${preset.ruleId} auto-paused even though the toggle is off`,
+      ).toBe(false)
+    })
+  }
+})

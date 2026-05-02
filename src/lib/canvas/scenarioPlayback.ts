@@ -365,6 +365,27 @@ export function buildScenarioPlayback(
 }
 
 /**
+ * Returns true if going from scene `prev` to scene `next` invalidates a
+ * pre-built playback path. Used by the whiteboard to stop active playback
+ * the moment any path-affecting field of the scene changes (boat moves,
+ * waypoint drag, wind shift, etc.). Display-only changes (label/wake/grid
+ * toggles) don't affect the path and return false.
+ *
+ * Relies on the page's spread-mutation pattern: any path-relevant change
+ * produces a new sub-object reference (e.g. `{ ...scene, boats: [...] }`),
+ * so reference inequality on the relevant sub-fields is sufficient.
+ */
+export function isPlaybackPathInvalidated(prev: SceneState, next: SceneState): boolean {
+  if (prev === next) return false
+  if (prev.boats !== next.boats) return true
+  if (prev.marks !== next.marks) return true
+  if ((prev.waypoints ?? null) !== (next.waypoints ?? null)) return true
+  if (prev.wind !== next.wind) return true
+  if (prev.worldSize !== next.worldSize) return true
+  return false
+}
+
+/**
  * Sample the scene at time `t` on the given clip. Mirrors the per-boat lerp
  * logic in GameCanvas so off-screen rule evaluation matches what the user sees.
  */

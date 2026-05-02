@@ -2,13 +2,13 @@
   import { onMount } from 'svelte'
   import GameCanvas from '$lib/canvas/GameCanvas.svelte'
   import type { SceneState, Vec2, Waypoint, AnimationClip, RuleViolation } from '$lib/canvas/types.ts'
-  import { buildScenarioPlayback } from '$lib/canvas/scenarioPlayback.ts'
+  import { buildScenarioPlayback, isPlaybackPathInvalidated } from '$lib/canvas/scenarioPlayback.ts'
   import { ViolationPauseGate } from '$lib/canvas/violationPauseGate.ts'
   import { evaluateScene } from '$lib/rules/logic.ts'
   import { RULES_BY_ID } from '$lib/data/rulesIndex.ts'
   import { PRESETS_BY_ID } from '$lib/whiteboardPresets.ts'
   import { base } from '$app/paths'
-  import { Play, Square, Pause, SkipBack, SkipForward, Maximize2, Minimize2 } from 'lucide-svelte'
+  import { Play, Square, Pause, SkipBack, SkipForward, Maximize2, Minimize2, BellRing, BellOff } from 'lucide-svelte'
 
   // ── Default scene ──────────────────────────────────────────────────
   let scene = $state<SceneState>({
@@ -214,6 +214,15 @@
   /** Sorted, unique time bookmarks (start, each waypoint, end) for skip controls. */
   let bookmarks = $state<number[]>([])
 
+  /**
+   * The scene snapshot the current playback was built from. The $effect below
+   * compares this against the live `scene` and stops playback the instant any
+   * path-relevant field changes — so dragging a waypoint mid-playback halts
+   * the now-stale animation rather than letting it keep tracing the old path.
+   * The user re-presses Play once they're done editing.
+   */
+  let playbackBaseScene: SceneState | undefined = undefined
+
   function hasWaypoints(boatId: string): boolean {
     return (scene.waypoints ?? []).some(w => w.boatId === boatId)
   }
@@ -229,6 +238,7 @@
     sailingBoatId    = boatId
     playingAll       = false
     paused           = false
+    playbackBaseScene = scene
     resetViolationGate()
     seedPauseGateFromCurrentScene()
   }
@@ -243,6 +253,7 @@
     sailingBoatId    = undefined
     playingAll       = true
     paused           = false
+    playbackBaseScene = scene
     resetViolationGate()
     seedPauseGateFromCurrentScene()
   }
@@ -253,8 +264,16 @@
     playingAll       = false
     paused           = false
     bookmarks        = []
+    playbackBaseScene = undefined
     resetViolationGate()
   }
+
+  $effect(() => {
+    // Stop active playback the moment any path-relevant scene field changes.
+    if (currentAnimation && playbackBaseScene && isPlaybackPathInvalidated(playbackBaseScene, scene)) {
+      stopRoute()
+    }
+  })
 
   function skipForward(): void {
     if (!currentAnimation) return
@@ -297,9 +316,14 @@
   // ── Rule violations ────────────────────────────────────────────────
   let liveViolations = $state<RuleViolation[]>([])
 
+  /** User-controlled toggle (switch in the playback island). When off, new
+   *  violations still update the cards but never auto-pause the playback. */
+  let autoPauseOnViolation = $state(true)
+
   // Auto-pause on each new (ruleId, violatorBoatId) pair so the user can read
   // the violation card before the scene moves on. See ViolationPauseGate for
-  // the exact rules; reset on every play-start / stop.
+  // the exact rules; reset on every play-start / stop, and on every loop wrap
+  // so the same violations re-pause on subsequent passes.
   const pauseGate = new ViolationPauseGate()
 
   function resetViolationGate(): void {
@@ -320,9 +344,29 @@
     pauseGate.noteViolations(evaluateScene(scene))
   }
 
+  /**
+   * Watch for the playback wrapping (loop) or being skipped backward and
+   * re-seed the gate so each loop pass can re-pause on the same violations.
+   * Reading `playbackTime` makes this $effect re-run on every animation
+   * frame, but the body is just two cheap reads + a comparison.
+   */
+  let prevPlaybackTime = 0
+  $effect(() => {
+    if (!currentAnimation) {
+      prevPlaybackTime = playbackTime
+      return
+    }
+    const REWIND_THRESHOLD_SEC = 0.5  // larger than any single-frame advance
+    if (playbackTime + REWIND_THRESHOLD_SEC < prevPlaybackTime) {
+      pauseGate.reset()
+      seedPauseGateFromCurrentScene()
+    }
+    prevPlaybackTime = playbackTime
+  })
+
   function onViolationsChanged(violations: RuleViolation[]): void {
     liveViolations = violations
-    if (!currentAnimation || paused) return
+    if (!currentAnimation || paused || !autoPauseOnViolation) return
     if (pauseGate.noteViolations(violations)) paused = true
   }
 
@@ -461,18 +505,30 @@
                   <Square size={14} strokeWidth={2.5} />
                 </button>
               </div>
-              <label class="pb-speed">
-                <input
-                  type="number"
-                  min="0.1"
-                  max="10"
-                  step="0.5"
-                  bind:value={timeScale}
-                  class="speed-input"
-                  aria-label="Playback speed multiplier"
-                />
-                <span class="speed-suffix">×</span>
-              </label>
+              <div class="pb-right">
+                <button
+                  class="pb-btn pb-btn--toggle"
+                  class:pb-btn--toggle-on={autoPauseOnViolation}
+                  onclick={() => autoPauseOnViolation = !autoPauseOnViolation}
+                  aria-pressed={autoPauseOnViolation}
+                  aria-label="Auto-pause on rule violation"
+                  title="Auto-pause on each new rule violation ({autoPauseOnViolation ? 'on' : 'off'})"
+                >
+                  {#if autoPauseOnViolation}<BellRing size={14} strokeWidth={2.5} />{:else}<BellOff size={14} strokeWidth={2.5} />{/if}
+                </button>
+                <label class="pb-speed">
+                  <input
+                    type="number"
+                    min="0.1"
+                    max="10"
+                    step="0.5"
+                    bind:value={timeScale}
+                    class="speed-input"
+                    aria-label="Playback speed multiplier"
+                  />
+                  <span class="speed-suffix">×</span>
+                </label>
+              </div>
             </div>
             <input
               type="range"
@@ -660,7 +716,13 @@
   }
   .pb-controls > .pb-time     { justify-self: start;  }
   .pb-controls > .pb-buttons  { justify-self: center; }
-  .pb-controls > .pb-speed    { justify-self: end;    }
+  .pb-controls > .pb-right    { justify-self: end;    }
+
+  .pb-right {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
 
   .pb-buttons {
     display: flex;
@@ -686,6 +748,15 @@
   .pb-btn--play:hover { background: rgba(255, 255, 255, 0.14); }
   .pb-btn--stop { color: rgba(255, 96, 96, 0.85); }
   .pb-btn--stop:hover { background: rgba(255, 96, 96, 0.15); color: #ff6060; }
+  /* Auto-pause toggle: dim when off, accent ring when on. */
+  .pb-btn--toggle {
+    color: rgba(255, 255, 255, 0.4);
+  }
+  .pb-btn--toggle-on {
+    color: #FFCB05;
+    background: rgba(255, 203, 5, 0.12);
+  }
+  .pb-btn--toggle-on:hover { background: rgba(255, 203, 5, 0.22); color: #ffd84d; }
 
   /* Thin slider track, subtle thumb that grows on hover. */
   .pb-slider {
