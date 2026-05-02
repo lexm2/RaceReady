@@ -1,14 +1,13 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import GameCanvas from '$lib/canvas/GameCanvas.svelte'
-  import type { SceneState, BoatState, Mark, Vec2, Waypoint, AnimationClip, AnimationKeyframe, BoatKeyframeData, RuleViolation } from '$lib/canvas/types.ts'
-  import { calcLegSpeed } from '$lib/canvas/renderer/waypoint.ts'
-  import { lerpAngle } from '$lib/canvas/renderer/coords.ts'
+  import type { SceneState, Vec2, Waypoint, AnimationClip, RuleViolation } from '$lib/canvas/types.ts'
+  import { buildScenarioPlayback } from '$lib/canvas/scenarioPlayback.ts'
   import { evaluateScene } from '$lib/rules/logic.ts'
   import { RULES_BY_ID } from '$lib/data/rulesIndex.ts'
   import { PRESETS_BY_ID } from '$lib/whiteboardPresets.ts'
   import { base } from '$app/paths'
-  import { Play, Square, Pause, SkipBack, SkipForward } from 'lucide-svelte'
+  import { Play, Square, Pause, SkipBack, SkipForward, Maximize2, Minimize2 } from 'lucide-svelte'
 
   // ── Default scene ──────────────────────────────────────────────────
   let scene = $state<SceneState>({
@@ -211,155 +210,38 @@
   let timeScale        = $state(7)
   let playbackTime     = $state(0)
 
-  const TURN_RATE     = 60     // degrees per second of heading change
-  const TURN_SPEED_MUL = 0.4   // boats slow to ~40% of leg speed during a turn
-
-  function legBearing(from: Vec2, to: Vec2): number {
-    return ((Math.atan2(to.x - from.x, -(to.y - from.y)) * 180) / Math.PI + 360) % 360
-  }
-
-  function headingVec(deg: number): Vec2 {
-    const r = (deg * Math.PI) / 180
-    return { x: Math.sin(r), y: -Math.cos(r) }
-  }
-
-  interface RouteFrame { time: number; data: BoatKeyframeData }
-  interface BoatRoute { frames: RouteFrame[]; waypointTimes: number[] }
-
-  function buildBoatRoute(boatId: string): BoatRoute | null {
-    const boat = scene.boats.find(b => b.id === boatId)
-    if (!boat) return null
-    const wps = (scene.waypoints ?? [])
-      .filter(w => w.boatId === boatId)
-      .sort((a, b) => a.order - b.order)
-    if (wps.length === 0) return null
-
-    const frames: RouteFrame[] = []
-    const waypointTimes: number[] = []
-    let t = 0
-
-    function push(heading: number, position: Vec2) {
-      frames.push({ time: t, data: { boatId, position, heading } })
-    }
-
-    /**
-     * Curve through a heading change instead of pivoting in place. Samples the
-     * turn in small angular steps; at each step, the boat advances forward
-     * along the mid-step heading at a reduced speed. Returns the final
-     * position (offset from the pivot, so the next leg starts from there).
-     */
-    function rotate(pos: Vec2, fromH: number, toH: number): Vec2 {
-      const turn = Math.abs(((toH - fromH + 540) % 360) - 180)
-      if (turn < 1) return pos
-
-      const turnDuration = turn / TURN_RATE
-      const turnSpeedMs = Math.max(boat!.speed * 0.514444 * TURN_SPEED_MUL, 0.2)
-      // ~10° per sample, but at least 4 samples for short turns.
-      const steps = Math.max(4, Math.ceil(turn / 10))
-      const dt    = turnDuration / steps
-      const dDist = turnSpeedMs * dt
-
-      let curPos = pos
-      let curH   = fromH
-      for (let k = 1; k <= steps; k++) {
-        const nextH = lerpAngle(fromH, toH, k / steps)
-        const midH  = lerpAngle(curH, nextH, 0.5)
-        const v     = headingVec(midH)
-        curPos = { x: curPos.x + v.x * dDist, y: curPos.y + v.y * dDist }
-        t += dt
-        push(nextH, curPos)
-        curH = nextH
-      }
-      return curPos
-    }
-
-    const firstBearing = legBearing(boat.position, wps[0]!.position)
-    push(boat.heading, boat.position)
-    let prevPos = rotate(boat.position, boat.heading, firstBearing)
-
-    for (let i = 0; i < wps.length; i++) {
-      const wp      = wps[i]!
-      const bearing = legBearing(prevPos, wp.position)
-      const distM   = Math.hypot(wp.position.x - prevPos.x, wp.position.y - prevPos.y)
-      const speedMs = Math.max(calcLegSpeed(bearing, scene.wind.directionDeg) * 0.514444, 0.3)
-      t += distM / speedMs
-      push(bearing, wp.position)
-      waypointTimes.push(t)
-
-      const nextPos     = i < wps.length - 1 ? wps[i + 1]!.position : boat.position
-      const nextBearing = legBearing(wp.position, nextPos)
-      prevPos = rotate(wp.position, bearing, nextBearing)
-    }
-
-    return { frames, waypointTimes }
-  }
-
-  function sampleBoatAt(frames: RouteFrame[], t: number): BoatKeyframeData {
-    const clamped = Math.max(0, Math.min(t, frames.at(-1)!.time))
-    let ai = 0
-    for (let i = 0; i < frames.length - 1; i++) if (clamped >= frames[i]!.time) ai = i
-    const a = frames[ai]!
-    const b = frames[Math.min(ai + 1, frames.length - 1)]!
-    const seg = b.time - a.time
-    const raw = seg === 0 ? 0 : (clamped - a.time) / seg
-    return {
-      boatId: a.data.boatId,
-      position: {
-        x: a.data.position.x + (b.data.position.x - a.data.position.x) * raw,
-        y: a.data.position.y + (b.data.position.y - a.data.position.y) * raw,
-      },
-      heading: lerpAngle(a.data.heading, b.data.heading, raw),
-    }
-  }
-
-  function buildClip(routeMap: Map<string, RouteFrame[]>): AnimationClip {
-    const allTimes = new Set<number>()
-    let maxDuration = 0
-    for (const frames of routeMap.values()) {
-      frames.forEach(f => allTimes.add(f.time))
-      maxDuration = Math.max(maxDuration, frames.at(-1)!.time)
-    }
-    const sortedTimes = [...allTimes].sort((a, b) => a - b)
-    const keyframes: AnimationKeyframe[] = sortedTimes.map(t => ({
-      time: t,
-      boats: [...routeMap.entries()].map(([, frames]) => sampleBoatAt(frames, t)),
-    }))
-    return { keyframes, durationSec: maxDuration, loop: true }
-  }
-
   /** Sorted, unique time bookmarks (start, each waypoint, end) for skip controls. */
   let bookmarks = $state<number[]>([])
 
-  function buildBookmarks(routes: BoatRoute[], duration: number): number[] {
-    const set = new Set<number>([0, duration])
-    for (const r of routes) for (const t of r.waypointTimes) set.add(t)
-    return [...set].sort((a, b) => a - b)
+  function hasWaypoints(boatId: string): boolean {
+    return (scene.waypoints ?? []).some(w => w.boatId === boatId)
   }
 
   function playRoute(boatId: string): void {
-    const route = buildBoatRoute(boatId)
-    if (!route) return
-    currentAnimation = buildClip(new Map([[boatId, route.frames]]))
-    bookmarks        = buildBookmarks([route], currentAnimation.durationSec)
+    if (!hasWaypoints(boatId)) return
+    // Sail just this boat; others stay static (their absence from the clip's
+    // keyframes leaves them at their base-scene positions per GameCanvas).
+    const soloScene: SceneState = { ...scene, boats: scene.boats.filter(b => b.id === boatId) }
+    const playback = buildScenarioPlayback(soloScene, { loop: true })
+    currentAnimation = playback.clip
+    bookmarks        = playback.bookmarks
     sailingBoatId    = boatId
     playingAll       = false
+    paused           = false
+    resetViolationGate()
   }
 
   function playAllRoutes(): void {
-    const routeMap = new Map<string, RouteFrame[]>()
-    const routes: BoatRoute[] = []
-    for (const boat of scene.boats) {
-      const route = buildBoatRoute(boat.id)
-      if (route) {
-        routeMap.set(boat.id, route.frames)
-        routes.push(route)
-      }
-    }
-    if (routeMap.size === 0) return
-    currentAnimation = buildClip(routeMap)
-    bookmarks        = buildBookmarks(routes, currentAnimation.durationSec)
+    if (!scene.boats.some(b => hasWaypoints(b.id))) return
+    // All boats animate for the full duration. Boats without waypoints sail
+    // straight ahead so neither boat freezes while the other is still moving.
+    const playback = buildScenarioPlayback(scene, { loop: true })
+    currentAnimation = playback.clip
+    bookmarks        = playback.bookmarks
     sailingBoatId    = undefined
     playingAll       = true
+    paused           = false
+    resetViolationGate()
   }
 
   function stopRoute(): void {
@@ -368,6 +250,7 @@
     playingAll       = false
     paused           = false
     bookmarks        = []
+    resetViolationGate()
   }
 
   function skipForward(): void {
@@ -389,11 +272,57 @@
   // ── Panel collapse ─────────────────────────────────────────────────
   let panelOpen = $state(true)
 
+  // ── Fullscreen ─────────────────────────────────────────────────────
+  let canvasWrapEl: HTMLDivElement | undefined = $state(undefined)
+  let isFullscreen = $state(false)
+
+  function toggleFullscreen(): void {
+    if (!canvasWrapEl) return
+    if (document.fullscreenElement) {
+      document.exitFullscreen()
+    } else {
+      canvasWrapEl.requestFullscreen()
+    }
+  }
+
+  onMount(() => {
+    const onChange = () => { isFullscreen = document.fullscreenElement === canvasWrapEl }
+    document.addEventListener('fullscreenchange', onChange)
+    return () => document.removeEventListener('fullscreenchange', onChange)
+  })
+
   // ── Rule violations ────────────────────────────────────────────────
   let liveViolations = $state<RuleViolation[]>([])
 
+  /**
+   * Cumulative set of (ruleId|violatorBoatId) keys we've already paused on
+   * during the current playback. Cleared on play-start / stop so a re-run can
+   * re-trigger the same violations. Resume from auto-pause keeps these keys,
+   * so the same violation re-firing on the very next frame doesn't immediately
+   * re-pause.
+   */
+  let seenViolationKeys = new Set<string>()
+
+  function violationKey(v: RuleViolation): string {
+    return `${v.ruleId}|${v.violatorBoatId}`
+  }
+
+  function resetViolationGate(): void {
+    seenViolationKeys = new Set()
+  }
+
   function onViolationsChanged(violations: RuleViolation[]): void {
     liveViolations = violations
+    if (!currentAnimation || paused) return
+    let hasNew = false
+    for (const v of violations) {
+      const k = violationKey(v)
+      if (!seenViolationKeys.has(k)) {
+        seenViolationKeys.add(k)
+        hasNew = true
+      }
+    }
+    if (hasNew) paused = true
   }
 
   /** Severity ordering helper. */
@@ -462,7 +391,7 @@
 
   <div class="whiteboard-layout">
     <!-- Canvas -->
-    <div class="canvas-wrap">
+    <div class="canvas-wrap" bind:this={canvasWrapEl}>
       <GameCanvas
         {scene}
         interactive
@@ -482,13 +411,37 @@
         bind:animationTime={playbackTime}
       />
 
-      <!-- Bottom-center stack: preset hint + playback island -->
-      <div class="bottom-stack">
-        {#if activePresetHint}
-          <div class="preset-hint" role="note">
-            {activePresetHint}
-          </div>
+      <!-- Bottom-left controls: fullscreen + play routes -->
+      <div class="canvas-corner canvas-corner--bl">
+        <button
+          class="corner-btn"
+          onclick={toggleFullscreen}
+          aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+          title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+        >
+          {#if isFullscreen}<Minimize2 size={16} strokeWidth={2} />{:else}<Maximize2 size={16} strokeWidth={2} />{/if}
+        </button>
+        {#if !currentAnimation && (scene.waypoints ?? []).length > 0}
+          <button
+            class="corner-btn corner-btn--play"
+            onclick={playAllRoutes}
+            aria-label="Play routes"
+            title="Play routes"
+          >
+            <Play size={16} strokeWidth={2} />
+          </button>
         {/if}
+      </div>
+
+      <!-- Top-center: preset hint -->
+      {#if activePresetHint}
+        <div class="preset-hint" role="note">
+          {activePresetHint}
+        </div>
+      {/if}
+
+      <!-- Bottom-center: playback island -->
+      <div class="bottom-stack">
         {#if currentAnimation}
           <div class="playback-island" role="group" aria-label="Playback controls">
             <div class="pb-controls">
@@ -624,35 +577,6 @@
               <button class="add-boat-btn" onclick={addBoat}>+ Add Boat</button>
             </section>
 
-            <section class="panel-section">
-              <div class="section-header">
-                <h3>Routes</h3>
-                {#if (scene.waypoints ?? []).length > 0}
-                  <button class="route-sail" onclick={playAllRoutes} aria-label="Play all routes">
-                    <Play size={11} strokeWidth={2} />
-                  </button>
-                {/if}
-              </div>
-              {#if (scene.waypoints ?? []).length === 0}
-                <p class="route-hint">Select a boat, then right-click to place waypoints.</p>
-              {:else}
-                <ul class="route-list">
-                  {#each scene.boats.filter(b => (scene.waypoints ?? []).some(w => w.boatId === b.id)) as boat (boat.id)}
-                    {@const count = (scene.waypoints ?? []).filter(w => w.boatId === boat.id).length}
-                    <li class="route-row">
-                      <span class="route-swatch" style="background:{hullHex(boat.hullColor)}"></span>
-                      <span class="route-name">{boat.label}</span>
-                      <span class="route-count">{count} pts</span>
-                      <button class="route-sail" onclick={() => playRoute(boat.id)} aria-label="Sail route for {boat.label}">
-                        <Play size={11} strokeWidth={2} />
-                      </button>
-                      <button class="route-clear" onclick={() => { clearWaypoints(boat.id); if (sailingBoatId === boat.id || playingAll) stopRoute() }} aria-label="Clear route for {boat.label}">×</button>
-                    </li>
-                  {/each}
-                </ul>
-                <button class="add-boat-btn" onclick={() => { clearWaypoints(); stopRoute() }}>Clear All</button>
-              {/if}
-            </section>
           </div>
         {/if}
       </aside>
@@ -692,7 +616,13 @@
   .bottom-stack > * { pointer-events: auto; }
 
   .preset-hint {
-    max-width: 100%;
+    position: absolute;
+    top: var(--space-3);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    /* Cap so we never overlap the top-left violations or top-right panel toggle. */
+    max-width: min(520px, calc(100% - 460px));
     padding: var(--space-2) var(--space-3);
     background: color-mix(in srgb, var(--bg-card) 92%, transparent);
     backdrop-filter: blur(8px);
@@ -712,7 +642,7 @@
     flex-direction: column;
     gap: 6px;
     padding: 8px 18px 10px;
-    background: rgba(0, 0, 0, 0.78);
+    background: rgba(8, 25, 60, 0.82);
     backdrop-filter: blur(14px) saturate(140%);
     -webkit-backdrop-filter: blur(14px) saturate(140%);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -760,11 +690,11 @@
   .pb-slider {
     -webkit-appearance: none;
     appearance: none;
-    width: 100%;
+    width: calc(100% - 24px);
     height: 14px;       /* hit target; track is drawn smaller below */
     background: transparent;
     outline: none;
-    margin: 0;
+    margin: 0 12px;
     cursor: pointer;
   }
   .pb-slider::-webkit-slider-runnable-track {
@@ -821,6 +751,38 @@
   }
   .pb-speed .speed-input:focus { border-color: rgba(255, 255, 255, 0.5); }
   .pb-speed .speed-suffix { color: rgba(255, 255, 255, 0.6); }
+
+  /* ── Canvas corner controls ──────────────────────────────────────── */
+  .canvas-corner {
+    position: absolute;
+    z-index: 10;
+    display: flex;
+    gap: var(--space-2);
+  }
+  .canvas-corner--bl { bottom: var(--space-3); left: var(--space-3); }
+
+  .corner-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--bg-card) 88%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-card);
+    transition: color 0.15s, background 0.15s;
+  }
+  .corner-btn:hover {
+    color: var(--text);
+    background: color-mix(in srgb, var(--bg-card) 96%, transparent);
+  }
+  .corner-btn--play { color: var(--accent); }
+  .corner-btn--play:hover { color: var(--accent); }
 
   /* ── Violation notifications ─────────────────────────────────────── */
   .violations-overlay {
@@ -1149,83 +1111,6 @@
     width: 100%;
   }
   .add-boat-btn:hover { background: var(--bg-hover, rgba(0,0,0,0.04)); }
-
-  /* Routes */
-  .route-hint {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin: 0;
-    line-height: 1.4;
-  }
-
-  .route-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
-  }
-
-  .route-row {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    font-size: 0.82rem;
-    color: var(--text);
-  }
-
-  .route-swatch {
-    display: block;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    border: 1px solid rgba(0,0,0,0.15);
-  }
-
-  .route-name {
-    flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .route-count {
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--text-muted);
-  }
-
-  .route-controls {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-  }
-
-  .route-sail {
-    background: none;
-    border: none;
-    color: var(--accent);
-    cursor: pointer;
-    padding: 0 2px;
-    opacity: 0.8;
-    display: flex;
-    align-items: center;
-  }
-  .route-sail:hover   { opacity: 1; }
-  .route-sail.sailing { color: #ff6060; opacity: 1; }
-
-  .route-clear {
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    cursor: pointer;
-    font-size: 1rem;
-    line-height: 1;
-    padding: 0 2px;
-  }
-  .route-clear:hover { color: var(--text); }
 
   /* ── Responsive ──────────────────────────────────────────────────── */
   @media (max-width: 768px) {
