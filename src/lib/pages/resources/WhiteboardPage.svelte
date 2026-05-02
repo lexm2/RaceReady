@@ -340,6 +340,40 @@
     return () => document.removeEventListener('fullscreenchange', onChange)
   })
 
+  // ── Keyboard shortcuts ─────────────────────────────────────────────
+  // Space = play/pause, ←/→ = skip to prev/next waypoint bookmark.
+  // Suppressed while the user is typing in an input/textarea so we don't
+  // hijack normal text editing.
+  function isEditableTarget(t: EventTarget | null): boolean {
+    if (!(t instanceof HTMLElement)) return false
+    if (t.isContentEditable) return true
+    const tag = t.tagName
+    return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT'
+  }
+
+  onMount(() => {
+    function onKey(e: KeyboardEvent): void {
+      if (e.metaKey || e.ctrlKey || e.altKey) return
+      if (isEditableTarget(e.target)) return
+
+      if (e.key === ' ' || e.code === 'Space') {
+        e.preventDefault()
+        if (currentAnimation) togglePause()
+        else if (scene.boats.some(b => hasWaypoints(b.id))) playAllRoutes()
+      } else if (e.key === 'ArrowRight') {
+        if (!currentAnimation) return
+        e.preventDefault()
+        skipForward()
+      } else if (e.key === 'ArrowLeft') {
+        if (!currentAnimation) return
+        e.preventDefault()
+        skipBackward()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  })
+
   onMount(() => {
     function close(): void {
       openConditionBoatId = undefined
