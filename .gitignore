@@ -31,3 +31,6 @@ pnpm-debug.log*
 
 # Local
 *.local
+
+# Claude
+CLAUDE.md

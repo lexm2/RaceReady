@@ -1,4 +1,4 @@
-// ─── Primitives ───────────────────────────────────────────────────────────────
+// Primitives
 
 /** 2-D vector in world-space (metres) or screen-space (px). */
 export interface Vec2 {
@@ -6,7 +6,7 @@ export interface Vec2 {
   y: number
 }
 
-// ─── Domain ───────────────────────────────────────────────────────────────────
+// Domain
 
 export type Tack = 'port' | 'starboard'
 
@@ -76,7 +76,7 @@ export interface DisplayToggles {
   showCompassRose?: boolean
 }
 
-// ─── Rule evaluation ──────────────────────────────────────────────────────────
+// Rule evaluation
 
 export type RuleSeverity = 'advisory' | 'warning' | 'violation'
 
@@ -126,7 +126,7 @@ export interface SceneState {
   waypoints?: Waypoint[]
 }
 
-// ─── Camera ───────────────────────────────────────────────────────────────────
+// Camera
 
 export interface Camera {
   /** World-space point displayed at the centre of the canvas. */
@@ -135,7 +135,7 @@ export interface Camera {
   zoom: number
 }
 
-// ─── Animation ────────────────────────────────────────────────────────────────
+// Animation
 
 export interface BoatKeyframeData {
   boatId: string
@@ -168,7 +168,7 @@ export interface AnimationPlayback {
   startWallTime: number
 }
 
-// ─── Render context ───────────────────────────────────────────────────────────
+// Render context
 
 /**
  * Passed by value to every draw function.
@@ -190,7 +190,7 @@ export interface RenderContext {
   violations?: RuleViolation[]
 }
 
-// ─── Component props ──────────────────────────────────────────────────────────
+// Component props
 
 export interface GameCanvasProps {
   scene: SceneState

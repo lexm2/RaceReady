@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { Component } from 'svelte';
+  import type { IconComponent } from '$lib/themes/theme.svelte.ts';
 
   interface Props {
-    icon: Component
+    icon: IconComponent
     title: string
     description: string
     items: string[]

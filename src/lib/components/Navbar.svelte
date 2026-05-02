@@ -18,12 +18,12 @@
   }
 
   $effect(() => {
-    function handleOutsideClick(e) {
-      if (!e.target.closest('.nav-dropdown')) {
+    function handleOutsideClick(e: MouseEvent) {
+      if (!(e.target as Element | null)?.closest('.nav-dropdown')) {
         openDropdown = null;
       }
     }
-    function handleEscape(e) {
+    function handleEscape(e: KeyboardEvent) {
       if (e.key === 'Escape') openDropdown = null;
     }
     document.addEventListener('click', handleOutsideClick);

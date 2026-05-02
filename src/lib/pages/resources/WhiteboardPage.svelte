@@ -8,9 +8,9 @@
   import { RULES_BY_ID } from '$lib/data/rulesIndex.ts'
   import { PRESETS_BY_ID } from '$lib/whiteboardPresets.ts'
   import { base } from '$app/paths'
-  import { Play, Square, Pause, SkipBack, SkipForward, Maximize2, Minimize2, BellRing, BellOff, Sailboat, LifeBuoy, Anchor, Mountain } from 'lucide-svelte'
+  import { Play, Square, Pause, SkipBack, SkipForward, Maximize2, Minimize2, BellRing, BellOff, Sailboat, LifeBuoy, Anchor, Mountain, X, Settings, ArrowRight } from 'lucide-svelte'
 
-  // ── Default scene ──────────────────────────────────────────────────
+  // Default scene
   let scene = $state<SceneState>({
     worldSize: { x: 300, y: 220 },
     wind: { directionDeg: 0, speedKnots: 10 },
@@ -22,9 +22,8 @@
       { from: 'mark-2', to: 'mark-1' },
     ],
     boats: [
-      // Default scene is a Rule 10 (port-starboard) crossing — boats on
-      // opposite tacks, ~16 m apart, on a converging upwind course. The
-      // rule evaluator should ring Boat B (port tack) as the keep-clear boat.
+      // Default scene: port-starboard crossing, ~16 m apart, converging upwind.
+      // Boat B (port) should be flagged as the keep-clear boat.
       {
         id: 'boat-a',
         position:   { x: 158, y: 120 },
@@ -58,7 +57,7 @@
     waypoints: [],
   })
 
-  // ── Drag handlers - parent owns scene state ────────────────────────
+  // Drag handlers (parent owns scene state)
   function onBoatDrag(boatId: string, pos: Vec2): void {
     scene = {
       ...scene,
@@ -77,7 +76,7 @@
     }
   }
 
-  // ── Selection & rotation ───────────────────────────────────────────
+  // Selection and rotation
   let selectedBoatId = $state<string | undefined>(undefined)
 
   function onBoatClick(boatId: string): void {
@@ -102,7 +101,7 @@
   }
 
 
-  // ── Display toggles ────────────────────────────────────────────────
+  // Display toggles
   function toggle(key: keyof typeof scene.display): void {
     scene = {
       ...scene,
@@ -110,7 +109,7 @@
     }
   }
 
-  // ── Boats ──────────────────────────────────────────────────────────
+  // Boats
   const COLOR_HEX: Record<string, string> = {
     maize: '#FFCB05', blue: '#00274C', arboretum: '#2f65a7',
     orange: '#d86018', teal: '#00b2a9', red: '#9a3324', white: '#FFFFFF',
@@ -163,10 +162,8 @@
   let conditionMenuPos = $state<{ top: number; right: number } | undefined>(undefined)
 
   function setBoatCondition(id: string, next: Condition): void {
-    // Capsized / anchored / aground boats can't sail, so a planned route on
-    // one no longer makes sense — drop the boat's waypoints when it leaves
-    // the normal state. (Going back to normal leaves an empty path; the user
-    // can re-plot waypoints if they want.)
+    // Capsized / anchored / aground boats can't sail, so drop the boat's
+    // waypoints when it leaves the normal state.
     const dropWaypoints = next !== 'normal'
     scene = {
       ...scene,
@@ -190,7 +187,7 @@
     openConditionBoatId = id
   }
 
-  // ── Waypoints ──────────────────────────────────────────────────────
+  // Waypoints
   function onWaypointDrag(waypointId: string, pos: Vec2): void {
     scene = {
       ...scene,
@@ -226,7 +223,7 @@
     }
   }
 
-  // ── Route animation ────────────────────────────────────────────────
+  // Route animation
   let currentAnimation = $state<AnimationClip | undefined>(undefined)
   let sailingBoatId    = $state<string | undefined>(undefined)
   let playingAll       = $state(false)
@@ -238,11 +235,9 @@
   let bookmarks = $state<number[]>([])
 
   /**
-   * The scene snapshot the current playback was built from. The $effect below
-   * compares this against the live `scene` and stops playback the instant any
-   * path-relevant field changes — so dragging a waypoint mid-playback halts
-   * the now-stale animation rather than letting it keep tracing the old path.
-   * The user re-presses Play once they're done editing.
+   * Snapshot of the scene the current playback was built from. The $effect
+   * below stops playback when any path-relevant field changes, so dragging
+   * a waypoint mid-playback halts the stale animation.
    */
   let playbackBaseScene: SceneState | undefined = undefined
 
@@ -293,9 +288,7 @@
 
   $effect(() => {
     // Stop active playback the moment any path-relevant scene field changes.
-    // Also drop the preset hint at this point — the user has edited the
-    // canonical setup and the hint's instructions ("Press play. Boat B starts
-    // clear astern…") no longer describe what's on screen.
+    // Also drop the preset hint, since it no longer describes the edited scene.
     if (currentAnimation && playbackBaseScene && isPlaybackPathInvalidated(playbackBaseScene, scene)) {
       stopRoute()
       activePresetHint = null
@@ -318,10 +311,10 @@
     paused = !paused
   }
 
-  // ── Panel collapse ─────────────────────────────────────────────────
+  // Panel collapse
   let panelOpen = $state(true)
 
-  // ── Fullscreen ─────────────────────────────────────────────────────
+  // Fullscreen
   let canvasWrapEl: HTMLDivElement | undefined = $state(undefined)
   let isFullscreen = $state(false)
 
@@ -340,10 +333,8 @@
     return () => document.removeEventListener('fullscreenchange', onChange)
   })
 
-  // ── Keyboard shortcuts ─────────────────────────────────────────────
-  // Space = play/pause, ←/→ = skip to prev/next waypoint bookmark.
-  // Suppressed while the user is typing in an input/textarea so we don't
-  // hijack normal text editing.
+  // Keyboard shortcuts: Space = play/pause, ←/→ = prev/next waypoint.
+  // Suppressed while the user is typing in an input/textarea.
   function isEditableTarget(t: EventTarget | null): boolean {
     if (!(t instanceof HTMLElement)) return false
     if (t.isContentEditable) return true
@@ -403,7 +394,7 @@
     }
   })
 
-  // ── Rule violations ────────────────────────────────────────────────
+  // Rule violations
   let liveViolations = $state<RuleViolation[]>([])
 
   /** User-controlled toggle (switch in the playback island). When off, new
@@ -421,14 +412,11 @@
   }
 
   /**
-   * Seed the gate with the current scene's static violations the moment
-   * playback starts. Without this seed, GameCanvas's onViolationsChanged
-   * dedup ("only fire when the violation set changes") can swallow the
-   * initial t=0 callback during a play-start — the static set was already
-   * delivered while the page was still showing the static scene — leaving
-   * the gate uninitialised. The first new violation that *does* arrive
-   * (e.g. R15 at the ROW transfer) would then be treated as the seed
-   * instead of as a pause-trigger, and the user would never get a pause.
+   * Seed the gate with the current scene's static violations on play-start.
+   * Without this, GameCanvas's onViolationsChanged dedup swallows the
+   * initial t=0 callback (the static set was already delivered before play),
+   * leaving the gate uninitialised so the first real new violation gets
+   * treated as the seed instead of triggering a pause.
    */
   function seedPauseGateFromCurrentScene(): void {
     pauseGate.noteViolations(evaluateScene(scene))
@@ -472,7 +460,7 @@
     rightOfWay: string | null
   }
 
-  // ── Preset loading (?preset=<id> query param) ─────────────────────
+  // Preset loading (?preset=<id> query param)
   let activePresetTitle = $state<string | null>(null)
   let activePresetHint  = $state<string | null>(null)
 
@@ -490,8 +478,7 @@
     }
   })
 
-  // Playback-island derived state — drives disabled / icon switching when the
-  // island is rendered with no active animation.
+  // Playback-island derived state: disabled flags + play/pause icon switching.
   let hasAnyWaypoints = $derived((scene.waypoints ?? []).length > 0)
   let playDisabled    = $derived(!currentAnimation && !hasAnyWaypoints)
   let navDisabled     = $derived(!currentAnimation)
@@ -524,7 +511,7 @@
 <div class="page-container">
   <div class="page-header">
     <div class="container">
-      <h1>Whiteboard{activePresetTitle ? ` — ${activePresetTitle}` : ''}</h1>
+      <h1>Whiteboard{activePresetTitle ? `: ${activePresetTitle}` : ''}</h1>
       <p class="page-subtitle">
         Plan race scenarios: drag boats and marks, set wind direction, and step through situations.
       </p>
@@ -649,9 +636,9 @@
                 {#if card.ruleId === 'rule_14'}
                   <strong>{card.violator}</strong> must avoid contact.
                 {:else if card.ruleId === 'rule_15'}
-                  <strong>{card.violator}</strong> just acquired right of way — give <strong>{card.rightOfWay}</strong> room to keep clear.
+                  <strong>{card.violator}</strong> just acquired right of way. Give <strong>{card.rightOfWay}</strong> room to keep clear.
                 {:else if card.ruleId === 'rule_16'}
-                  <strong>{card.violator}</strong> is changing course — give <strong>{card.rightOfWay}</strong> room to keep clear.
+                  <strong>{card.violator}</strong> is changing course. Give <strong>{card.rightOfWay}</strong> room to keep clear.
                 {:else if card.ruleId === 'rule_17'}
                   <strong>{card.violator}</strong> may be sailing above proper course.
                 {:else}
@@ -659,7 +646,7 @@
                 {/if}
               </p>
               <a class="violation-link" href="{base}/resources/rulebook?rule={card.ruleId}">
-                View rule →
+                View rule <ArrowRight size={12} strokeWidth={2.5} />
               </a>
             </div>
           {/each}
@@ -673,7 +660,7 @@
           onclick={() => panelOpen = !panelOpen}
           aria-label={panelOpen ? 'Collapse panel' : 'Expand panel'}
         >
-          {panelOpen ? '✕' : '⚙'}
+          {#if panelOpen}<X size={16} strokeWidth={2.5} />{:else}<Settings size={16} strokeWidth={2.5} />{/if}
         </button>
 
         {#if panelOpen}
@@ -727,7 +714,7 @@
                         <TriggerIcon size={12} strokeWidth={2} />
                       </button>
                     </span>
-                    <button class="boat-remove" onclick={() => removeBoat(boat.id)} aria-label="Remove {boat.label}">×</button>
+                    <button class="boat-remove" onclick={() => removeBoat(boat.id)} aria-label="Remove {boat.label}"><X size={12} strokeWidth={2.5} /></button>
                   </li>
                 {/each}
               </ul>
@@ -783,7 +770,7 @@
     box-shadow: var(--shadow-card);
   }
 
-  /* ── Bottom-center stack (preset hint + playback island) ─────────── */
+  /* Bottom-center stack (preset hint + playback island) */
   .bottom-stack {
     position: absolute;
     bottom: var(--space-3);
@@ -957,7 +944,7 @@
   .pb-speed .speed-input:focus { border-color: rgba(255, 255, 255, 0.5); }
   .pb-speed .speed-suffix { color: rgba(255, 255, 255, 0.6); }
 
-  /* ── Canvas corner controls ──────────────────────────────────────── */
+  /* Canvas corner controls */
   .canvas-corner {
     position: absolute;
     z-index: 10;
@@ -987,7 +974,7 @@
     background: color-mix(in srgb, var(--bg-card) 96%, transparent);
   }
 
-  /* ── Violation notifications ─────────────────────────────────────── */
+  /* Violation notifications */
   .violations-overlay {
     position: absolute;
     top: var(--space-3);
@@ -1065,6 +1052,9 @@
 
   .violation-link {
     align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     font-size: 0.75rem;
     color: var(--accent);
     text-decoration: none;
@@ -1072,7 +1062,7 @@
   }
   .violation-link:hover { text-decoration: underline; }
 
-  /* ── Overlay panel ───────────────────────────────────────────────── */
+  /* Overlay panel */
   .overlay-panel {
     position: absolute;
     top: var(--space-3);
@@ -1175,6 +1165,7 @@
     border-radius: var(--radius-sm);
     text-align: right;
     -moz-appearance: textfield;
+    appearance: textfield;
   }
   .speed-input::-webkit-outer-spin-button,
   .speed-input::-webkit-inner-spin-button {
@@ -1273,9 +1264,10 @@
     border: none;
     color: var(--text-muted);
     cursor: pointer;
-    font-size: 1rem;
     line-height: 1;
     padding: 0 2px;
+    display: inline-flex;
+    align-items: center;
   }
   .boat-remove:hover { color: var(--text); }
 
@@ -1350,7 +1342,7 @@
   }
   .add-boat-btn:hover { background: var(--bg-hover, rgba(0,0,0,0.04)); }
 
-  /* ── Responsive ──────────────────────────────────────────────────── */
+  /* Responsive */
   @media (max-width: 768px) {
     .whiteboard-layout {
       padding: var(--space-3);

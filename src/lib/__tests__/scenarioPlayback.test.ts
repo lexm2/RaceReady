@@ -6,6 +6,7 @@ import {
   sampleSceneAt,
 } from '../canvas/scenarioPlayback.ts'
 import { ViolationPauseGate } from '../canvas/violationPauseGate.ts'
+import type { RuleViolation } from '../canvas/types.ts'
 
 /**
  * Match GameCanvas's RULE_LOOKBACK_SEC: rules 15 and 16 need a prior scene

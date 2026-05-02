@@ -1,7 +1,7 @@
 import type { RenderContext, BoatState } from '../types.ts'
 import { worldToScreen } from './coords.ts'
 
-// ─── Constants shared with GameCanvas for hit-testing ────────────────────────
+// Constants shared with GameCanvas for hit-testing
 /** Hull length in world units - must match boat.ts. */
 export const HULL_LENGTH_M = 10
 /** Returns the screen-space position of the rotation handle for a given boat. */
@@ -22,7 +22,7 @@ export function getHandleScreenPos(
   }
 }
 
-// ─── Selection ring ───────────────────────────────────────────────────────────
+// Selection ring
 
 export function drawSelectionRing(rc: RenderContext): void {
   if (!rc.selectedBoatId) return
@@ -81,7 +81,7 @@ export function drawSelectionRing(rc: RenderContext): void {
   ctx.restore()
 }
 
-// ─── Labels ───────────────────────────────────────────────────────────────────
+// Labels
 
 export function drawLabels(rc: RenderContext): void {
   for (const boat of rc.scene.boats) {
@@ -126,7 +126,7 @@ export function drawLabels(rc: RenderContext): void {
   }
 }
 
-// ─── Grid (Whiteboard mode) ───────────────────────────────────────────────────
+// Grid (Whiteboard mode)
 
 export function drawGrid(rc: RenderContext): void {
   const { ctx, canvas, camera, scene, dpr } = rc

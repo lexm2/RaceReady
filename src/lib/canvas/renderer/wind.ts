@@ -25,7 +25,7 @@ export function drawWindIndicator(rc: RenderContext): void {
   drawWidgetLabel(ctx, cx, cy + r + 6 * dpr, dpr)
 }
 
-// ─── Private helpers ──────────────────────────────────────────────────────────
+// Private helpers
 
 function drawWidgetBackground(
   ctx: CanvasRenderingContext2D,

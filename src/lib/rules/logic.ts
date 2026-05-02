@@ -16,7 +16,7 @@ import {
   normalize360,
 } from './generator/utils.ts'
 
-// ─── Geometry predicates ──────────────────────────────────────────────────────
+// Geometry predicates
 
 /**
  * Boat A is "clear astern" of B when A's projected position along B's heading
@@ -76,10 +76,8 @@ export function isWhileTacking(boat: BoatState, wind: WindState): boolean {
 
 /**
  * Closest point of approach (CPA): minimum distance between two straight-line
- * trajectories of constant-heading constant-speed boats over a forward window.
- *
- * Returns: { tCpaSec, distanceM } — t may be negative or beyond windowSec
- * (meaning closest point is in the past or further future); the caller decides.
+ * trajectories of constant-heading, constant-speed boats. The returned t may
+ * be negative or beyond windowSec (closest point in past or further future).
  */
 export function closestPointOfApproach(
   a: BoatState,
@@ -112,7 +110,7 @@ export function closestPointOfApproach(
   return { tCpaSec: tCpa, distanceM: Math.hypot(dxAtT, dyAtT) }
 }
 
-// ─── Rule application — pair-wise evaluators ──────────────────────────────────
+// Rule application: pair-wise evaluators
 
 /**
  * Returns the keep-clear boat id for the given pair under the given rule,
@@ -134,7 +132,6 @@ export function applyRule11(a: BoatState, b: BoatState, wind: WindState): string
 export function applyRule12(a: BoatState, b: BoatState, wind: WindState): string | null {
   if (!isSameTack(a, b, wind)) return null
   if (isOverlapped(a, b)) return null
-  // The boat clear astern keeps clear of the boat clear ahead.
   return isClearAstern(a, b) ? a.id : b.id
 }
 
@@ -147,27 +144,25 @@ export function applyRule13(a: BoatState, b: BoatState, wind: WindState): string
 }
 
 /**
- * Rule 14 — Avoiding contact. Applies to BOTH boats; the right-of-way boat
- * "need not act to avoid contact until it is clear that the other boat is
- * not keeping clear", so we only fire this when contact is imminent.
- * Returns both ids when the boats are within `CONTACT_IMMINENT_M`.
+ * Avoiding contact applies to both boats. The right-of-way boat "need not
+ * act until it is clear that the other boat is not keeping clear", so we
+ * only fire this when contact is imminent.
  */
 export function applyRule14(a: BoatState, b: BoatState): [string, string] | null {
   return distance(a.position, b.position) <= CONTACT_IMMINENT_M ? [a.id, b.id] : null
 }
 
 /**
- * Rule 17 — Same tack; proper course. Best-effort static approximation:
- * fires when boats are same-tack overlapped, distance is within 2 hull lengths,
- * and the leeward boat is sailing closer to the wind than close-hauled
- * (i.e. above proper course on a beat). Real RRS Rule 17 also requires that
- * the overlap was acquired from clear astern, which we cannot determine
- * without prior frames — so this may produce false positives.
+ * Proper course (same tack). Static approximation: fires when boats are
+ * same-tack overlapped within 2 hull lengths and the leeward boat is heading
+ * higher than close-hauled. The real rule also requires the overlap to have
+ * been acquired from clear astern, which we can't see without prior frames,
+ * so this may produce false positives.
  */
 export function applyRule17(a: BoatState, b: BoatState, wind: WindState): string | null {
   if (!isSameTack(a, b, wind)) return null
   if (!isOverlapped(a, b)) return null
-  // Within two hull lengths leeward — the rule's specific distance.
+  // Within two hull lengths leeward (the rule's specific distance).
   if (distance(a.position, b.position) > 2 * HULL_LENGTH_M) return null
   const leeward = isWindward(a, b, wind) ? b : a
   // "Proper course" upwind ≈ close-hauled. If the leeward boat is heading
@@ -178,9 +173,9 @@ export function applyRule17(a: BoatState, b: BoatState, wind: WindState): string
 }
 
 /**
- * Rule 22 — A capsized / anchored / aground boat (or one rescuing) has
- * absolute right of way. Returns the id of the boat that must keep clear,
- * or null if neither boat is in a non-normal condition.
+ * A capsized / anchored / aground / rescuing boat has absolute right of way.
+ * Returns the id of the boat that must keep clear, or null if both are normal
+ * or both are impaired.
  */
 export function applyRule22(a: BoatState, b: BoatState): string | null {
   const aImpaired = (a.condition ?? 'normal') !== 'normal'
@@ -215,11 +210,10 @@ function angularDelta(a: number, b: number): number {
 }
 
 /**
- * Rule 15 — Acquiring right of way. Fires on the boat that just gained ROW
- * (so this boat is not currently the keep-clear boat, but it has a residual
- * obligation to give the other boat room). If the boat that gained ROW also
- * changed heading significantly between prev and current, we assume it
- * gained ROW through its own action — Rule 15 then does NOT apply.
+ * Acquiring right of way. Fires on the boat that just gained ROW; it has a
+ * residual obligation to give the other boat room. If the acquirer also
+ * changed heading significantly, we assume it gained ROW through its own
+ * action and Rule 15 does NOT apply.
  */
 export function applyRule15(
   curA: BoatState, curB: BoatState,
@@ -240,9 +234,9 @@ export function applyRule15(
 }
 
 /**
- * Rule 16 — Changing course. The right-of-way boat must give the other boat
- * room to keep clear. Fires when the current ROW boat changed heading by
- * more than `HEADING_CHANGE_THRESHOLD_DEG` between prev and current.
+ * Changing course. The right-of-way boat must give room to keep clear. Fires
+ * when the current ROW boat changed heading by more than
+ * `HEADING_CHANGE_THRESHOLD_DEG` between prev and current.
  */
 export function applyRule16(
   curA: BoatState, curB: BoatState,
@@ -264,24 +258,18 @@ export function applyRule18(
   wind: WindState,
   marks: Mark[],
 ): { keepClearId: string; markId: string } | null {
-  // Rule 18 applies when both boats are in the zone of the same mark and on
-  // the same tack (simplified MVP — real rule has more nuances).
+  // Simplified mark-room: applies when both boats are in the zone of the same
+  // mark on the same tack. Inside boat (smaller cross-track offset to the
+  // mark) gets room; outside boat must keep clear.
   for (const mark of marks) {
     if (mark.type !== 'buoy' && mark.type !== 'gate_buoy') continue
     if (!isInZone(a, mark) || !isInZone(b, mark)) continue
     if (!isSameTack(a, b, wind)) continue
 
-    // The "outside" boat must give mark-room to the "inside" boat.
-    // Inside boat = the one on the side of the mark closer to the next leg.
-    // Approximation: inside = the boat whose perpendicular distance to the mark
-    // along the across-track axis (perpendicular to heading) is smaller.
     const v = headingToVector(a.heading)
-    // Perpendicular vector (right-hand side of heading)
     const perp = { x: -v.y, y: v.x }
     const aOff = (a.position.x - mark.position.x) * perp.x + (a.position.y - mark.position.y) * perp.y
     const bOff = (b.position.x - mark.position.x) * perp.x + (b.position.y - mark.position.y) * perp.y
-    // The "inside" boat is the one closer to the mark on the perpendicular axis
-    // (smaller |offset|). The outside boat must keep clear / give room.
     const insideId = Math.abs(aOff) < Math.abs(bOff) ? a.id : b.id
     const outsideId = insideId === a.id ? b.id : a.id
     return { keepClearId: outsideId, markId: mark.id }
@@ -289,13 +277,13 @@ export function applyRule18(
   return null
 }
 
-// ─── Per-frame evaluator ──────────────────────────────────────────────────────
+// Per-frame evaluator
 
 const PROXIMITY_ADVISORY_M = 40   // rule applies, comfortable separation
 const PROXIMITY_WARNING_M = 18    // boats getting close
 const PROXIMITY_VIOLATION_M = 8   // collision-imminent
-const CONTACT_IMMINENT_M    = 6   // Rule 14 — both boats must avoid contact
-const HEADING_CHANGE_THRESHOLD_DEG = 12   // Rule 16 — heading delta over the lookback window
+const CONTACT_IMMINENT_M    = 6   // both boats must avoid contact
+const HEADING_CHANGE_THRESHOLD_DEG = 12   // ROW heading delta over the lookback window
 
 function severityFromDistance(distM: number): RuleViolation['severity'] | null {
   if (distM <= PROXIMITY_VIOLATION_M) return 'violation'
@@ -309,7 +297,7 @@ const RULE_DESCRIPTIONS: Record<EncodedRuleId, string> = {
   rule_11: 'Windward boat must keep clear of leeward boat (same tack, overlapped)',
   rule_12: 'Boat clear astern must keep clear of boat clear ahead (same tack)',
   rule_13: 'Boat tacking must keep clear of a boat on a tack',
-  rule_14: 'Contact imminent — both boats must avoid contact',
+  rule_14: 'Contact imminent; both boats must avoid contact',
   rule_15: 'Boat acquiring right of way must initially give room to keep clear',
   rule_16: 'Right-of-way boat changing course must give room to keep clear',
   rule_17: 'Leeward boat may be sailing above proper course while overlapped',
@@ -319,12 +307,9 @@ const RULE_DESCRIPTIONS: Record<EncodedRuleId, string> = {
 }
 
 /**
- * Evaluate the entire scene: returns the strongest applicable rule violation
- * for each pair of boats.
- *
- * If `prevScene` is provided (sampled some seconds earlier on the animation
- * timeline), rules 15 and 16 — which depend on right-of-way transfers and
- * course changes — are also evaluated.
+ * Evaluate the scene: returns the strongest applicable rule violation per
+ * pair of boats. If `prevScene` is provided (sampled seconds earlier on the
+ * animation timeline), rules 15 and 16 are also evaluated.
  */
 export function evaluateScene(scene: SceneState, prevScene?: SceneState): RuleViolation[] {
   const violations: RuleViolation[] = []
@@ -342,9 +327,9 @@ export function evaluateScene(scene: SceneState, prevScene?: SceneState): RuleVi
       const sev = severityFromDistance(distM)
       if (!sev) continue
 
-      // Rule 14 — contact imminent. Always reported (in parallel with the
-      // applicable right-of-way rule) when boats are within contact range,
-      // for BOTH boats. Severity is forced to 'violation'.
+      // Avoiding contact: always reported in parallel with the applicable
+      // right-of-way rule when boats are within contact range, on BOTH boats.
+      // Severity is forced to 'violation'.
       const r14 = applyRule14(a, b)
       if (r14) {
         for (const id of r14) {
@@ -357,9 +342,9 @@ export function evaluateScene(scene: SceneState, prevScene?: SceneState): RuleVi
         }
       }
 
-      // Rule 17 — leeward boat may be sailing above proper course. This is a
-      // constraint on the right-of-way boat under R11, not an alternative to
-      // it, so it fires in parallel rather than via the priority chain.
+      // Proper course: this is a constraint on the leeward right-of-way boat
+      // under windward-leeward (Rule 11), not an alternative, so it fires in
+      // parallel rather than via the priority chain.
       const r17 = applyRule17(a, b, wind)
       if (r17) {
         violations.push({
@@ -371,9 +356,9 @@ export function evaluateScene(scene: SceneState, prevScene?: SceneState): RuleVi
         })
       }
 
-      // Rules 15 / 16 — both compare current state to a prior sample of the
-      // same animation. They impose obligations on the right-of-way boat,
-      // so they fire in parallel with whatever pair rule applies.
+      // Acquiring ROW (15) and changing course (16) compare current state to
+      // a prior sample. Both impose obligations on the right-of-way boat, so
+      // they fire in parallel with whatever pair rule applies.
       if (prevById) {
         const prevA = prevById.get(a.id)
         const prevB = prevById.get(b.id)

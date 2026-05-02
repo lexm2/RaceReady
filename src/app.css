@@ -3,10 +3,10 @@
  * -----------------------
  * Theme-agnostic resets, layout primitives, and utility classes.
  * All color/font values come from CSS custom properties defined in
- * src/lib/themes/themes.css — imported before this file in main.js.
+ * src/lib/themes/themes.css, imported before this file in main.js.
  */
 
-/* ─── Non-theme globals ─────────────────────────────────────────── */
+/* Non-theme globals */
 :root {
   /* Spacing scale */
   --space-1:  4px;
@@ -41,7 +41,7 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ─── Reset ─────────────────────────────────────────────────────── */
+/* Reset */
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -60,7 +60,7 @@ body {
   flex-direction: column;
 }
 
-/* ─── Base typography ────────────────────────────────────────────── */
+/* Base typography */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   color: var(--text);
@@ -84,19 +84,19 @@ a:hover {
   opacity: 0.85;
 }
 
-/* ─── Scrollbar ──────────────────────────────────────────────────── */
+/* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track  { background: var(--scrollbar-track); }
 ::-webkit-scrollbar-thumb  { background: var(--scrollbar-thumb); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
 
-/* ─── Selection ──────────────────────────────────────────────────── */
+/* Selection */
 ::selection {
   background: var(--selection-bg);
   color: var(--text);
 }
 
-/* ─── Layout utilities ───────────────────────────────────────────── */
+/* Layout utilities */
 .container {
   width: 100%;
   max-width: 1200px;
@@ -104,7 +104,7 @@ a:hover {
   padding: 0 var(--space-6);
 }
 
-/* ─── Button primitives ──────────────────────────────────────────── */
+/* Button primitives */
 /*
  * Uses --btn-primary-* tokens so each theme can express its brand.
  * Maritime: maize → seafoam green   U-M: Maize (#FFCB05) on Michigan Blue
@@ -159,7 +159,7 @@ a:hover {
   transform: translateY(-1px);
 }
 
-/* ─── Page layout ────────────────────────────────────────────────── */
+/* Page layout */
 .page-container {
   flex: 1;
   display: flex;
@@ -192,7 +192,7 @@ a:hover {
   margin: 0 auto;
 }
 
-/* ─── Section headings ───────────────────────────────────────────── */
+/* Section headings */
 .section-heading {
   font-size: clamp(1.5rem, 3vw, 2.25rem);
   font-weight: 700;
@@ -210,7 +210,7 @@ a:hover {
   margin: 0 auto var(--space-12);
 }
 
-/* ─── Stub pages ─────────────────────────────────────────────────── */
+/* Stub pages */
 .stub-content {
   display: flex;
   align-items: center;

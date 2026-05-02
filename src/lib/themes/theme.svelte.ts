@@ -10,12 +10,15 @@
  */
 
 import { Moon, Sun } from 'lucide-svelte';
-import type { Component } from 'svelte';
+import type { IconProps } from 'lucide-svelte';
+import type { ComponentType, SvelteComponent } from 'svelte';
+
+export type IconComponent = ComponentType<SvelteComponent<IconProps>>
 
 export interface Theme {
   id: string
   label: string
-  icon: Component
+  icon: IconComponent
 }
 
 export interface ThemeStore {

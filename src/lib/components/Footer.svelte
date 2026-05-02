@@ -31,7 +31,7 @@
     </div>
 
     <div class="footer-links">
-      {#snippet linkCol(heading, links)}
+      {#snippet linkCol(heading: string, links: { label: string; href: string }[])}
         <div class="link-col">
           <h4 class="col-heading">{heading}</h4>
           <ul>

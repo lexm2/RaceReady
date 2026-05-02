@@ -12,7 +12,7 @@ import {
 } from './utils.ts'
 
 /**
- * Rule 13 — While Tacking: a boat that is tacking (between head-to-wind and
+ * While tacking: a boat that is tacking (between head-to-wind and
  * close-hauled) keeps clear of a boat on a tack.
  *
  * One boat begins on starboard tack close-hauled, then tacks to port; another
@@ -110,7 +110,7 @@ export function generateRule13Scenario(params: Rule13Params = {}): RuleScenario 
     animation: wrapClip(keyframes, duration, true),
     answer: {
       boatId: tackingId,
-      explanation: 'A boat that is tacking — from when she passes head-to-wind until she is on a close-hauled course — must keep clear of a boat on a tack. The tacking boat is on Rule 13 throughout that window, even if she would otherwise have right of way.',
+      explanation: 'A boat that is tacking (from when she passes head-to-wind until she is on a close-hauled course) must keep clear of a boat on a tack. The tacking boat is on the while-tacking rule throughout that window, even if she would otherwise have right of way.',
       ruleRef: 'rule_13',
     },
     difficulty: 'intermediate',

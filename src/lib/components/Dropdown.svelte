@@ -1,10 +1,10 @@
 <script lang="ts">
-  import type { Component } from 'svelte';
+  import type { IconComponent } from '$lib/themes/theme.svelte.ts';
 
   interface DropdownItem {
     label: string
     href: string
-    icon?: Component
+    icon?: IconComponent
   }
   interface Props {
     label: string

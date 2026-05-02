@@ -1,7 +1,7 @@
 <script lang="ts">
   import { base } from '$app/paths';
   import { PRESETS } from '$lib/whiteboardPresets.ts';
-  import { Play } from 'lucide-svelte';
+  import { Play, ArrowRight } from 'lucide-svelte';
 </script>
 
 <div class="page-container">
@@ -27,7 +27,7 @@
         <h3 class="rule-card-title">{preset.title}</h3>
         <p class="rule-card-summary">{preset.summary}</p>
         <p class="rule-card-hint">{preset.hint}</p>
-        <span class="rule-card-cta">Open in whiteboard →</span>
+        <span class="rule-card-cta">Open in whiteboard <ArrowRight size={12} strokeWidth={2.5} /></span>
       </a>
     {/each}
   </div>
@@ -110,6 +110,9 @@
   }
 
   .rule-card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     margin-top: var(--space-2);
     font-size: 0.85rem;
     color: var(--accent);

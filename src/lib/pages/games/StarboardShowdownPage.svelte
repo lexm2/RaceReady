@@ -10,7 +10,7 @@
   // Markdown loader (same pattern as RulebookPage)
   const ruleFiles = import.meta.glob('/rules/**/*.md', { query: '?raw', import: 'default' })
 
-  // ── State ────────────────────────────────────────────────────────────────
+  // State
   let queue       = $state<RuleScenario[]>(shuffleScenarios())
   let index       = $state(0)
   let phase       = $state<'playing' | 'correct' | 'wrong' | 'finished'>('playing')
@@ -30,7 +30,7 @@
     )[0]!
   })
 
-  // ── Handlers ─────────────────────────────────────────────────────────────
+  // Handlers
   function handleBoatClick(boatId: string): void {
     if (!current || phase !== 'playing') return
     if (boatId === current.answer.boatId) {
@@ -81,7 +81,7 @@
       .catch(() => { ruleLoading = false })
   }
 
-  // ── Rule evaluator passed to canvas (closure-stable reference) ───────────
+  // Rule evaluator passed to canvas (closure-stable reference)
   const evaluator = (scene: import('$lib/canvas/types.ts').SceneState) => evaluateScene(scene)
 </script>
 
@@ -137,10 +137,10 @@
           <h3>{phase === 'correct' ? 'Correct!' : 'Not quite.'}</h3>
           <p>{current.answer.explanation}</p>
           {#if ruleLoading}
-            <p class="rule-loading">Loading rule text…</p>
+            <p class="rule-loading">Loading rule text...</p>
           {:else if ruleHtml}
             <details class="rule-details">
-              <summary>Show {current.answer.ruleRef.replace('rule_', 'Rule ')}</summary>
+              <summary>Show {RULES_BY_ID[current.answer.ruleRef]?.title ?? current.answer.ruleRef}</summary>
               <div class="rule-md">{@html ruleHtml}</div>
             </details>
           {/if}

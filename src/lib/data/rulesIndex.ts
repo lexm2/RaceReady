@@ -27,7 +27,7 @@ export interface RuleGroup {
 export type RuleNode = RuleLeaf | RuleGroup
 
 export const RULES_INDEX: RuleNode[] = [
-  // ── Standalone documents ──────────────────────────────────────────
+  // Standalone documents
   {
     id: 'introduction',
     title: 'Introduction',
@@ -47,7 +47,7 @@ export const RULES_INDEX: RuleNode[] = [
     path: '/rules/basic_principles/basic_principles.md',
   },
 
-  // ── Part 1 ────────────────────────────────────────────────────────
+  // Part 1
   {
     id: 'part1',
     title: 'Part 1: Fundamental Rules',
@@ -63,7 +63,7 @@ export const RULES_INDEX: RuleNode[] = [
     ],
   },
 
-  // ── Part 2 ────────────────────────────────────────────────────────
+  // Part 2
   {
     id: 'part2',
     title: 'Part 2: When Boats Meet',
@@ -119,7 +119,7 @@ export const RULES_INDEX: RuleNode[] = [
     ],
   },
 
-  // ── Part 3 ────────────────────────────────────────────────────────
+  // Part 3
   {
     id: 'part3',
     title: 'Part 3: Conduct of a Race',
@@ -142,7 +142,7 @@ export const RULES_INDEX: RuleNode[] = [
     ],
   },
 
-  // ── Part 4 ────────────────────────────────────────────────────────
+  // Part 4
   {
     id: 'part4',
     title: 'Part 4: Other Requirements When Racing',
@@ -185,7 +185,7 @@ export const RULES_INDEX: RuleNode[] = [
     ],
   },
 
-  // ── Part 5 ────────────────────────────────────────────────────────
+  // Part 5
   {
     id: 'part5',
     title: 'Part 5: Protests, Redress, Hearings, Misconduct',
@@ -237,7 +237,7 @@ export const RULES_INDEX: RuleNode[] = [
     ],
   },
 
-  // ── Part 6 ────────────────────────────────────────────────────────
+  // Part 6
   {
     id: 'part6',
     title: 'Part 6: Entry and Qualification',
@@ -253,7 +253,7 @@ export const RULES_INDEX: RuleNode[] = [
     ],
   },
 
-  // ── Part 7 ────────────────────────────────────────────────────────
+  // Part 7
   {
     id: 'part7',
     title: 'Part 7: Event Organization',
@@ -271,7 +271,7 @@ export const RULES_INDEX: RuleNode[] = [
     ],
   },
 
-  // ── Appendices ────────────────────────────────────────────────────
+  // Appendices
   {
     id: 'appendices',
     title: 'Appendices',
@@ -294,7 +294,7 @@ export const RULES_INDEX: RuleNode[] = [
     ],
   },
 
-  // ── Race Signals ──────────────────────────────────────────────────
+  // Race Signals
   {
     id: 'race_signals',
     title: 'Race Signals',
@@ -303,7 +303,7 @@ export const RULES_INDEX: RuleNode[] = [
   },
 ]
 
-// ── Helpers ───────────────────────────────────────────────────────────
+// Helpers
 
 /** Recursively collect all loadable items (has .path) into a flat array. */
 function flattenIndex(items: RuleNode[], acc: RuleLeaf[] = []): RuleLeaf[] {

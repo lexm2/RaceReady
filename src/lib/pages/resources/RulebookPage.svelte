@@ -12,12 +12,12 @@
     return requested && RULES_BY_ID[requested] ? requested : 'introduction'
   }
 
-  // ── State ────────────────────────────────────────────────────────
+  // State
   let selectedId    = $state(initialRuleId())
   let contentHtml   = $state('')
   let isLoading     = $state(false)
   let loadError     = $state<string | null>(null)
-  let expandedParts = $state(new Set([findParentPartId(selectedId) ?? 'part1']))
+  let expandedParts = $state(new Set([findParentPartId(initialRuleId()) ?? 'part1']))
   let sidebarOpen   = $state(false)
   let searchQuery   = $state('')
 
@@ -30,7 +30,7 @@
       : []
   )
 
-  // ── Content loading ───────────────────────────────────────────────
+  // Content loading
   $effect(() => {
     const item = RULES_BY_ID[selectedId]
     if (!item?.path) return
@@ -62,7 +62,7 @@
     return () => window.removeEventListener('keydown', onKeydown)
   })
 
-  // ── Actions ───────────────────────────────────────────────────────
+  // Actions
   function selectItem(id: string): void {
     selectedId = id
     if (window.matchMedia('(max-width: 768px)').matches) {
@@ -167,10 +167,11 @@
                 {#if expandedParts.has(node.id)}
                   <div class="toc-part-children">
                     {#if node.preamble}
+                      {@const partPreamble = node.preamble}
                       <button
                         class="toc-rule toc-preamble"
-                        class:active={selectedId === node.preamble.id}
-                        onclick={() => selectItem(node.preamble.id)}
+                        class:active={selectedId === partPreamble.id}
+                        onclick={() => selectItem(partPreamble.id)}
                       >Preamble</button>
                     {/if}
 
@@ -178,10 +179,11 @@
                       {#if child.type === 'section'}
                         <div class="toc-section-label">{child.title}</div>
                         {#if child.preamble}
+                          {@const sectionPreamble = child.preamble}
                           <button
                             class="toc-rule toc-preamble toc-rule--indented"
-                            class:active={selectedId === child.preamble.id}
-                            onclick={() => selectItem(child.preamble.id)}
+                            class:active={selectedId === sectionPreamble.id}
+                            onclick={() => selectItem(sectionPreamble.id)}
                           >Preamble</button>
                         {/if}
                         {#each child.children as rule (rule.id)}
@@ -257,7 +259,7 @@
 </div>
 
 <style>
-  /* ── Page shell ─────────────────────────────────────────────────── */
+  /* Page shell */
   .rulebook-page {
     min-height: 100vh;
   }
@@ -286,7 +288,7 @@
     color: var(--text-muted);
   }
 
-  /* ── Two-panel grid ─────────────────────────────────────────────── */
+  /* Two-panel grid */
   .rulebook-layout {
     display: grid;
     grid-template-columns: 280px 1fr;
@@ -294,7 +296,7 @@
     min-height: calc(100vh - var(--nav-height) - 90px);
   }
 
-  /* ── Sidebar ────────────────────────────────────────────────────── */
+  /* Sidebar */
   .rulebook-sidebar {
     position: sticky;
     top: var(--nav-height);
@@ -304,7 +306,7 @@
     background: var(--bg-surface);
   }
 
-  /* ── Search ─────────────────────────────────────────────────────── */
+  /* Search */
   .sidebar-search {
     padding: var(--space-3) var(--space-4);
     border-bottom: 1px solid var(--border);
@@ -348,7 +350,7 @@
     opacity: 0.7;
   }
 
-  /* ── TOC ────────────────────────────────────────────────────────── */
+  /* TOC */
   .toc {
     padding: var(--space-2) 0 var(--space-8);
   }
@@ -483,7 +485,7 @@
     font-style: italic;
   }
 
-  /* ── Content panel ──────────────────────────────────────────────── */
+  /* Content panel */
   .rulebook-content {
     padding: var(--space-10) var(--space-10) var(--space-16);
     min-height: 600px;
@@ -496,7 +498,7 @@
     font-size: 14px;
   }
 
-  /* ── Rule article (markdown output) ────────────────────────────── */
+  /* Rule article (markdown output) */
   .rule-article {
     max-width: 760px;
   }
@@ -574,7 +576,7 @@
     border-radius: 3px;
   }
 
-  /* ── Loading / error ────────────────────────────────────────────── */
+  /* Loading / error */
   .loading-state,
   .error-state {
     display: flex;
@@ -611,7 +613,7 @@
     to { transform: rotate(360deg); }
   }
 
-  /* ── Mobile sidebar ─────────────────────────────────────────────── */
+  /* Mobile sidebar */
   .sidebar-backdrop {
     display: none;
     position: fixed;

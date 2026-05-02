@@ -1,7 +1,7 @@
 import type { RenderContext, BoatState, ColorValue } from '../types.ts'
 import { worldToScreen, normalizeAngle } from './coords.ts'
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// Constants
 
 /** Hull length in world units (metres). */
 const HULL_LENGTH_M = 10
@@ -16,7 +16,7 @@ const PALETTE: Record<string, string> = {
   white:     '#FFFFFF',
 }
 
-// ─── Public API ───────────────────────────────────────────────────────────────
+// Public API
 
 export function drawBoatWake(rc: RenderContext, boat: BoatState): void {
   if (boat.speed <= 0) return
@@ -81,7 +81,7 @@ export function drawBoat(rc: RenderContext, boat: BoatState): void {
   ctx.restore()
 }
 
-// ─── Private helpers ──────────────────────────────────────────────────────────
+// Private helpers
 
 function resolveColor(value: ColorValue): string {
   return PALETTE[value] ?? value

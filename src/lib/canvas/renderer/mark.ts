@@ -43,7 +43,7 @@ export function drawMark(rc: RenderContext, mark: Mark): void {
   }
 }
 
-// ─── Private helpers ──────────────────────────────────────────────────────────
+// Private helpers
 
 function drawZoneRing(
   ctx: CanvasRenderingContext2D,

@@ -73,7 +73,7 @@ export function renderScene(rc: RenderContext): void {
 
 }
 
-// ─── Course leg lines ─────────────────────────────────────────────────────────
+// Course leg lines
 
 function drawCourseLegs(rc: RenderContext): void {
   const { ctx, canvas, camera, scene, dpr } = rc

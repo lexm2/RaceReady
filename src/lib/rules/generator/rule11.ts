@@ -12,7 +12,7 @@ import {
 } from './utils.ts'
 
 /**
- * Rule 11 — Same Tack, Overlapped: windward boat keeps clear of leeward boat.
+ * Same tack, overlapped: windward boat keeps clear of leeward boat.
  *
  * Both boats sail the same heading, separated laterally so one is clearly
  * windward of the other.

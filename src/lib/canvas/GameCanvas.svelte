@@ -12,7 +12,7 @@
   import { worldToScreen, screenToWorld, lerpVec2, lerpAngle, normalizeAngle } from './renderer/coords.ts'
   import { getHandleScreenPos } from './renderer/ui.ts'
 
-  // ── Props ────────────────────────────────────────────────────────────────────
+  // Props
   let {
     scene,
     camera: cameraProp,
@@ -36,24 +36,24 @@
     class: className = '',
   }: GameCanvasProps = $props()
 
-  // Cached previous violation list — used to fire onViolationsChanged only on change.
+  // Cached previous violation list, used to fire onViolationsChanged only on change.
   let prevViolationsKey = ''
 
   /** Seconds to look back when sampling prior animation state for rules 15/16. */
   const RULE_LOOKBACK_SEC = 1.2
 
-  // ── Element refs ─────────────────────────────────────────────────────────────
+  // Element refs
   let canvasEl  = $state<HTMLCanvasElement | null>(null)
   let wrapperEl = $state<HTMLDivElement | null>(null)
 
-  // ── Internal state ───────────────────────────────────────────────────────────
+  // Internal state
   let dpr            = $state(window.devicePixelRatio || 1)
   let rafId          = $state(0)
   let playback       = $state<AnimationPlayback | null>(null)
   let canvasSize     = $state({ w: 0, h: 0 })  // CSS px; used by autoFitCamera
   let lastRafTs       = 0   // wall timestamp of previous rAF frame
 
-  // ── Derived camera ───────────────────────────────────────────────────────────
+  // Derived camera
   let camera = $derived<Camera>(
     cameraProp ?? autoFitCamera(scene.worldSize, canvasSize.w, canvasSize.h, dpr),
   )
@@ -78,7 +78,7 @@
     }
   }
 
-  // ── Resize ───────────────────────────────────────────────────────────────────
+  // Resize
   $effect(() => {
     if (!wrapperEl || !canvasEl) return
 
@@ -100,7 +100,7 @@
     return () => ro.disconnect()
   })
 
-  // ── Animation setup ──────────────────────────────────────────────────────────
+  // Animation setup
   $effect(() => {
     if (!animation) {
       playback        = null
@@ -113,7 +113,7 @@
     lastRafTs       = 0
   })
 
-  // ── rAF loop ─────────────────────────────────────────────────────────────────
+  // rAF loop
   $effect(() => {
     if (!canvasEl) return
     let running = true
@@ -131,7 +131,7 @@
     }
   })
 
-  // ── Core draw function ────────────────────────────────────────────────────────
+  // Core draw function
   function drawFrame(timestamp: DOMHighResTimeStamp): void {
     if (!canvasEl) return
     const ctx = canvasEl.getContext('2d')
@@ -166,9 +166,8 @@
     // For change-based rules (15, 16) sample the same animation a moment in
     // the past so the evaluator can compare the right-of-way relationship.
     // Lookback is in animation time, not wall time, so it stays valid while
-    // paused — important for the auto-pause-on-violation flow, which would
-    // otherwise drop the rule that triggered the pause as soon as the pause
-    // took effect.
+    // paused. This matters for the auto-pause-on-violation flow, which would
+    // otherwise drop the rule that triggered the pause once the pause took effect.
     let prevScene: SceneState | undefined
     if (playback) {
       const lookbackTarget = animTime - RULE_LOOKBACK_SEC
@@ -211,7 +210,7 @@
     renderScene(rc)
   }
 
-  // ── Animation interpolation ───────────────────────────────────────────────────
+  // Animation interpolation
   function applyAnimation(
     base: SceneState,
     pb: AnimationPlayback,
@@ -251,7 +250,7 @@
     return { ...base, boats: animatedBoats }
   }
 
-  // ── Hit-testing ───────────────────────────────────────────────────────────────
+  // Hit-testing
   const BOAT_HIT_M       = 6    // world-space metres
   const MARK_HIT_M       = 4
   const WAYPOINT_HIT_M   = 5
@@ -329,7 +328,7 @@
     onBackgroundClick?.(world)
   }
 
-  // ── Drag ─────────────────────────────────────────────────────────────────────
+  // Drag
   let dragTarget = $state<{ type: 'boat' | 'mark' | 'rotate' | 'waypoint'; id: string } | null>(null)
 
   function handleMouseDown(e: MouseEvent): void {

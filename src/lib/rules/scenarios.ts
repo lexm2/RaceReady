@@ -8,35 +8,32 @@ import {
   generateRule19Scenario,
 } from './generator/index.ts'
 
-/**
- * Canonical scenarios — each entry calls a generator with a specific param set.
- * Adding new variations is one line each.
- */
+/** Canonical scenarios; each entry calls a generator with a specific param set. */
 export const ALL_SCENARIOS: RuleScenario[] = [
-  // Rule 10 — Port-Starboard
+  // Port-Starboard
   generateRule10Scenario({ windDirDeg: 0, timeToConflictSec: 6 }),
   generateRule10Scenario({ windDirDeg: 0, timeToConflictSec: 7, stbdHeadingDeg: 305, portHeadingDeg: 55 }),
   generateRule10Scenario({ windDirDeg: 90, timeToConflictSec: 6 }),
   generateRule10Scenario({ windDirDeg: 270, timeToConflictSec: 7 }),
 
-  // Rule 11 — Same tack, overlapped
+  // Same tack, overlapped (windward keeps clear)
   generateRule11Scenario({ windDirDeg: 0, tack: 'starboard', windwardLateralOffsetM: 16 }),
   generateRule11Scenario({ windDirDeg: 0, tack: 'port', windwardLateralOffsetM: 14 }),
   generateRule11Scenario({ windDirDeg: 90, tack: 'starboard', windwardLateralOffsetM: 18, windwardLongitudinalOffsetM: 6 }),
 
-  // Rule 12 — Same tack, not overlapped (overtaking)
+  // Same tack, not overlapped (overtaking)
   generateRule12Scenario({ windDirDeg: 0, tack: 'starboard', asternDistanceM: 28 }),
   generateRule12Scenario({ windDirDeg: 0, tack: 'port', asternDistanceM: 32 }),
 
-  // Rule 13 — While tacking
+  // While tacking
   generateRule13Scenario({ windDirDeg: 0 }),
   generateRule13Scenario({ windDirDeg: 90, tackStartSec: 3.5 }),
 
-  // Rule 18 — Mark room
+  // Mark room
   generateRule18Scenario({ windDirDeg: 0, insideSide: 'left' }),
   generateRule18Scenario({ windDirDeg: 0, insideSide: 'right', separationM: 18 }),
 
-  // Rule 19 — Obstruction
+  // Obstruction
   generateRule19Scenario({ windDirDeg: 0, insideSide: 'left' }),
 ]
 

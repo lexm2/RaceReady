@@ -13,8 +13,8 @@ import {
 } from './utils.ts'
 
 /**
- * Rule 12 — Same Tack, Not Overlapped: boat clear astern keeps clear of
- * boat clear ahead. The trailing boat is overtaking faster, closing the gap.
+ * Same tack, not overlapped: boat clear astern keeps clear of boat clear
+ * ahead. The trailing boat is overtaking faster, closing the gap.
  */
 export function generateRule12Scenario(params: Rule12Params = {}): RuleScenario {
   const wind = params.windDirDeg ?? DEFAULT_WIND_DIR_DEG

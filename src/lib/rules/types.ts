@@ -7,7 +7,7 @@ import type {
   Mark,
 } from '$lib/canvas/types.ts'
 
-// ─── Rule ids encoded in code ─────────────────────────────────────────────────
+// Rule ids encoded in code
 
 export type EncodedRuleId =
   | 'rule_10'
@@ -22,7 +22,7 @@ export type EncodedRuleId =
   | 'rule_19'
   | 'rule_22'
 
-// ─── Scenario shape consumed by games / whiteboard ────────────────────────────
+// Scenario shape consumed by games / whiteboard
 
 export type QuestionType = 'who_must_keep_clear' | 'who_has_right_of_way'
 
@@ -48,13 +48,13 @@ export interface RuleScenario {
   tags: string[]
 }
 
-// ─── Generator parameters (one interface per rule) ────────────────────────────
+// Generator parameters (one interface per rule)
 
 export interface CommonParams {
   windDirDeg?: number
   worldSize?: Vec2
   speedKnots?: number
-  /** Anchor for the IDs — useful when composing scenarios. */
+  /** Anchor for the IDs; useful when composing scenarios. */
   boatAId?: string
   boatBId?: string
 }

@@ -13,8 +13,8 @@ import {
 } from './utils.ts'
 
 /**
- * Rule 18 — Mark-Room: when boats are overlapped at the zone, the outside
- * boat must give the inside boat room to round the mark.
+ * Mark-room: when boats are overlapped at the zone, the outside boat must
+ * give the inside boat room to round the mark.
  *
  * Two boats approach a mark on the same tack, overlapped, with one inside.
  * The mark's zone (3 hull lengths) is rendered automatically by the mark renderer.
@@ -127,7 +127,7 @@ export function generateRule18Scenario(params: Rule18Params = {}): RuleScenario 
     animation: wrapClip(keyframes, duration, true),
     answer: {
       boatId: outsideId,
-      explanation: 'When boats are overlapped at the zone (3 hull lengths from the mark), the outside boat must give the inside overlapped boat mark-room — room to sail her proper course to and around the mark. The outside boat keeps clear.',
+      explanation: 'When boats are overlapped at the zone (3 hull lengths from the mark), the outside boat must give the inside overlapped boat mark-room: room to sail her proper course to and around the mark. The outside boat keeps clear.',
       ruleRef: 'rule_18',
     },
     difficulty: 'intermediate',

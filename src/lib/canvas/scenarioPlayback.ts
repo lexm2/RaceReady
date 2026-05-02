@@ -28,7 +28,7 @@ export interface BoatRoute {
   frames: RouteFrame[]
   /** Animation times where this boat hits a waypoint (used for skip-bookmarks). */
   waypointTimes: number[]
-  /** Total time of the last keyframe — may be shorter than the clip's overall duration. */
+  /** Total time of the last keyframe; may be shorter than the clip's overall duration. */
   naturalDurationSec: number
 }
 
@@ -126,10 +126,9 @@ function buildBoatRoute(boat: BoatState, waypoints: Waypoint[], windDirDeg: numb
 
   push(boat.heading, boat.position)
 
-  // Capsized / anchored / aground boats can't sail — emit a single keyframe
-  // and bail before any waypoint following or in-place pivoting. (The page
-  // already drops their waypoints on condition change, but guard anyway so
-  // any straggler waypoints don't put the boat into motion.)
+  // Immobile boats (capsized / anchored / aground) emit one keyframe and
+  // skip waypoint following. The page drops their waypoints on condition
+  // change; this guards against any straggler.
   const immobile = (boat.condition ?? 'normal') !== 'normal'
   if (immobile || wps.length === 0) {
     return { boatId: boat.id, frames, waypointTimes, naturalDurationSec: 0 }
@@ -197,8 +196,8 @@ function buildBoatRoute(boat: BoatState, waypoints: Waypoint[], windDirDeg: numb
     }
   }
 
-  // Initial in-place pivot to align heading with the first leg. The boat has
-  // no inbound leg here — there's nothing to round into — so we simply spin.
+  // Initial in-place pivot to align heading with the first leg. With no
+  // inbound leg there's nothing to round into, so we simply spin.
   pivotInPlace(boat.position, boat.heading, bearings[0]!)
   let prevExit: Vec2 = boat.position
 
@@ -290,7 +289,7 @@ function extendRouteToDuration(route: BoatRoute, scene: SceneState, clipDuration
   const boat = scene.boats.find(b => b.id === route.boatId)!
   const heading = last.data.heading
 
-  // Capsized / anchored / aground boats can't sail — hold position for the
+  // Immobile boats (capsized / anchored / aground) hold position for the
   // remainder of the clip instead of drifting forward at the last heading.
   const immobile = (boat.condition ?? 'normal') !== 'normal'
   const speedMs = immobile ? 0 : legSpeedMs(heading, scene.wind.directionDeg)

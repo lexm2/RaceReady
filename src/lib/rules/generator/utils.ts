@@ -115,7 +115,7 @@ export function generateTackingKeyframes(opts: {
     /** Speed-multiplier during the tack itself (typically ~0.3). */
     tackSpeedMul?: number
   }
-  /** All other boats — straight line. */
+  /** All other boats: straight line. */
   otherBoats: Array<{
     id: string
     startPos: Vec2

@@ -13,7 +13,7 @@ import {
 } from './utils.ts'
 
 /**
- * Rule 19 — Room to Pass an Obstruction: when boats are overlapped passing an
+ * Room to pass an obstruction: when boats are overlapped passing an
  * obstruction, the outside boat gives the inside boat room.
  *
  * Two boats on the same tack, overlapped, approach an obstruction (rendered

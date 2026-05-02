@@ -1,12 +1,12 @@
 import type { RenderContext, Waypoint } from '../types.ts'
 import { worldToScreen } from './coords.ts'
 
-// ─── Polar speed model ────────────────────────────────────────────────────────
+// Polar speed model
 
 /** Returns approximate boat speed (knots) for a given leg bearing and wind direction. */
 export function calcLegSpeed(legBearingDeg: number, windFromDeg: number): number {
   const twa = ((legBearingDeg - windFromDeg + 360) % 360)
-  const sym = twa > 180 ? 360 - twa : twa   // symmetric 0–180, 0=head-to-wind 180=downwind
+  const sym = twa > 180 ? 360 - twa : twa   // symmetric 0..180, 0=head-to-wind 180=downwind
   if (sym < 30) return 0                     // no-go zone (head to wind)
   const t = sym / 180
   // Peaks ~120° TWA (broad reach), tapers at 0° and 180°
@@ -16,12 +16,12 @@ export function calcLegSpeed(legBearingDeg: number, windFromDeg: number): number
 function speedColor(legBearingDeg: number, windFromDeg: number): string {
   const twa = ((legBearingDeg - windFromDeg + 360) % 360)
   const sym = twa > 180 ? 360 - twa : twa
-  if (sym < 60)  return 'rgba(255,150,0,0.95)'   // upwind — orange
-  if (sym < 120) return 'rgba(80,220,100,0.95)'  // reach — green
-  return 'rgba(80,160,255,0.95)'                  // downwind — blue
+  if (sym < 60)  return 'rgba(255,150,0,0.95)'   // upwind: orange
+  if (sym < 120) return 'rgba(80,220,100,0.95)'  // reach: green
+  return 'rgba(80,160,255,0.95)'                  // downwind: blue
 }
 
-// ─── Color resolution ─────────────────────────────────────────────────────────
+// Color resolution
 
 const PALETTE: Record<string, string> = {
   maize: '#FFCB05', blue: '#00274C', arboretum: '#2f65a7',
@@ -32,7 +32,7 @@ function resolveColor(c: string): string {
   return PALETTE[c] ?? c
 }
 
-// ─── Arrowhead helper ─────────────────────────────────────────────────────────
+// Arrowhead helper
 
 function drawArrow(
   ctx: CanvasRenderingContext2D,
@@ -58,7 +58,7 @@ function drawArrow(
   ctx.fill()
 }
 
-// ─── Leg drawing helper ───────────────────────────────────────────────────────
+// Leg drawing helper
 
 function drawLeg(
   ctx: CanvasRenderingContext2D,
@@ -116,7 +116,7 @@ function drawLeg(
   }
 }
 
-// ─── Main draw function ───────────────────────────────────────────────────────
+// Main draw function
 
 export function drawWaypoints(rc: RenderContext): void {
   const { ctx, canvas, camera, scene, dpr } = rc
@@ -146,7 +146,7 @@ export function drawWaypoints(rc: RenderContext): void {
     const boat  = boatMap.get(boatId)
     if (!boat) continue
 
-    // ── Dashed path: boat → wp0 → wp1 → … ───────────────────────────────────
+    // Dashed path: boat to wp0 to wp1 ...
     ctx.setLineDash([6 * dpr, 4 * dpr])
     ctx.strokeStyle = color + 'aa'
     ctx.lineWidth   = 1.5 * dpr
@@ -161,7 +161,7 @@ export function drawWaypoints(rc: RenderContext): void {
     ctx.stroke()
     ctx.setLineDash([])
 
-    // ── Speed labels & arrows ─────────────────────────────────────────────────
+    // Speed labels and arrows
 
     // First leg: boat → waypoint 0
     drawLeg(ctx, canvas, camera, scene, dpr, boat.position, wps[0]!.position, color, markerR)
@@ -171,7 +171,7 @@ export function drawWaypoints(rc: RenderContext): void {
       drawLeg(ctx, canvas, camera, scene, dpr, wps[i]!.position, wps[i + 1]!.position, color, markerR)
     }
 
-    // ── Waypoint markers ──────────────────────────────────────────────────────
+    // Waypoint markers
     for (let i = 0; i < wps.length; i++) {
       const wp = wps[i]!
       const s  = worldToScreen(wp.position, camera, canvas)

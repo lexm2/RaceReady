@@ -43,14 +43,14 @@ const wp = (id: string, boatId: string, x: number, y: number, order: number): Wa
 export const PRESETS: WhiteboardPreset[] = [
   {
     id: 'rule_10', ruleId: 'rule_10',
-    title: 'Rule 10 — Port / Starboard',
+    title: 'Port / Starboard',
     summary: 'Two boats converging on opposite tacks.',
     hint: 'Boat B (port tack) must keep clear of Boat A (starboard).',
     scene: { ...baseScene, boats: [A(), B()], waypoints: [] },
   },
   {
     id: 'rule_11', ruleId: 'rule_11',
-    title: 'Rule 11 — Same Tack, Windward Keeps Clear',
+    title: 'Same Tack, Windward Keeps Clear',
     summary: 'Two boats on the same tack, overlapped side-by-side.',
     hint: 'The windward boat (more upwind) must keep clear of the leeward boat.',
     scene: {
@@ -64,7 +64,7 @@ export const PRESETS: WhiteboardPreset[] = [
   },
   {
     id: 'rule_12', ruleId: 'rule_12',
-    title: 'Rule 12 — Same Tack, Clear Astern',
+    title: 'Same Tack, Clear Astern',
     summary: 'Trailing boat must keep clear of the boat clear ahead.',
     hint: 'Boat A is clear astern of Boat B and must keep clear.',
     scene: {
@@ -78,7 +78,7 @@ export const PRESETS: WhiteboardPreset[] = [
   },
   {
     id: 'rule_13', ruleId: 'rule_13',
-    title: 'Rule 13 — While Tacking',
+    title: 'While Tacking',
     summary: 'A boat in the no-go zone must keep clear of a boat on a tack.',
     hint: 'Boat A is head-to-wind (tacking). It must keep clear of Boat B.',
     scene: {
@@ -89,9 +89,9 @@ export const PRESETS: WhiteboardPreset[] = [
   },
   {
     id: 'rule_14', ruleId: 'rule_14',
-    title: 'Rule 14 — Avoiding Contact',
+    title: 'Avoiding Contact',
     summary: 'Both boats must avoid contact when collision is imminent.',
-    hint: 'Both boats pinching head-to-wind on opposite tacks, locked within 6 m. Rule 14 fires on both, with Rule 10 keeping the port-tack boat clear.',
+    hint: 'Both boats are pinching head-to-wind on opposite tacks, locked within 6 m. The avoiding-contact rule fires on both, while port-starboard keeps Boat B clear.',
     scene: {
       ...baseScene,
       boats: [
@@ -103,9 +103,9 @@ export const PRESETS: WhiteboardPreset[] = [
   },
   {
     id: 'rule_15', ruleId: 'rule_15',
-    title: 'Rule 15 — Acquiring Right of Way',
+    title: 'Acquiring Right of Way',
     summary: 'A boat just gained right of way and must give the other boat room.',
-    hint: 'Press play. Boat B starts clear astern on a faster reach and slides into a leeward overlap. Watch the keep-clear flip from B to A — Rule 15 fires on B as it acquires right of way.',
+    hint: 'Press play. Boat B starts clear astern on a faster reach and slides into a leeward overlap. Watch the keep-clear flip from B to A as B acquires right of way.',
     scene: {
       ...baseScene,
       boats: [
@@ -121,9 +121,9 @@ export const PRESETS: WhiteboardPreset[] = [
   },
   {
     id: 'rule_16', ruleId: 'rule_16',
-    title: 'Rule 16 — Changing Course',
+    title: 'Changing Course',
     summary: 'Right-of-way boat changing course must give room to keep clear.',
-    hint: 'Press play. Boat A (starboard, ROW) sails close-hauled, then sharply heads down at the first waypoint. Rule 16 fires on A while it turns.',
+    hint: 'Press play. Boat A (starboard, ROW) sails close-hauled, then sharply heads down at the first waypoint. The right-of-way boat must give Boat B room while changing course.',
     scene: {
       ...baseScene,
       boats: [
@@ -139,9 +139,9 @@ export const PRESETS: WhiteboardPreset[] = [
   },
   {
     id: 'rule_17', ruleId: 'rule_17',
-    title: 'Rule 17 — Proper Course',
+    title: 'Proper Course',
     summary: 'Leeward boat sailing above proper course while overlapped.',
-    hint: 'Both pinching on starboard, overlapped. Boat B (leeward) is heading above close-hauled — Rule 17 advisory fires on B alongside Rule 11 on A.',
+    hint: 'Both boats are pinching on starboard, overlapped. Boat B (leeward) is heading above close-hauled, sailing above proper course while A is the windward boat.',
     scene: {
       ...baseScene,
       boats: [
@@ -153,7 +153,7 @@ export const PRESETS: WhiteboardPreset[] = [
   },
   {
     id: 'rule_18', ruleId: 'rule_18',
-    title: 'Rule 18 — Mark Room',
+    title: 'Mark Room',
     summary: 'Outside boat must give mark-room to the inside overlapped boat.',
     hint: 'Both boats are within mark-1\'s zone. The outside boat (Boat A) must keep clear.',
     scene: {
@@ -167,9 +167,9 @@ export const PRESETS: WhiteboardPreset[] = [
   },
   {
     id: 'rule_22', ruleId: 'rule_22',
-    title: 'Rule 22 — Capsized / Anchored / Aground',
+    title: 'Capsized / Anchored / Aground',
     summary: 'A capsized boat has absolute right of way.',
-    hint: 'Boat B is capsized. Boat A must keep clear under Rule 22 (overrides Rule 10).',
+    hint: 'Boat B is capsized. Boat A must keep clear of the capsized boat (this overrides port-starboard).',
     scene: {
       ...baseScene,
       boats: [A(), B({ condition: 'capsized' })],
