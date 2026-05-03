@@ -82,7 +82,7 @@ function drawLeg(
   const label    = spd === 0 ? 'no-go' : `${spd} kt`
   const fontSize = 9 * dpr
 
-  ctx.font         = `bold ${fontSize}px Oswald, sans-serif`
+  ctx.font         = `bold ${fontSize}px Montserrat, sans-serif`
   ctx.textAlign    = 'center'
   ctx.textBaseline = 'middle'
 
@@ -180,7 +180,7 @@ export function drawWaypoints(rc: RenderContext): void {
       ctx.stroke()
 
       const numSize = 7 * dpr
-      ctx.font         = `bold ${numSize}px Oswald, sans-serif`
+      ctx.font         = `bold ${numSize}px Montserrat, sans-serif`
       ctx.textAlign    = 'center'
       ctx.textBaseline = 'middle'
       ctx.fillStyle    = color

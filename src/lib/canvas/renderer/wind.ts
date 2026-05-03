@@ -123,7 +123,7 @@ function drawSpeedLabel(
   knots: number,
   dpr: number,
 ): void {
-  ctx.font         = `bold ${8 * dpr}px Oswald, sans-serif`
+  ctx.font         = `bold ${8 * dpr}px Montserrat, sans-serif`
   ctx.textAlign    = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillStyle    = SPEED_LABEL_FILL
@@ -136,7 +136,7 @@ function drawWidgetLabel(
   labelY: number,
   dpr: number,
 ): void {
-  ctx.font         = `${7 * dpr}px Oswald, sans-serif`
+  ctx.font         = `${7 * dpr}px Montserrat, sans-serif`
   ctx.textAlign    = 'center'
   ctx.textBaseline = 'top'
   ctx.fillStyle    = WIDGET_LABEL_FILL
