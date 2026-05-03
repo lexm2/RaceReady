@@ -27,12 +27,12 @@ const baseScene: Omit<SceneState, 'boats' | 'waypoints'> = {
 }
 
 const A = (over: Partial<BoatState> = {}): BoatState => ({
-  id: 'boat-a', position: { x: 158, y: 120 }, heading: 315, tack: 'starboard',
+  id: 'boat-a', position: { x: 158, y: 120 }, heading: 315,
   speed: 6, hullColor: 'maize', sailColor: 'blue', label: 'Boat A', isPlayer: true,
   ...over,
 })
 const B = (over: Partial<BoatState> = {}): BoatState => ({
-  id: 'boat-b', position: { x: 142, y: 120 }, heading: 45, tack: 'port',
+  id: 'boat-b', position: { x: 142, y: 120 }, heading: 45,
   speed: 5, hullColor: 'orange', sailColor: 'white', label: 'Boat B', isPlayer: false,
   ...over,
 })
@@ -49,8 +49,8 @@ export const PRESETS: WhiteboardPreset[] = [
     scene: {
       ...baseScene,
       boats: [
-        A({ position: { x: 220, y: 180 }, heading: 315, tack: 'starboard' }),
-        B({ position: {  x: 80, y: 200 }, heading:  45, tack: 'port' }),
+        A({ position: { x: 220, y: 180 }, heading: 315 }),
+        B({ position: {  x: 80, y: 200 }, heading:  45 }),
       ],
       waypoints: [
         wp('wp-r10-a-1', 'boat-a', 140, 100, 0),
@@ -67,8 +67,8 @@ export const PRESETS: WhiteboardPreset[] = [
     scene: {
       ...baseScene,
       boats: [
-        A({ position: { x: 170, y:  80 }, heading: 315, tack: 'starboard' }),
-        B({ position: { x: 152, y:  97 }, heading: 315, tack: 'starboard' }),
+        A({ position: { x: 170, y:  80 }, heading: 315 }),
+        B({ position: { x: 152, y:  97 }, heading: 315 }),
       ],
       waypoints: [
         wp('wp-r11-a-1', 'boat-a', 130, 40, 0),
@@ -85,8 +85,8 @@ export const PRESETS: WhiteboardPreset[] = [
     scene: {
       ...baseScene,
       boats: [
-        A({ position: { x:  60, y:  80 }, heading: 45, tack: 'port' }),
-        B({ position: { x:  80, y:  60 }, heading: 45, tack: 'port' }),
+        A({ position: { x:  60, y:  80 }, heading: 45 }),
+        B({ position: { x:  80, y:  60 }, heading: 45 }),
       ],
       waypoints: [
         wp('wp-r12-a-1', 'boat-a', 120, 20, 0),
@@ -103,8 +103,8 @@ export const PRESETS: WhiteboardPreset[] = [
     scene: {
       ...baseScene,
       boats: [
-        A({ position: { x: 160, y: 110 }, heading: 315, tack: 'starboard' }),
-        B({ position: {  x: 90, y: 100 }, heading:  76, tack: 'port' }),
+        A({ position: { x: 160, y: 110 }, heading: 315 }),
+        B({ position: {  x: 90, y: 100 }, heading:  76 }),
       ],
       waypoints: [
         wp('wp-r13-a-1', 'boat-a', 155, 105, 0),
@@ -123,8 +123,8 @@ export const PRESETS: WhiteboardPreset[] = [
     scene: {
       ...baseScene,
       boats: [
-        A({ position: { x: 168, y: 130 }, heading: 310, tack: 'starboard' }),
-        B({ position: { x: 132, y: 130 }, heading:  50, tack: 'port' }),
+        A({ position: { x: 168, y: 130 }, heading: 310 }),
+        B({ position: { x: 132, y: 130 }, heading:  50 }),
       ],
       waypoints: [
         wp('wp-r14-a-1', 'boat-a',  91,  77, 0),
@@ -141,8 +141,8 @@ export const PRESETS: WhiteboardPreset[] = [
     scene: {
       ...baseScene,
       boats: [
-        A({ position: { x: 150, y: 120 }, heading: 315, tack: 'starboard' }),
-        B({ position: { x: 155, y: 130 }, heading: 270, tack: 'starboard', speed: 7 }),
+        A({ position: { x: 150, y: 120 }, heading: 315 }),
+        B({ position: { x: 155, y: 130 }, heading: 270, speed: 7 }),
       ],
       waypoints: [
         wp('wp-r15-a-1', 'boat-a', 130, 100, 0),
@@ -159,8 +159,8 @@ export const PRESETS: WhiteboardPreset[] = [
     scene: {
       ...baseScene,
       boats: [
-        A({ position: { x: 140, y: 130 }, heading: 315, tack: 'starboard' }),
-        B({ position: { x: 155, y: 145 }, heading: 315, tack: 'starboard' }),
+        A({ position: { x: 140, y: 130 }, heading: 315 }),
+        B({ position: { x: 155, y: 145 }, heading: 315 }),
       ],
       waypoints: [
         wp('wp-r16-a-1', 'boat-a', 130, 120, 0),
@@ -177,8 +177,8 @@ export const PRESETS: WhiteboardPreset[] = [
     scene: {
       ...baseScene,
       boats: [
-        A({ position: { x: 170, y:  80 }, heading: 320, tack: 'starboard' }),
-        B({ position: { x: 163, y:  87 }, heading: 320, tack: 'starboard' }),
+        A({ position: { x: 170, y:  80 }, heading: 320 }),
+        B({ position: { x: 163, y:  87 }, heading: 320 }),
       ],
       waypoints: [
         wp('wp-r17-a-1', 'boat-a', 130,  32, 0),
@@ -195,8 +195,8 @@ export const PRESETS: WhiteboardPreset[] = [
     scene: {
       ...baseScene,
       boats: [
-        A({ position: { x: 210, y: 110 }, heading: 315, tack: 'starboard' }),
-        B({ position: { x: 180, y:  90 }, heading: 315, tack: 'starboard' }),
+        A({ position: { x: 210, y: 110 }, heading: 315 }),
+        B({ position: { x: 180, y:  90 }, heading: 315 }),
       ],
       waypoints: [
         wp('wp-r18-a-1', 'boat-a', 130,  30, 0),
@@ -213,7 +213,7 @@ export const PRESETS: WhiteboardPreset[] = [
     scene: {
       ...baseScene,
       boats: [
-        A({ position: { x: 220, y: 170 }, heading: 315, tack: 'starboard' }),
+        A({ position: { x: 220, y: 170 }, heading: 315 }),
         B({ position: { x: 130, y:  80 }, heading:   0, condition: 'capsized' }),
       ],
       waypoints: [

@@ -28,7 +28,6 @@
         id: 'boat-a',
         position:   { x: 158, y: 120 },
         heading:    315,           // NW, close-hauled starboard with wind from N
-        tack:       'starboard',
         speed:      6,
         hullColor:  'maize',
         sailColor:  'blue',
@@ -39,7 +38,6 @@
         id: 'boat-b',
         position:   { x: 142, y: 120 },
         heading:    45,            // NE, close-hauled port with wind from N
-        tack:       'port',
         speed:      5,
         hullColor:  'orange',
         sailColor:  'white',
@@ -90,13 +88,7 @@
   function onBoatRotate(boatId: string, heading: number): void {
     scene = {
       ...scene,
-      boats: scene.boats.map(b => {
-        if (b.id !== boatId) return b
-        // Auto-derive tack from new heading relative to wind
-        const awa  = ((scene.wind.directionDeg - heading) % 360 + 360) % 360
-        const tack = awa < 180 ? 'starboard' : 'port'
-        return { ...b, heading, tack }
-      }),
+      boats: scene.boats.map(b => b.id === boatId ? { ...b, heading } : b),
     }
   }
 
@@ -130,7 +122,6 @@
       id:        `boat-${Date.now()}`,
       position:  { x: scene.worldSize.x / 2, y: scene.worldSize.y / 2 },
       heading:   0,
-      tack:      'starboard',
       speed:     5,
       hullColor: colors.hull,
       sailColor: colors.sail,

@@ -7,7 +7,6 @@ import {
   startPosition,
   generateTackingKeyframes,
   wrapClip,
-  deriveTack,
   normalize360,
 } from './utils.ts'
 
@@ -49,7 +48,6 @@ export function generateRule13Scenario(params: Rule13Params = {}): RuleScenario 
       id: tackingId,
       position: tackingStart,
       heading: startHeading,
-      tack: deriveTack(startHeading, wind),
       speed,
       hullColor: 'maize',
       sailColor: 'blue',
@@ -60,7 +58,6 @@ export function generateRule13Scenario(params: Rule13Params = {}): RuleScenario 
       id: otherId,
       position: otherStart,
       heading: otherHeading,
-      tack: deriveTack(otherHeading, wind),
       speed,
       hullColor: 'arboretum',
       sailColor: 'white',

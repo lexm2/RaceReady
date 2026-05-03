@@ -42,7 +42,6 @@ export function generateRule10Scenario(params: Rule10Params = {}): RuleScenario 
       id: boatAId,
       position: stbdStart,
       heading: stbdHeading,
-      tack: deriveTack(stbdHeading, wind),
       speed,
       hullColor: 'maize',
       sailColor: 'blue',
@@ -53,7 +52,6 @@ export function generateRule10Scenario(params: Rule10Params = {}): RuleScenario 
       id: boatBId,
       position: portStart,
       heading: portHeading,
-      tack: deriveTack(portHeading, wind),
       speed,
       hullColor: 'orange',
       sailColor: 'white',
@@ -85,7 +83,7 @@ export function generateRule10Scenario(params: Rule10Params = {}): RuleScenario 
   )
 
   // The port-tack boat must keep clear.
-  const keepClearId = boats[0]!.tack === 'port' ? boatAId : boatBId
+  const keepClearId = deriveTack(stbdHeading, wind) === 'port' ? boatAId : boatBId
   const keepClearLabel = keepClearId === boatAId ? 'Boat A' : 'Boat B'
   const rightOfWayLabel = keepClearId === boatAId ? 'Boat B' : 'Boat A'
 

@@ -3,7 +3,6 @@ import type {
   Mark,
   WindState,
   SceneState,
-  Tack,
   RuleViolation,
 } from '$lib/canvas/types.ts'
 import type { EncodedRuleId } from './types.ts'

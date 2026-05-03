@@ -35,7 +35,6 @@ export interface BoatState {
   position: Vec2
   /** Degrees, 0 = pointing up (north), increases clockwise. */
   heading: number
-  tack: Tack
   /** Knots - used only to scale wake intensity. */
   speed: number
   hullColor: ColorValue

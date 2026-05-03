@@ -7,7 +7,6 @@ import {
   startPosition,
   generateLinearKeyframes,
   wrapClip,
-  deriveTack,
   headingToVector,
   normalize360,
 } from './utils.ts'
@@ -65,7 +64,6 @@ export function generateRule18Scenario(params: Rule18Params = {}): RuleScenario 
       id: insideId,
       position: insideStart,
       heading: approach,
-      tack: deriveTack(approach, wind),
       speed,
       hullColor: 'maize',
       sailColor: 'blue',
@@ -76,7 +74,6 @@ export function generateRule18Scenario(params: Rule18Params = {}): RuleScenario 
       id: outsideId,
       position: outsideStart,
       heading: approach,
-      tack: deriveTack(approach, wind),
       speed,
       hullColor: 'orange',
       sailColor: 'white',

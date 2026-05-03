@@ -6,7 +6,6 @@ import {
   DEFAULT_WIND_SPEED_KNOTS,
   generateLinearKeyframes,
   wrapClip,
-  deriveTack,
   headingToVector,
   normalize360,
 } from './utils.ts'
@@ -53,7 +52,6 @@ export function generateRule11Scenario(params: Rule11Params = {}): RuleScenario 
       id: boatAId,
       position: leewardStart,
       heading,
-      tack: deriveTack(heading, wind),
       speed,
       hullColor: 'arboretum',
       sailColor: 'white',
@@ -64,7 +62,6 @@ export function generateRule11Scenario(params: Rule11Params = {}): RuleScenario 
       id: boatBId,
       position: windwardStart,
       heading,
-      tack: deriveTack(heading, wind),
       speed,
       hullColor: 'orange',
       sailColor: 'maize',
