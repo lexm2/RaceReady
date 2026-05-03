@@ -804,13 +804,13 @@
     flex-direction: column;
     gap: 6px;
     padding: 8px 18px 10px;
-    background: rgba(8, 25, 60, 0.82);
+    background: color-mix(in srgb, var(--bg-card) 82%, transparent);
     backdrop-filter: blur(14px) saturate(140%);
     -webkit-backdrop-filter: blur(14px) saturate(140%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid color-mix(in srgb, var(--text) 8%, transparent);
     /* Pill-shaped: full-circle ends, flat top/bottom. */
     border-radius: 9999px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 6px 20px color-mix(in srgb, black 45%, transparent);
   }
 
   .pb-controls {
@@ -838,7 +838,7 @@
   .pb-btn {
     background: none;
     border: none;
-    color: rgba(255, 255, 255, 0.7);
+    color: color-mix(in srgb, var(--text) 70%, transparent);
     cursor: pointer;
     padding: 4px 5px;
     border-radius: 999px;
@@ -848,26 +848,32 @@
     flex-shrink: 0;
     transition: background 0.15s, color 0.15s;
   }
-  .pb-btn:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+  .pb-btn:hover { background: color-mix(in srgb, var(--text) 10%, transparent); color: var(--text); }
   .pb-btn:disabled {
-    color: rgba(255, 255, 255, 0.25);
+    color: color-mix(in srgb, var(--text) 25%, transparent);
     cursor: not-allowed;
     background: none;
   }
-  .pb-btn:disabled:hover { background: none; color: rgba(255, 255, 255, 0.25); }
-  .pb-btn--play { color: #fff; padding: 5px 7px; }
-  .pb-btn--play:hover { background: rgba(255, 255, 255, 0.14); }
-  .pb-btn--stop { color: rgba(255, 96, 96, 0.85); }
-  .pb-btn--stop:hover { background: rgba(255, 96, 96, 0.15); color: #ff6060; }
+  .pb-btn:disabled:hover { background: none; color: color-mix(in srgb, var(--text) 25%, transparent); }
+  .pb-btn--play { color: var(--text); padding: 5px 7px; }
+  .pb-btn--play:hover { background: color-mix(in srgb, var(--text) 14%, transparent); }
+  .pb-btn--stop { color: color-mix(in srgb, var(--tappan-red) 85%, var(--text)); }
+  .pb-btn--stop:hover {
+    background: color-mix(in srgb, var(--tappan-red) 15%, transparent);
+    color: var(--tappan-red);
+  }
   /* Auto-pause toggle: dim when off, accent ring when on. */
   .pb-btn--toggle {
-    color: rgba(255, 255, 255, 0.4);
+    color: color-mix(in srgb, var(--text) 40%, transparent);
   }
   .pb-btn--toggle-on {
-    color: #FFCB05;
-    background: rgba(255, 203, 5, 0.12);
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
   }
-  .pb-btn--toggle-on:hover { background: rgba(255, 203, 5, 0.22); color: #ffd84d; }
+  .pb-btn--toggle-on:hover {
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+    color: color-mix(in srgb, var(--accent) 80%, var(--text));
+  }
 
   /* Thin slider track, subtle thumb that grows on hover. */
   .pb-slider {
@@ -882,12 +888,12 @@
   }
   .pb-slider::-webkit-slider-runnable-track {
     height: 2px;
-    background: rgba(255, 255, 255, 0.18);
+    background: color-mix(in srgb, var(--text) 18%, transparent);
     border-radius: 2px;
   }
   .pb-slider::-moz-range-track {
     height: 2px;
-    background: rgba(255, 255, 255, 0.18);
+    background: color-mix(in srgb, var(--text) 18%, transparent);
     border-radius: 2px;
   }
   .pb-slider::-webkit-slider-thumb {
@@ -897,7 +903,7 @@
     height: 6px;
     margin-top: -2px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.7);
+    background: color-mix(in srgb, var(--text) 70%, transparent);
     border: none;
     transition: transform 0.15s, background 0.15s;
   }
@@ -905,19 +911,19 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.7);
+    background: color-mix(in srgb, var(--text) 70%, transparent);
     border: none;
     transition: transform 0.15s, background 0.15s;
   }
   .pb-slider:hover::-webkit-slider-thumb,
-  .pb-slider:active::-webkit-slider-thumb { transform: scale(1.6); background: #fff; }
+  .pb-slider:active::-webkit-slider-thumb { transform: scale(1.6); background: var(--text); }
   .pb-slider:hover::-moz-range-thumb,
-  .pb-slider:active::-moz-range-thumb     { transform: scale(1.6); background: #fff; }
+  .pb-slider:active::-moz-range-thumb     { transform: scale(1.6); background: var(--text); }
 
   .pb-time {
     font-family: var(--font-mono);
     font-size: 0.72rem;
-    color: rgba(255, 255, 255, 0.7);
+    color: color-mix(in srgb, var(--text) 70%, transparent);
     white-space: nowrap;
   }
 
@@ -925,15 +931,15 @@
     display: inline-flex;
     align-items: baseline;
     gap: 1px;
-    color: rgba(255, 255, 255, 0.7);
+    color: color-mix(in srgb, var(--text) 70%, transparent);
   }
   .pb-speed .speed-input {
-    color: #fff;
-    border-color: rgba(255, 255, 255, 0.18);
+    color: var(--text);
+    border-color: color-mix(in srgb, var(--text) 18%, transparent);
     background: transparent;
   }
-  .pb-speed .speed-input:focus { border-color: rgba(255, 255, 255, 0.5); }
-  .pb-speed .speed-suffix { color: rgba(255, 255, 255, 0.6); }
+  .pb-speed .speed-input:focus { border-color: color-mix(in srgb, var(--text) 50%, transparent); }
+  .pb-speed .speed-suffix { color: color-mix(in srgb, var(--text) 60%, transparent); }
 
   /* Canvas corner controls */
   .canvas-corner {
@@ -998,9 +1004,9 @@
     gap: 4px;
   }
 
-  .violation-card--advisory { border-left-color: rgba(255, 203, 5, 0.85); }
-  .violation-card--warning  { border-left-color: rgba(255, 140, 0, 0.95); }
-  .violation-card--violation { border-left-color: rgba(239, 68, 68, 1); }
+  .violation-card--advisory { border-left-color: color-mix(in srgb, var(--michigan-maize) 85%, transparent); }
+  .violation-card--warning  { border-left-color: color-mix(in srgb, var(--ross-orange) 95%, transparent); }
+  .violation-card--violation { border-left-color: var(--tappan-red); }
 
   .violation-head {
     display: flex;
@@ -1020,9 +1026,18 @@
     color: var(--bg-card);
     background: var(--text-muted);
   }
-  .violation-card--advisory  .violation-sev { background: rgba(255, 203, 5, 0.95); color: #1a1a1a; }
-  .violation-card--warning   .violation-sev { background: rgba(255, 140, 0, 0.98); color: #1a1a1a; }
-  .violation-card--violation .violation-sev { background: rgba(239, 68, 68, 1);    color: #fff;     }
+  .violation-card--advisory  .violation-sev {
+    background: color-mix(in srgb, var(--michigan-maize) 95%, transparent);
+    color: var(--puma-black);
+  }
+  .violation-card--warning   .violation-sev {
+    background: color-mix(in srgb, var(--ross-orange) 98%, transparent);
+    color: var(--puma-black);
+  }
+  .violation-card--violation .violation-sev {
+    background: var(--tappan-red);
+    color: var(--text);
+  }
 
   .violation-rule {
     font-family: var(--font-heading);
@@ -1239,7 +1254,7 @@
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    border: 1px solid rgba(0,0,0,0.15);
+    border: 1px solid color-mix(in srgb, black 15%, transparent);
     pointer-events: none;
   }
 
@@ -1283,8 +1298,8 @@
   }
   .boat-condition:hover { color: var(--text); }
   .boat-condition--active {
-    color: rgba(239, 68, 68, 1);
-    border-color: rgba(239, 68, 68, 0.6);
+    color: var(--tappan-red);
+    border-color: color-mix(in srgb, var(--tappan-red) 60%, transparent);
   }
 
   .condition-menu {
@@ -1317,7 +1332,7 @@
     font-size: 0.78rem;
     text-align: left;
   }
-  .condition-menu-item:hover { background: var(--bg-hover, rgba(0, 0, 0, 0.04)); }
+  .condition-menu-item:hover { background: var(--bg-hover, color-mix(in srgb, black 4%, transparent)); }
   .condition-menu-item--selected { color: var(--accent); font-weight: 600; }
 
   .add-boat-btn {
@@ -1331,7 +1346,7 @@
     text-align: center;
     width: 100%;
   }
-  .add-boat-btn:hover { background: var(--bg-hover, rgba(0,0,0,0.04)); }
+  .add-boat-btn:hover { background: var(--bg-hover, color-mix(in srgb, black 4%, transparent)); }
 
   /* Responsive */
   @media (max-width: 768px) {
