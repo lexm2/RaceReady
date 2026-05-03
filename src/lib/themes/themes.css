@@ -48,15 +48,15 @@
   --navy-light:  #003878;
 
   /* Semantic */
-  --bg:              var(--navy-mid);
-  --bg-surface:      #002255;
-  --bg-card:         var(--navy-light);
+  --bg:              var(--puma-black);
+  --bg-surface:      #1a1d1f;
+  --bg-card:         var(--michigan-blue);
   --text:            #FFFFFF;
   --text-muted:      var(--umma-tan);
   --accent:          var(--michigan-maize);
   --accent-alt:      var(--ross-orange);
-  --link:            var(--michigan-maize);
-  --border:          rgba(255, 203, 5, 0.18);
+  --link:            var(--arboretum-blue);
+  --border:          rgba(255, 255, 255, 0.12);
   --border-hover:    rgba(255, 203, 5, 0.55);
 
   /* Floating surfaces (dropdowns, popovers) */
@@ -78,12 +78,12 @@
   --shadow-glow:     0 0 32px rgba(255, 203, 5, 0.25);
 
   /* Typography */
-  --font-sans:       'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', system-ui, sans-serif;
-  --font-heading:    'Oswald', 'Montserrat', var(--font-sans);
+  --font-sans:       'IBM Plex Sans', 'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', system-ui, sans-serif;
+  --font-heading:    'Montserrat', 'Oswald', var(--font-sans);
   --font-mono:       'IBM Plex Mono', ui-monospace, Consolas, monospace;
 
   /* Hero */
-  --hero-bg:           var(--navy-mid);
+  --hero-bg:           var(--bg);
   --hero-wave-fill:    var(--navy);
   --hero-glow-opacity: 0.15;
   --hero-glow-1:       var(--arboretum-blue);
@@ -100,7 +100,7 @@
   --badge-dot:       var(--michigan-maize);
 
   /* CTA band (always dark Michigan Blue) */
-  --cta-bg:          var(--navy-mid);
+  --cta-bg:          var(--michigan-blue);
   --cta-text:        #FFFFFF;
   --cta-text-muted:  var(--umma-tan);
 
@@ -158,8 +158,8 @@
   --shadow-glow:     0 0 24px rgba(255, 203, 5, 0.35);
 
   /* Typography: same U-M fonts */
-  --font-sans:       'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', system-ui, sans-serif;
-  --font-heading:    'Oswald', 'Montserrat', var(--font-sans);
+  --font-sans:       'IBM Plex Sans', 'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', system-ui, sans-serif;
+  --font-heading:    'Montserrat', 'Oswald', var(--font-sans);
   --font-mono:       'IBM Plex Mono', ui-monospace, Consolas, monospace;
 
   /* Hero: light background, Michigan Blue + Maize palette */
