@@ -116,6 +116,11 @@
   --btn-primary-bg:   var(--michigan-maize);
   --btn-primary-text: var(--michigan-blue);
   --btn-primary-hover:#FFD52E;
+
+  /* Severity */
+  --sev-advisory:  var(--michigan-maize);
+  --sev-warning:   var(--ross-orange);
+  --sev-violation: var(--tappan-red);
 }
 
 /* U-M Light */
@@ -196,4 +201,9 @@
   --btn-primary-bg:   var(--michigan-maize);
   --btn-primary-text: var(--michigan-blue);
   --btn-primary-hover:#FFD52E;
+
+  /* Severity */
+  --sev-advisory:  var(--michigan-maize);
+  --sev-warning:   var(--ross-orange);
+  --sev-violation: var(--tappan-red);
 }
