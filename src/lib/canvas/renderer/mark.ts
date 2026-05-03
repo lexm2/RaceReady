@@ -1,9 +1,16 @@
 import type { RenderContext, Mark } from '../types.ts'
 import { worldToScreen } from './coords.ts'
+import { CANVAS_PALETTE, MARK_FILL, hexWithAlpha } from './colors.ts'
 
 const BUOY_RADIUS  = 6    // screen px (constant regardless of zoom - always legible)
-/** Zone radius per RRS: 3 boat lengths. Boat length = 10 m → 30 m. */
+/** Zone radius per RRS: 3 boat lengths. Boat length = 10 m -> 30 m. */
 const ZONE_RADIUS_M = 30
+
+const BUOY_STROKE_DEFAULT  = hexWithAlpha(CANVAS_PALETTE.white, 0.9)
+const BUOY_HIGHLIGHT_FILL  = hexWithAlpha(CANVAS_PALETTE.white, 0.45)
+const COMMITTEE_MAST       = hexWithAlpha(CANVAS_PALETTE.white, 0.7)
+const LABEL_BACKING        = 'rgba(0,0,0,0.5)'
+const GATE_LINE_STROKE     = hexWithAlpha(CANVAS_PALETTE.white, 0.3)
 
 export function drawMark(rc: RenderContext, mark: Mark): void {
   const { ctx, canvas, camera, dpr } = rc
@@ -52,27 +59,19 @@ function drawZoneRing(
   zoom: number,
   dpr: number,
 ): void {
-  const zoneR = ZONE_RADIUS_M * zoom   // world metres → physical px
+  const zoneR = ZONE_RADIUS_M * zoom
 
-  // Tinted fill - very subtle so it doesn't obscure boats
-  const fillColor = mark.side === 'port'      ? 'rgba(216,96,24,0.06)'
-                  : mark.side === 'starboard' ? 'rgba(34,197,94,0.06)'
-                  :                             'rgba(255,203,5,0.06)'
-
-  // Dashed stroke - same hue as the buoy, more visible
-  const strokeColor = mark.side === 'port'      ? 'rgba(216,96,24,0.45)'
-                    : mark.side === 'starboard' ? 'rgba(34,197,94,0.45)'
-                    :                             'rgba(255,203,5,0.45)'
+  const sideHex     = MARK_FILL[mark.side]
+  const fillColor   = hexWithAlpha(sideHex, 0.06)
+  const strokeColor = hexWithAlpha(sideHex, 0.45)
 
   ctx.save()
 
-  // Fill
   ctx.beginPath()
   ctx.arc(screen.x, screen.y, zoneR, 0, Math.PI * 2)
   ctx.fillStyle = fillColor
   ctx.fill()
 
-  // Dashed border
   ctx.beginPath()
   ctx.arc(screen.x, screen.y, zoneR, 0, Math.PI * 2)
   ctx.setLineDash([6 * dpr, 5 * dpr])
@@ -90,13 +89,9 @@ function drawBuoy(
   r: number,
   dpr: number,
 ): void {
-  const fill = mark.side === 'port'       ? '#d86018'
-             : mark.side === 'starboard'  ? '#22c55e'
-             :                              '#FFCB05'
+  const fill   = MARK_FILL[mark.side]
+  const stroke = mark.side === 'none' ? CANVAS_PALETTE.michiganBlue : BUOY_STROKE_DEFAULT
 
-  const stroke = mark.side === 'none' ? '#00274C' : 'rgba(255,255,255,0.9)'
-
-  // Main circle
   ctx.beginPath()
   ctx.arc(0, 0, r, 0, Math.PI * 2)
   ctx.fillStyle   = fill
@@ -108,7 +103,7 @@ function drawBuoy(
   // Inner highlight
   ctx.beginPath()
   ctx.arc(-r * 0.3, -r * 0.3, r * 0.25, 0, Math.PI * 2)
-  ctx.fillStyle = 'rgba(255,255,255,0.45)'
+  ctx.fillStyle = BUOY_HIGHLIGHT_FILL
   ctx.fill()
 }
 
@@ -120,9 +115,9 @@ function drawCommitteeBoat(ctx: CanvasRenderingContext2D, r: number, dpr: number
   // Rounded rectangle hull
   ctx.beginPath()
   ctx.roundRect(-w / 2, -h / 2, w, h, cr)
-  ctx.fillStyle   = '#002255'
+  ctx.fillStyle   = CANVAS_PALETTE.waterMid
   ctx.fill()
-  ctx.strokeStyle = '#FFCB05'
+  ctx.strokeStyle = CANVAS_PALETTE.maize
   ctx.lineWidth   = 1.5 * dpr
   ctx.stroke()
 
@@ -130,7 +125,7 @@ function drawCommitteeBoat(ctx: CanvasRenderingContext2D, r: number, dpr: number
   ctx.beginPath()
   ctx.moveTo(0, -h / 2)
   ctx.lineTo(0, -h / 2 - 8 * dpr)
-  ctx.strokeStyle = 'rgba(255,255,255,0.7)'
+  ctx.strokeStyle = COMMITTEE_MAST
   ctx.lineWidth   = 1 * dpr
   ctx.stroke()
 }
@@ -138,9 +133,9 @@ function drawCommitteeBoat(ctx: CanvasRenderingContext2D, r: number, dpr: number
 function drawPinEnd(ctx: CanvasRenderingContext2D, r: number, dpr: number): void {
   ctx.beginPath()
   ctx.arc(0, 0, r * 0.7, 0, Math.PI * 2)
-  ctx.fillStyle   = '#FFFFFF'
+  ctx.fillStyle   = CANVAS_PALETTE.white
   ctx.fill()
-  ctx.strokeStyle = '#00274C'
+  ctx.strokeStyle = CANVAS_PALETTE.michiganBlue
   ctx.lineWidth   = 1.5 * dpr
   ctx.stroke()
 
@@ -149,7 +144,7 @@ function drawPinEnd(ctx: CanvasRenderingContext2D, r: number, dpr: number): void
   ctx.beginPath()
   ctx.moveTo(-s, -s); ctx.lineTo(s, s)
   ctx.moveTo( s, -s); ctx.lineTo(-s, s)
-  ctx.strokeStyle = '#00274C'
+  ctx.strokeStyle = CANVAS_PALETTE.michiganBlue
   ctx.lineWidth   = 1 * dpr
   ctx.stroke()
 }
@@ -172,7 +167,7 @@ function drawMarkLabel(
   const labelY = -(r + 4 * dpr)
 
   // Backing rect
-  ctx.fillStyle = 'rgba(0,0,0,0.5)'
+  ctx.fillStyle = LABEL_BACKING
   ctx.beginPath()
   ctx.roundRect(
     -tw / 2 - px,
@@ -184,7 +179,7 @@ function drawMarkLabel(
   ctx.fill()
 
   // Text
-  ctx.fillStyle = '#FFFFFF'
+  ctx.fillStyle = CANVAS_PALETTE.white
   ctx.fillText(label, 0, labelY)
 }
 
@@ -204,7 +199,7 @@ function drawGateLine(rc: RenderContext, mark: Mark): void {
   ctx.moveTo(a.x, a.y)
   ctx.lineTo(b.x, b.y)
   ctx.setLineDash([6 * dpr, 4 * dpr])
-  ctx.strokeStyle = 'rgba(255,255,255,0.3)'
+  ctx.strokeStyle = GATE_LINE_STROKE
   ctx.lineWidth   = 1 * dpr
   ctx.stroke()
   ctx.setLineDash([])

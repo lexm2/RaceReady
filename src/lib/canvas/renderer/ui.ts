@@ -1,9 +1,18 @@
 import type { RenderContext, BoatState } from '../types.ts'
 import { worldToScreen } from './coords.ts'
+import { CANVAS_PALETTE, hexWithAlpha } from './colors.ts'
 
 // Constants shared with GameCanvas for hit-testing
 /** Hull length in world units - must match boat.ts. */
 export const HULL_LENGTH_M = 10
+
+const SELECTION_RING_STROKE = hexWithAlpha(CANVAS_PALETTE.maize, 0.65)
+const SELECTION_STEM_STROKE = hexWithAlpha(CANVAS_PALETTE.maize, 0.45)
+const LABEL_BACKING_FILL    = hexWithAlpha(CANVAS_PALETTE.waterDeep, 0.78)
+const LABEL_BORDER_PLAYER   = hexWithAlpha(CANVAS_PALETTE.maize, 0.6)
+const LABEL_BORDER_OTHER    = hexWithAlpha(CANVAS_PALETTE.maize, 0.3)
+const GRID_MAJOR_STROKE     = hexWithAlpha(CANVAS_PALETTE.white, 0.13)
+const GRID_MINOR_STROKE     = hexWithAlpha(CANVAS_PALETTE.white, 0.07)
 /** Returns the screen-space position of the rotation handle for a given boat. */
 export function getHandleScreenPos(
   boat: BoatState,
@@ -42,7 +51,7 @@ export function drawSelectionRing(rc: RenderContext): void {
   ctx.beginPath()
   ctx.arc(screen.x, screen.y, ringR, 0, Math.PI * 2)
   ctx.setLineDash([5 * dpr, 4 * dpr])
-  ctx.strokeStyle = 'rgba(255,203,5,0.65)'
+  ctx.strokeStyle = SELECTION_RING_STROKE
   ctx.lineWidth   = 1.5 * dpr
   ctx.stroke()
   ctx.setLineDash([])
@@ -53,7 +62,7 @@ export function drawSelectionRing(rc: RenderContext): void {
   ctx.beginPath()
   ctx.moveTo(stemStartX, stemStartY)
   ctx.lineTo(handle.x, handle.y)
-  ctx.strokeStyle = 'rgba(255,203,5,0.45)'
+  ctx.strokeStyle = SELECTION_STEM_STROKE
   ctx.lineWidth   = 1 * dpr
   ctx.stroke()
 
@@ -61,9 +70,9 @@ export function drawSelectionRing(rc: RenderContext): void {
   const hr = 6 * dpr
   ctx.beginPath()
   ctx.arc(handle.x, handle.y, hr, 0, Math.PI * 2)
-  ctx.fillStyle   = '#FFCB05'
+  ctx.fillStyle   = CANVAS_PALETTE.maize
   ctx.fill()
-  ctx.strokeStyle = '#00274C'
+  ctx.strokeStyle = CANVAS_PALETTE.michiganBlue
   ctx.lineWidth   = 1.5 * dpr
   ctx.stroke()
 
@@ -73,7 +82,7 @@ export function drawSelectionRing(rc: RenderContext): void {
   ctx.rotate(headRad)
   ctx.beginPath()
   ctx.arc(0, 0, hr * 0.45, -Math.PI * 0.75, Math.PI * 0.25)
-  ctx.strokeStyle = '#00274C'
+  ctx.strokeStyle = CANVAS_PALETTE.michiganBlue
   ctx.lineWidth   = 1 * dpr
   ctx.stroke()
   ctx.restore()
@@ -108,20 +117,18 @@ export function drawLabels(rc: RenderContext): void {
     const bh = th + py * 2
 
     // Backing rect
-    ctx.fillStyle = 'rgba(0,26,53,0.78)'
+    ctx.fillStyle = LABEL_BACKING_FILL
     ctx.beginPath()
     ctx.roundRect(bx, by, bw, bh, 4 * dpr)
     ctx.fill()
 
     // Border - thicker/brighter for player
-    ctx.strokeStyle = boat.isPlayer
-      ? 'rgba(255,203,5,0.6)'
-      : 'rgba(255,203,5,0.3)'
+    ctx.strokeStyle = boat.isPlayer ? LABEL_BORDER_PLAYER : LABEL_BORDER_OTHER
     ctx.lineWidth = 1 * dpr
     ctx.stroke()
 
     // Text
-    ctx.fillStyle = boat.isPlayer ? '#FFCB05' : '#FFFFFF'
+    ctx.fillStyle = boat.isPlayer ? CANVAS_PALETTE.maize : CANVAS_PALETTE.white
     ctx.fillText(label, screen.x, screen.y - labelOffY)
   }
 }
@@ -180,9 +187,7 @@ export function drawGrid(rc: RenderContext): void {
         ctx.moveTo(screen.x, ext1.y)
         ctx.lineTo(screen.x, ext2.y)
       }
-      ctx.strokeStyle = isMajor
-        ? 'rgba(255,255,255,0.13)'
-        : 'rgba(255,255,255,0.07)'
+      ctx.strokeStyle = isMajor ? GRID_MAJOR_STROKE : GRID_MINOR_STROKE
       ctx.lineWidth = (isMajor ? 0.75 : 0.5) * dpr
       ctx.stroke()
     }

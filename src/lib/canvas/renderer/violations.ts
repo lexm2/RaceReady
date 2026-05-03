@@ -1,14 +1,9 @@
 import type { RenderContext, RuleViolation } from '../types.ts'
 import { worldToScreen } from './coords.ts'
+import { VIOLATION_COLORS } from './colors.ts'
 
 /** Boat-hull length (matches boat.ts). World metres. */
 const HULL_LENGTH_M = 10
-
-const COLORS: Record<RuleViolation['severity'], { stroke: string; fill: string }> = {
-  advisory: { stroke: 'rgba(255,203,5,0.85)',  fill: 'rgba(255,203,5,0.10)'  }, // maize
-  warning:  { stroke: 'rgba(255,140,0,0.95)',  fill: 'rgba(255,140,0,0.16)'  }, // orange
-  violation:{ stroke: 'rgba(239,68,68,1.00)',  fill: 'rgba(239,68,68,0.22)'  }, // red
-}
 
 /**
  * Draw a colored ring around each boat that is currently a "keep clear" boat
@@ -39,7 +34,7 @@ export function drawViolations(rc: RenderContext): void {
     const rWorld = HULL_LENGTH_M * 0.95   // ring sits just outside the hull
     const rPx = rWorld * camera.zoom
 
-    const c = COLORS[v.severity]
+    const c = VIOLATION_COLORS[v.severity]
     const lineW = (v.severity === 'violation' ? 2.5 : v.severity === 'warning' ? 2 : 1.5) * dpr
     const pulseScale = v.severity === 'advisory' ? 1.0 : 1.0 + 0.06 * pulse
 

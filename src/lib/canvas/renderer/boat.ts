@@ -1,20 +1,14 @@
-import type { RenderContext, BoatState, ColorValue } from '../types.ts'
+import type { RenderContext, BoatState } from '../types.ts'
 import { worldToScreen, normalizeAngle } from './coords.ts'
-
-// Constants
+import { CANVAS_PALETTE, hexWithAlpha, resolveBoatColor } from './colors.ts'
 
 /** Hull length in world units (metres). */
 const HULL_LENGTH_M = 10
 
-const PALETTE: Record<string, string> = {
-  maize:     '#FFCB05',
-  blue:      '#00274C',
-  arboretum: '#2f65a7',
-  orange:    '#d86018',
-  teal:      '#00b2a9',
-  red:       '#9a3324',
-  white:     '#FFFFFF',
-}
+const PLAYER_SHADOW       = hexWithAlpha(CANVAS_PALETTE.maize, 0.5)
+const MAST_HIGHLIGHT_FILL = hexWithAlpha(CANVAS_PALETTE.white, 0.5)
+const SAIL_STROKE         = hexWithAlpha(CANVAS_PALETTE.white, 0.15)
+const WAKE_END            = hexWithAlpha(CANVAS_PALETTE.white, 0)
 
 // Public API
 
@@ -37,8 +31,8 @@ export function drawBoatWake(rc: RenderContext, boat: BoatState): void {
 
   for (const side of [-1, 1] as const) {
     const grad = ctx.createLinearGradient(0, L / 2, 0, L / 2 + wakeLen)
-    grad.addColorStop(0, `rgba(255,255,255,${alpha})`)
-    grad.addColorStop(1, 'rgba(255,255,255,0)')
+    grad.addColorStop(0, hexWithAlpha(CANVAS_PALETTE.white, alpha))
+    grad.addColorStop(1, WAKE_END)
 
     ctx.beginPath()
     ctx.moveTo(0, L / 2)
@@ -68,7 +62,7 @@ export function drawBoat(rc: RenderContext, boat: BoatState): void {
 
   if (boat.isPlayer) {
     ctx.shadowBlur  = 12
-    ctx.shadowColor = 'rgba(255,203,5,0.5)'
+    ctx.shadowColor = PLAYER_SHADOW
   }
 
   drawHull(ctx, boat, L, W)
@@ -82,10 +76,6 @@ export function drawBoat(rc: RenderContext, boat: BoatState): void {
 }
 
 // Private helpers
-
-function resolveColor(value: ColorValue): string {
-  return PALETTE[value] ?? value
-}
 
 /** Lightens a hex color by mixing toward white at the given ratio. */
 function lightenHex(hex: string, ratio: number): string {
@@ -104,7 +94,7 @@ function drawHull(
   L: number,
   W: number,
 ): void {
-  const hullHex = resolveColor(boat.hullColor)
+  const hullHex = resolveBoatColor(boat.hullColor)
 
   ctx.beginPath()
   ctx.moveTo(0, -L / 2)                                                    // bow
@@ -127,13 +117,13 @@ function drawMast(ctx: CanvasRenderingContext2D, L: number, W: number): void {
 
   ctx.beginPath()
   ctx.arc(mx, my, r, 0, Math.PI * 2)
-  ctx.fillStyle = '#1a1a2e'
+  ctx.fillStyle = CANVAS_PALETTE.mastBlack
   ctx.fill()
 
   // Highlight dot
   ctx.beginPath()
   ctx.arc(mx - r * 0.3, my - r * 0.3, r * 0.25, 0, Math.PI * 2)
-  ctx.fillStyle = 'rgba(255,255,255,0.5)'
+  ctx.fillStyle = MAST_HIGHLIGHT_FILL
   ctx.fill()
 }
 
@@ -160,18 +150,10 @@ function drawSail(
   ctx.lineTo(sign * W * 1.35, -L * 0.05)             // clew (outboard end)
   ctx.closePath()
 
-  const sailHex = resolveColor(boat.sailColor)
+  const sailHex = resolveBoatColor(boat.sailColor)
   ctx.fillStyle   = hexWithAlpha(sailHex, 0.82)
-  ctx.strokeStyle = 'rgba(255,255,255,0.15)'
+  ctx.strokeStyle = SAIL_STROKE
   ctx.lineWidth   = 0.8
   ctx.fill()
   ctx.stroke()
-}
-
-/** Converts a hex color + alpha to an rgba() string. */
-function hexWithAlpha(hex: string, alpha: number): string {
-  const r = parseInt(hex.slice(1, 3), 16)
-  const g = parseInt(hex.slice(3, 5), 16)
-  const b = parseInt(hex.slice(5, 7), 16)
-  return `rgba(${r},${g},${b},${alpha})`
 }

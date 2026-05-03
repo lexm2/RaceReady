@@ -7,6 +7,9 @@ import { drawLabels, drawGrid, drawSelectionRing } from './ui.ts'
 import { drawWaypoints } from './waypoint.ts'
 import { drawViolations } from './violations.ts'
 import { worldToScreen } from './coords.ts'
+import { CANVAS_PALETTE, hexWithAlpha } from './colors.ts'
+
+const COURSE_LEG_STROKE = hexWithAlpha(CANVAS_PALETTE.white, 0.2)
 
 /**
  * Master draw call - clears the canvas then issues all layers in painter's order.
@@ -83,7 +86,7 @@ function drawCourseLegs(rc: RenderContext): void {
 
   ctx.save()
   ctx.setLineDash([8 * dpr, 5 * dpr])
-  ctx.strokeStyle = 'rgba(255,255,255,0.2)'
+  ctx.strokeStyle = COURSE_LEG_STROKE
   ctx.lineWidth   = 1 * dpr
 
   for (const leg of scene.courseLegs) {
