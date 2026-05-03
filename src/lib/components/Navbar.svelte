@@ -167,21 +167,22 @@
     gap: 6px;
     padding: 6px 12px;
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border: 1px solid color-mix(in srgb, var(--nav-text) 25%, transparent);
     border-radius: var(--radius-sm);
     color: var(--nav-text-muted);
-    font-size: 13px;
+    font-size: var(--fs-label, 14px);
     font-weight: 500;
     font-family: var(--font-sans);
+    letter-spacing: 0.01em;
     cursor: pointer;
     transition: border-color var(--transition), color var(--transition), background var(--transition);
     white-space: nowrap;
   }
 
   .theme-toggle:hover {
-    border-color: var(--michigan-maize);
-    color: var(--michigan-maize);
-    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--accent);
+    color: var(--accent);
+    background: color-mix(in srgb, var(--nav-text) 6%, transparent);
   }
 
   .theme-icon {
@@ -197,7 +198,7 @@
 
   .nav-cta {
     padding: 8px 20px;
-    font-size: 14px;
+    font-size: var(--fs-button, 14px);
     text-decoration: none;
   }
 
