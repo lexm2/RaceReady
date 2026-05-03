@@ -109,6 +109,7 @@
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--michigan-maize);
+    font-family: var(--font-sans);
     margin-bottom: var(--space-4);
   }
 
@@ -123,15 +124,15 @@
 
   .footer-link {
     color: var(--footer-text);
-    font-size: 14px;
+    font-size: var(--fs-label, 14px);
     font-family: var(--font-sans);
     text-decoration: none;
     opacity: 0.8;
-    transition: color var(--transition);
+    transition: color var(--transition), opacity var(--transition);
   }
 
   .footer-link:hover {
-    color: var(--michigan-maize);
+    color: var(--link);
     opacity: 1;
   }
 
@@ -151,6 +152,7 @@
   .rules-note {
     font-size: 12px;
     color: var(--footer-text);
+    font-family: var(--font-sans);
     margin: 0;
     opacity: 0.6;
   }
