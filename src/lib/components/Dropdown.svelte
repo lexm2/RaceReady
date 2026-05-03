@@ -53,26 +53,45 @@
   }
 
   .dropdown-trigger {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 14px;
+    padding: 8px 4px;
+    margin: 0 10px;
     background: transparent;
     border: none;
     color: var(--nav-text-muted);
-    font-size: 14px;
+    font-size: var(--fs-label, 14px);
     font-weight: 500;
     font-family: var(--font-sans);
+    letter-spacing: 0.01em;
     cursor: pointer;
-    border-radius: var(--radius-sm);
-    transition: color var(--transition), background var(--transition);
+    transition: color var(--transition);
     white-space: nowrap;
+  }
+
+  .dropdown-trigger::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform var(--transition);
   }
 
   .dropdown-trigger:hover,
   .dropdown-trigger.active {
     color: var(--nav-text);
-    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .dropdown-trigger:hover::after,
+  .dropdown-trigger.active::after {
+    transform: scaleX(1);
   }
 
   .chevron {
@@ -89,7 +108,7 @@
     top: calc(100% + 8px);
     left: 0;
     min-width: 220px;
-    background: var(--surface-overlay);
+    background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-card);
@@ -118,10 +137,11 @@
     width: 100%;
     padding: 10px 14px;
     background: transparent;
-    color: var(--overlay-text);
-    font-size: 14px;
+    color: var(--text);
+    font-size: var(--fs-label, 14px);
     font-family: var(--font-sans);
     font-weight: 400;
+    letter-spacing: 0.01em;
     text-decoration: none;
     border-radius: var(--radius-sm);
     transition: background var(--transition), color var(--transition);
