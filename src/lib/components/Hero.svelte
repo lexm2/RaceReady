@@ -80,8 +80,8 @@
   .hero-glow {
     position: absolute;
     border-radius: 50%;
-    filter: blur(100px);
-    opacity: var(--hero-glow-opacity);
+    filter: blur(80px);
+    opacity: calc(var(--hero-glow-opacity) * 1.4);
     transition: background var(--transition-slow), opacity var(--transition-slow);
   }
 
@@ -133,9 +133,10 @@
   }
 
   .hero-title {
+    font-family: var(--font-heading);
     font-size: clamp(2.75rem, 7vw, 5.5rem);
     font-weight: 800;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.04em;
     line-height: 1.05;
     color: var(--hero-title-color);
     margin-bottom: var(--space-6);
@@ -143,10 +144,7 @@
   }
 
   .title-accent {
-    background: linear-gradient(135deg, var(--title-grad-from) 0%, var(--title-grad-to) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--accent);
   }
 
   .hero-description {
@@ -201,10 +199,10 @@
     display: flex;
     align-items: center;
     gap: var(--space-8);
-    padding: var(--space-6) var(--space-8);
+    padding: var(--space-4) var(--space-6);
     background: var(--hero-stats-bg);
     border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-md);
     transition: background var(--transition-slow), border-color var(--transition-slow);
   }
 
@@ -258,7 +256,7 @@
 
     .hero-stats {
       gap: var(--space-6);
-      padding: var(--space-4) var(--space-6);
+      padding: var(--space-3) var(--space-4);
     }
 
     .stat-value {
