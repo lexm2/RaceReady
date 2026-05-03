@@ -267,7 +267,7 @@
   .rulebook-header {
     padding: var(--space-8) 0 var(--space-6);
     text-align: center;
-    background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg) 100%);
+    background: var(--bg);
     border-bottom: 1px solid var(--border);
   }
 
@@ -276,15 +276,13 @@
     font-weight: 700;
     font-family: var(--font-heading);
     letter-spacing: -0.02em;
-    background: linear-gradient(135deg, var(--title-grad-from) 0%, var(--title-grad-to) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--text);
     margin-bottom: var(--space-2);
   }
 
   .rulebook-subtitle {
-    font-size: 0.9375rem;
+    font-family: var(--font-sans);
+    font-size: var(--fs-label, 14px);
     color: var(--text-muted);
   }
 
@@ -303,7 +301,9 @@
     height: calc(100vh - var(--nav-height));
     overflow-y: auto;
     border-right: 1px solid var(--border);
-    background: var(--bg-surface);
+    background: var(--bg-card);
+    font-family: var(--font-sans);
+    font-size: var(--fs-label, 14px);
   }
 
   /* Search */
@@ -331,12 +331,12 @@
   .sidebar-search input {
     width: 100%;
     padding: 7px 10px 7px 30px;
-    background: var(--bg-card);
+    background: var(--bg-surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     color: var(--text);
     font-family: var(--font-sans);
-    font-size: 13px;
+    font-size: var(--fs-label, 14px);
     transition: border-color var(--transition);
   }
 
@@ -361,13 +361,12 @@
     padding: 8px var(--space-4);
     background: transparent;
     border: none;
-    border-left: 2px solid transparent;
     color: var(--text-muted);
     font-family: var(--font-sans);
-    font-size: 13px;
+    font-size: var(--fs-label, 14px);
     text-align: left;
     cursor: pointer;
-    transition: background var(--transition), color var(--transition), border-color var(--transition);
+    transition: background var(--transition), color var(--transition), box-shadow var(--transition);
   }
 
   .toc-standalone:hover {
@@ -376,9 +375,9 @@
   }
 
   .toc-standalone.active {
-    color: var(--accent);
+    color: var(--text);
     background: color-mix(in srgb, var(--accent) 10%, transparent);
-    border-left-color: var(--accent);
+    box-shadow: inset 4px 0 0 var(--accent);
     font-weight: 600;
   }
 
@@ -444,13 +443,12 @@
     padding: 6px var(--space-4) 6px var(--space-6);
     background: transparent;
     border: none;
-    border-left: 2px solid transparent;
     color: var(--text-muted);
     font-family: var(--font-sans);
-    font-size: 13px;
+    font-size: var(--fs-label, 14px);
     text-align: left;
     cursor: pointer;
-    transition: background var(--transition), color var(--transition), border-color var(--transition);
+    transition: background var(--transition), color var(--transition), box-shadow var(--transition);
     line-height: 1.4;
   }
 
@@ -470,16 +468,16 @@
   }
 
   .toc-rule.active {
-    color: var(--accent);
+    color: var(--text);
     background: color-mix(in srgb, var(--accent) 10%, transparent);
-    border-left-color: var(--accent);
+    box-shadow: inset 4px 0 0 var(--accent);
     font-weight: 600;
     opacity: 1;
   }
 
   .no-results {
     padding: var(--space-6) var(--space-4);
-    font-size: 13px;
+    font-size: var(--fs-label, 14px);
     color: var(--text-muted);
     text-align: center;
     font-style: italic;
@@ -489,13 +487,19 @@
   .rulebook-content {
     padding: var(--space-10) var(--space-10) var(--space-16);
     min-height: 600px;
+    background: var(--bg);
+    font-family: var(--font-sans);
+    font-size: var(--fs-body, 16px);
+    line-height: 1.7;
+    color: var(--text);
   }
 
   .mobile-toc-toggle {
     display: none;
     margin-bottom: var(--space-6);
     gap: var(--space-2);
-    font-size: 14px;
+    font-family: var(--font-sans);
+    font-size: var(--fs-label, 14px);
   }
 
   /* Rule article (markdown output) */
@@ -506,11 +510,11 @@
   /* These target {@html} output so must be :global */
   :global(.rule-article h1) {
     font-family: var(--font-heading);
-    font-size: clamp(1.4rem, 2.5vw, 2rem);
+    font-size: clamp(1.6rem, 2.6vw, 2.25rem);
     font-weight: 700;
     letter-spacing: -0.01em;
     color: var(--text);
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-4);
     padding-bottom: var(--space-3);
     border-bottom: 2px solid var(--border);
     line-height: 1.2;
@@ -518,24 +522,27 @@
 
   :global(.rule-article h2) {
     font-family: var(--font-heading);
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     font-weight: 600;
     color: var(--text);
     margin: var(--space-8) 0 var(--space-3);
+    letter-spacing: -0.005em;
   }
 
   :global(.rule-article h3) {
-    font-size: 1rem;
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
     font-weight: 600;
     color: var(--text);
     margin: var(--space-6) 0 var(--space-2);
   }
 
   :global(.rule-article p) {
-    color: var(--text-muted);
-    line-height: 1.8;
+    font-family: var(--font-sans);
+    color: var(--text);
+    line-height: 1.7;
     margin-bottom: var(--space-4);
-    font-size: 0.9375rem;
+    font-size: var(--fs-body, 16px);
   }
 
   :global(.rule-article strong) {
@@ -545,11 +552,12 @@
 
   :global(.rule-article ul),
   :global(.rule-article ol) {
-    color: var(--text-muted);
+    font-family: var(--font-sans);
+    color: var(--text);
     padding-left: var(--space-8);
     margin-bottom: var(--space-4);
-    line-height: 1.8;
-    font-size: 0.9375rem;
+    line-height: 1.7;
+    font-size: var(--fs-body, 16px);
   }
 
   :global(.rule-article li) {
@@ -618,7 +626,7 @@
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: color-mix(in srgb, var(--puma-black) 60%, transparent);
     z-index: 49;
   }
 
@@ -646,7 +654,7 @@
       z-index: 50;
       transform: translateX(-100%);
       transition: transform var(--transition-slow);
-      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+      box-shadow: var(--shadow-card);
     }
 
     .rulebook-sidebar.open {
