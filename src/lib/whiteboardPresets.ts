@@ -44,62 +44,94 @@ export const PRESETS: WhiteboardPreset[] = [
   {
     id: 'rule_10', ruleId: 'rule_10',
     title: 'Port / Starboard',
-    summary: 'Two boats converging on opposite tacks.',
-    hint: 'Boat B (port tack) must keep clear of Boat A (starboard).',
-    scene: { ...baseScene, boats: [A(), B()], waypoints: [] },
+    summary: 'Two boats converge on opposite tacks toward the windward mark.',
+    hint: 'Press play. Boat A (starboard) and Boat B (port) close-haul toward the windward mark from opposite sides. As they cross within 40 m, the port-starboard rule fires on Boat B — port-tack must keep clear.',
+    scene: {
+      ...baseScene,
+      boats: [
+        A({ position: { x: 220, y: 180 }, heading: 315, tack: 'starboard' }),
+        B({ position: {  x: 80, y: 200 }, heading:  45, tack: 'port' }),
+      ],
+      waypoints: [
+        wp('wp-r10-a-1', 'boat-a', 140, 100, 0),
+        wp('wp-r10-b-1', 'boat-b', 160, 120, 0),
+      ],
+    },
+    autoPlay: true,
   },
   {
     id: 'rule_11', ruleId: 'rule_11',
     title: 'Same Tack, Windward Keeps Clear',
-    summary: 'Two boats on the same tack, overlapped side-by-side.',
-    hint: 'The windward boat (more upwind) must keep clear of the leeward boat.',
+    summary: 'Faster boat closes onto the leeward overlap of a slower boat ahead.',
+    hint: 'Press play. Boat B (beam reach) closes on Boat A from astern and slides into a leeward overlap. Once they overlap within 40 m, the windward-keeps-clear rule fires on Boat A.',
     scene: {
       ...baseScene,
       boats: [
-        A({ position: { x: 160, y: 100 }, heading: 315, tack: 'starboard' }),
-        B({ position: { x: 155, y: 110 }, heading: 315, tack: 'starboard' }),
+        A({ position: { x: 170, y:  80 }, heading: 315, tack: 'starboard' }),
+        B({ position: { x: 152, y:  97 }, heading: 315, tack: 'starboard' }),
       ],
-      waypoints: [],
+      waypoints: [
+        wp('wp-r11-a-1', 'boat-a', 130, 40, 0),
+        wp('wp-r11-b-1', 'boat-b', 112, 57, 0),
+      ],
     },
+    autoPlay: true,
   },
   {
     id: 'rule_12', ruleId: 'rule_12',
     title: 'Same Tack, Clear Astern',
-    summary: 'Trailing boat must keep clear of the boat clear ahead.',
-    hint: 'Boat A is clear astern of Boat B and must keep clear.',
+    summary: 'Trailing boat catches up on a slower boat ahead, both same tack.',
+    hint: 'Press play. Boat A (beam reach) closes on Boat B (close-hauled) from astern. As A pulls within 40 m while still clear astern, the clear-astern rule fires on A.',
     scene: {
       ...baseScene,
       boats: [
-        A({ position: { x: 160, y: 120 }, heading: 315, tack: 'starboard' }),
-        B({ position: { x: 150, y: 110 }, heading: 315, tack: 'starboard' }),
+        A({ position: { x:  60, y:  80 }, heading: 45, tack: 'port' }),
+        B({ position: { x:  80, y:  60 }, heading: 45, tack: 'port' }),
       ],
-      waypoints: [],
+      waypoints: [
+        wp('wp-r12-a-1', 'boat-a', 120, 20, 0),
+        wp('wp-r12-b-1', 'boat-b', 140,  0, 0),
+      ],
     },
+    autoPlay: true,
   },
   {
     id: 'rule_13', ruleId: 'rule_13',
     title: 'While Tacking',
-    summary: 'A boat in the no-go zone must keep clear of a boat on a tack.',
-    hint: 'Boat A is head-to-wind (tacking). It must keep clear of Boat B.',
+    summary: 'Boat tacks across head-to-wind while another approaches on a tack.',
+    hint: 'Press play. Boat A is on starboard close-hauled, then tacks to port at the first waypoint. While A is mid-tack in the no-go zone, Boat B is on a tack within 40 m — the while-tacking rule fires on A.',
     scene: {
       ...baseScene,
-      boats: [A({ heading: 0, tack: 'starboard' }), B()],
-      waypoints: [],
+      boats: [
+        A({ position: { x: 160, y: 110 }, heading: 315, tack: 'starboard' }),
+        B({ position: {  x: 90, y: 100 }, heading:  76, tack: 'port' }),
+      ],
+      waypoints: [
+        wp('wp-r13-a-1', 'boat-a', 155, 105, 0),
+        wp('wp-r13-a-2', 'boat-a', 175,  80, 1),
+        wp('wp-r13-a-3', 'boat-a', 215,  60, 2),
+        wp('wp-r13-b-1', 'boat-b', 170,  80, 0),
+      ],
     },
+    autoPlay: true,
   },
   {
     id: 'rule_14', ruleId: 'rule_14',
     title: 'Avoiding Contact',
-    summary: 'Both boats must avoid contact when collision is imminent.',
-    hint: 'Both boats are pinching head-to-wind on opposite tacks, locked within 6 m. The avoiding-contact rule fires on both, while port-starboard keeps Boat B clear.',
+    summary: 'Two boats on a converging course must avoid contact.',
+    hint: 'Press play. Both boats close-haul on opposite tacks toward the same point. As they close within 6 m, the avoiding-contact rule fires on both - neither may rely on right of way to allow contact.',
     scene: {
       ...baseScene,
       boats: [
-        A({ position: { x: 153, y: 120 }, heading: 350, tack: 'starboard' }),
-        B({ position: { x: 148, y: 120 }, heading: 10,  tack: 'port' }),
+        A({ position: { x: 168, y: 130 }, heading: 310, tack: 'starboard' }),
+        B({ position: { x: 132, y: 130 }, heading:  50, tack: 'port' }),
       ],
-      waypoints: [],
+      waypoints: [
+        wp('wp-r14-a-1', 'boat-a',  91,  77, 0),
+        wp('wp-r14-b-1', 'boat-b', 209,  77, 0),
+      ],
     },
+    autoPlay: true,
   },
   {
     id: 'rule_15', ruleId: 'rule_15',
@@ -140,41 +172,55 @@ export const PRESETS: WhiteboardPreset[] = [
   {
     id: 'rule_17', ruleId: 'rule_17',
     title: 'Proper Course',
-    summary: 'Leeward boat sailing above proper course while overlapped.',
-    hint: 'Both boats are pinching on starboard, overlapped. Boat B (leeward) is heading above close-hauled, sailing above proper course while A is the windward boat.',
+    summary: 'Leeward boat luffs above proper course while overlapped.',
+    hint: 'Press play. Both boats pinch above close-hauled on starboard. Boat B (leeward) closes laterally onto Boat A; once they overlap within two hull-lengths, the proper-course rule fires on B.',
     scene: {
       ...baseScene,
       boats: [
-        A({ position: { x: 165, y: 95 },  heading: 350, tack: 'starboard' }),
-        B({ position: { x: 150, y: 100 }, heading: 350, tack: 'starboard' }),
+        A({ position: { x: 170, y:  80 }, heading: 320, tack: 'starboard' }),
+        B({ position: { x: 163, y:  87 }, heading: 320, tack: 'starboard' }),
       ],
-      waypoints: [],
+      waypoints: [
+        wp('wp-r17-a-1', 'boat-a', 130,  32, 0),
+        wp('wp-r17-b-1', 'boat-b', 123,  39, 0),
+      ],
     },
+    autoPlay: true,
   },
   {
     id: 'rule_18', ruleId: 'rule_18',
     title: 'Mark Room',
-    summary: 'Outside boat must give mark-room to the inside overlapped boat.',
-    hint: 'Both boats are within mark-1\'s zone. The outside boat (Boat A) must keep clear.',
+    summary: 'Two boats round the windward mark; outside must give room.',
+    hint: 'Press play. Both boats sail toward mark-1 on the same tack. Once both enter the 30 m zone overlapped, the mark-room rule fires on the outside boat — give the inside boat room.',
     scene: {
       ...baseScene,
       boats: [
-        A({ position: { x: 140, y: 55 }, heading: 0, tack: 'starboard' }),
-        B({ position: { x: 155, y: 55 }, heading: 0, tack: 'starboard' }),
+        A({ position: { x: 210, y: 110 }, heading: 315, tack: 'starboard' }),
+        B({ position: { x: 180, y:  90 }, heading: 315, tack: 'starboard' }),
       ],
-      waypoints: [],
+      waypoints: [
+        wp('wp-r18-a-1', 'boat-a', 130,  30, 0),
+        wp('wp-r18-b-1', 'boat-b', 110,  20, 0),
+      ],
     },
+    autoPlay: true,
   },
   {
     id: 'rule_22', ruleId: 'rule_22',
     title: 'Capsized / Anchored / Aground',
-    summary: 'A capsized boat has absolute right of way.',
-    hint: 'Boat B is capsized. Boat A must keep clear of the capsized boat (this overrides port-starboard).',
+    summary: 'A boat sails toward a capsized boat that has absolute right of way.',
+    hint: 'Press play. Boat A close-hauls toward Boat B, which has capsized in the middle of the course. Once A pulls within 40 m, the capsized-boat rule fires on A (overrides all other rules).',
     scene: {
       ...baseScene,
-      boats: [A(), B({ condition: 'capsized' })],
-      waypoints: [],
+      boats: [
+        A({ position: { x: 220, y: 170 }, heading: 315, tack: 'starboard' }),
+        B({ position: { x: 130, y:  80 }, heading:   0, condition: 'capsized' }),
+      ],
+      waypoints: [
+        wp('wp-r22-a-1', 'boat-a', 130, 80, 0),
+      ],
     },
+    autoPlay: true,
   },
 ]
 
