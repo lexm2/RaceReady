@@ -1,6 +1,15 @@
 import type { RenderContext } from '../types.ts'
+import { CANVAS_PALETTE, hexWithAlpha } from './colors.ts'
 
 const WIDGET_RADIUS = 28  // CSS px
+
+const BG_FILL          = hexWithAlpha(CANVAS_PALETTE.waterDeep, 0.75)
+const BG_STROKE        = hexWithAlpha(CANVAS_PALETTE.maize,     0.5)
+const DOT_FILL         = hexWithAlpha(CANVAS_PALETTE.white,     0.45)
+const SHAFT_STROKE     = hexWithAlpha(CANVAS_PALETTE.white,     0.8)
+const FEATHER_STROKE   = hexWithAlpha(CANVAS_PALETTE.white,     0.5)
+const SPEED_LABEL_FILL = hexWithAlpha(CANVAS_PALETTE.white,     0.65)
+const WIDGET_LABEL_FILL = hexWithAlpha(CANVAS_PALETTE.white,    0.4)
 
 export function drawWindIndicator(rc: RenderContext): void {
   const { ctx, canvas, scene, dpr } = rc
@@ -34,9 +43,9 @@ function drawWidgetBackground(
 ): void {
   ctx.beginPath()
   ctx.arc(0, 0, r, 0, Math.PI * 2)
-  ctx.fillStyle   = 'rgba(0,26,53,0.75)'
+  ctx.fillStyle   = BG_FILL
   ctx.fill()
-  ctx.strokeStyle = 'rgba(255,203,5,0.5)'
+  ctx.strokeStyle = BG_STROKE
   ctx.lineWidth   = 1.5 * dpr
   ctx.stroke()
 }
@@ -52,13 +61,13 @@ function drawCardinalDots(
   for (let i = 0; i < 8; i++) {
     const angle = (i * 45 * Math.PI) / 180
     const x     = Math.sin(angle) * dotDist
-    const y     = -Math.cos(angle) * dotDist  // -cos so 0° is up
+    const y     = -Math.cos(angle) * dotDist  // -cos so 0deg is up
 
     ctx.beginPath()
     // North dot is larger and maize-coloured
     const isNorth = i === 0
     ctx.arc(x, y, isNorth ? dotR * 1.6 : dotR, 0, Math.PI * 2)
-    ctx.fillStyle = isNorth ? '#FFCB05' : 'rgba(255,255,255,0.45)'
+    ctx.fillStyle = isNorth ? CANVAS_PALETTE.maize : DOT_FILL
     ctx.fill()
   }
 }
@@ -84,7 +93,7 @@ function drawArrow(
   ctx.beginPath()
   ctx.moveTo(0, 0)
   ctx.lineTo(0, -shaftLen)
-  ctx.strokeStyle = 'rgba(255,255,255,0.8)'
+  ctx.strokeStyle = SHAFT_STROKE
   ctx.lineWidth   = 1.5 * dpr
   ctx.stroke()
 
@@ -94,7 +103,7 @@ function drawArrow(
   ctx.lineTo(-headWidth / 2, -shaftLen)
   ctx.lineTo( headWidth / 2, -shaftLen)
   ctx.closePath()
-  ctx.fillStyle = '#FFCB05'
+  ctx.fillStyle = CANVAS_PALETTE.maize
   ctx.fill()
 
   // Tail feather (small horizontal bar at the base)
@@ -102,7 +111,7 @@ function drawArrow(
   ctx.beginPath()
   ctx.moveTo(-featherW, r * 0.15)
   ctx.lineTo( featherW, r * 0.15)
-  ctx.strokeStyle = 'rgba(255,255,255,0.5)'
+  ctx.strokeStyle = FEATHER_STROKE
   ctx.lineWidth   = 1.5 * dpr
   ctx.stroke()
 
@@ -117,7 +126,7 @@ function drawSpeedLabel(
   ctx.font         = `bold ${8 * dpr}px Oswald, sans-serif`
   ctx.textAlign    = 'center'
   ctx.textBaseline = 'middle'
-  ctx.fillStyle    = 'rgba(255,255,255,0.65)'
+  ctx.fillStyle    = SPEED_LABEL_FILL
   ctx.fillText(`${Math.round(knots)}kn`, 0, WIDGET_RADIUS * dpr * 0.45)
 }
 
@@ -130,6 +139,6 @@ function drawWidgetLabel(
   ctx.font         = `${7 * dpr}px Oswald, sans-serif`
   ctx.textAlign    = 'center'
   ctx.textBaseline = 'top'
-  ctx.fillStyle    = 'rgba(255,255,255,0.4)'
+  ctx.fillStyle    = WIDGET_LABEL_FILL
   ctx.fillText('WIND', cx, labelY)
 }

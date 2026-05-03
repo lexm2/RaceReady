@@ -1,5 +1,11 @@
 import type { RenderContext, Waypoint } from '../types.ts'
 import { worldToScreen } from './coords.ts'
+import {
+  CANVAS_PALETTE,
+  LEG_SPEED_COLORS,
+  hexWithAlpha,
+  resolveBoatColor,
+} from './colors.ts'
 
 // Polar speed model
 
@@ -9,27 +15,16 @@ export function calcLegSpeed(legBearingDeg: number, windFromDeg: number): number
   const sym = twa > 180 ? 360 - twa : twa   // symmetric 0..180, 0=head-to-wind 180=downwind
   if (sym < 30) return 0                     // no-go zone (head to wind)
   const t = sym / 180
-  // Peaks ~120° TWA (broad reach), tapers at 0° and 180°
+  // Peaks ~120deg TWA (broad reach), tapers at 0deg and 180deg
   return Math.round(8 * Math.sin(Math.PI * t) * (1 - 0.2 * Math.cos(Math.PI * t)) * 10) / 10
 }
 
 function speedColor(legBearingDeg: number, windFromDeg: number): string {
   const twa = ((legBearingDeg - windFromDeg + 360) % 360)
   const sym = twa > 180 ? 360 - twa : twa
-  if (sym < 60)  return 'rgba(255,150,0,0.95)'   // upwind: orange
-  if (sym < 120) return 'rgba(80,220,100,0.95)'  // reach: green
-  return 'rgba(80,160,255,0.95)'                  // downwind: blue
-}
-
-// Color resolution
-
-const PALETTE: Record<string, string> = {
-  maize: '#FFCB05', blue: '#00274C', arboretum: '#2f65a7',
-  orange: '#d86018', teal: '#00b2a9', red: '#9a3324', white: '#FFFFFF',
-}
-
-function resolveColor(c: string): string {
-  return PALETTE[c] ?? c
+  if (sym < 60)  return LEG_SPEED_COLORS.upwind
+  if (sym < 120) return LEG_SPEED_COLORS.reach
+  return LEG_SPEED_COLORS.downwind
 }
 
 // Arrowhead helper
@@ -137,18 +132,18 @@ export function drawWaypoints(rc: RenderContext): void {
   }
 
   const boatMap      = new Map(scene.boats.map(b => [b.id, b]))
-  const boatColorMap = new Map(scene.boats.map(b => [b.id, resolveColor(b.hullColor)]))
+  const boatColorMap = new Map(scene.boats.map(b => [b.id, resolveBoatColor(b.hullColor)]))
 
   ctx.save()
 
   for (const [boatId, wps] of byBoat) {
-    const color = boatColorMap.get(boatId) ?? '#FFCB05'
+    const color = boatColorMap.get(boatId) ?? CANVAS_PALETTE.maize
     const boat  = boatMap.get(boatId)
     if (!boat) continue
 
     // Dashed path: boat to wp0 to wp1 ...
     ctx.setLineDash([6 * dpr, 4 * dpr])
-    ctx.strokeStyle = color + 'aa'
+    ctx.strokeStyle = hexWithAlpha(color, 0.67)
     ctx.lineWidth   = 1.5 * dpr
 
     ctx.beginPath()
@@ -163,10 +158,10 @@ export function drawWaypoints(rc: RenderContext): void {
 
     // Speed labels and arrows
 
-    // First leg: boat → waypoint 0
+    // First leg: boat to waypoint 0
     drawLeg(ctx, canvas, camera, scene, dpr, boat.position, wps[0]!.position, color, markerR)
 
-    // Subsequent legs: waypoint i → waypoint i+1
+    // Subsequent legs: waypoint i to waypoint i+1
     for (let i = 0; i < wps.length - 1; i++) {
       drawLeg(ctx, canvas, camera, scene, dpr, wps[i]!.position, wps[i + 1]!.position, color, markerR)
     }
@@ -178,7 +173,7 @@ export function drawWaypoints(rc: RenderContext): void {
 
       ctx.beginPath()
       ctx.arc(s.x, s.y, markerR, 0, Math.PI * 2)
-      ctx.fillStyle   = color + '33'
+      ctx.fillStyle   = hexWithAlpha(color, 0.2)
       ctx.fill()
       ctx.strokeStyle = color
       ctx.lineWidth   = 1.5 * dpr

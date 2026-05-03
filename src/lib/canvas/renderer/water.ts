@@ -1,4 +1,7 @@
 import type { RenderContext } from '../types.ts'
+import { CANVAS_PALETTE, hexWithAlpha } from './colors.ts'
+
+const WIND_STREAK_STROKE = hexWithAlpha(CANVAS_PALETTE.white, 0.055)
 
 /**
  * Draws the water background: a deep blue gradient + animated wind streaks.
@@ -13,9 +16,9 @@ export function drawWater(rc: RenderContext): void {
 function drawGradient(rc: RenderContext): void {
   const { ctx, canvas } = rc
   const grad = ctx.createLinearGradient(0, 0, 0, canvas.height)
-  grad.addColorStop(0.0,  '#001a35')
-  grad.addColorStop(0.45, '#002255')
-  grad.addColorStop(1.0,  '#003366')
+  grad.addColorStop(0.0,  CANVAS_PALETTE.waterDeep)
+  grad.addColorStop(0.45, CANVAS_PALETTE.waterMid)
+  grad.addColorStop(1.0,  CANVAS_PALETTE.waterShallow)
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, canvas.width, canvas.height)
 }
@@ -44,12 +47,12 @@ function drawWindStreaks(rc: RenderContext): void {
   const halfDiag = Math.ceil(Math.hypot(canvas.width, canvas.height) / 2) + SPACING
   const COUNT    = Math.ceil(2 * halfDiag / SPACING) + 1
 
-  ctx.strokeStyle = 'rgba(255,255,255,0.055)'
+  ctx.strokeStyle = WIND_STREAK_STROKE
   ctx.lineWidth   = 0.5 * dpr
 
   for (let i = 0; i < COUNT; i++) {
     const y = -halfDiag + i * SPACING + offset
-    // Vary length above halfDiag (minimum 1.0×) so lines always reach the canvas edge.
+    // Vary length above halfDiag (minimum 1.0x) so lines always reach the canvas edge.
     const lengthFactor = 1.0 + 0.4 * ((Math.sin(i * 127.1 + 311.7) + 1) / 2)
     const halfLen = halfDiag * lengthFactor
 
