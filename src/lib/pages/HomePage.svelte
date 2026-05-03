@@ -83,7 +83,7 @@
   .cta-section {
     padding: var(--space-20) 0;
     background: var(--cta-bg);
-    border-top: 1px solid rgba(255, 203, 5, 0.2);
+    border-top: 1px solid color-mix(in srgb, var(--michigan-maize) 20%, transparent);
   }
 
   .cta-inner {
@@ -125,12 +125,12 @@
 
   .cta-ghost {
     color: var(--cta-text);
-    border-color: rgba(255, 255, 255, 0.35);
+    border-color: color-mix(in srgb, var(--cta-text) 35%, transparent);
   }
 
   .cta-ghost:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.6);
+    background: color-mix(in srgb, var(--cta-text) 10%, transparent);
+    border-color: color-mix(in srgb, var(--cta-text) 60%, transparent);
     color: var(--cta-text);
   }
 

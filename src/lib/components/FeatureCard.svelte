@@ -8,7 +8,7 @@
     items: string[]
     ctaLabel: string
     ctaHref: string
-    accentColor?: string
+    accentColor?: 'maize' | 'blue' | 'orange'
   }
   let { icon: Icon, title, description, items, ctaLabel, ctaHref, accentColor = 'maize' }: Props = $props();
 
@@ -16,10 +16,6 @@
     maize:  'var(--michigan-maize)',
     blue:   'var(--arboretum-blue)',
     orange: 'var(--ross-orange)',
-    teal:   'var(--taubman-teal)',
-    red:    'var(--tappan-red)',
-    seafoam: 'var(--michigan-maize)',
-    gold:    'var(--ross-orange)',
   };
 
   let accent = $derived(colorMap[accentColor] ?? 'var(--michigan-maize)');
@@ -56,10 +52,11 @@
   .feature-card {
     display: flex;
     flex-direction: column;
-    background: var(--bg-surface);
+    background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     padding: var(--space-8);
+    box-shadow: var(--shadow-card);
     transition: border-color var(--transition), transform var(--transition-slow), box-shadow var(--transition-slow);
     cursor: default;
   }
@@ -67,14 +64,14 @@
   .feature-card:hover {
     border-color: var(--card-accent);
     transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--card-accent);
+    box-shadow: 0 0 0 1px var(--card-accent), 0 16px 48px color-mix(in srgb, black 35%, transparent), 0 0 32px color-mix(in srgb, var(--card-accent) 25%, transparent);
   }
 
   .card-icon-wrap {
     width: 52px;
     height: 52px;
     border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.06);
+    background: color-mix(in srgb, var(--text) 6%, transparent);
     border: 1px solid var(--border);
     display: flex;
     align-items: center;
@@ -96,7 +93,8 @@
   }
 
   .card-title {
-    font-size: 1.25rem;
+    font-family: var(--font-heading);
+    font-size: var(--fs-h3, 24px);
     font-weight: 700;
     color: var(--text);
     margin-bottom: var(--space-3);
@@ -104,7 +102,7 @@
   }
 
   .card-desc {
-    font-size: 0.9375rem;
+    font-size: var(--fs-body, 16px);
     color: var(--text-muted);
     line-height: 1.65;
     margin-bottom: var(--space-6);
@@ -124,7 +122,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 14px;
+    font-size: var(--fs-body, 16px);
     color: var(--text-muted);
   }
 
@@ -144,7 +142,7 @@
     border: 1px solid var(--card-accent);
     border-radius: var(--radius-sm);
     color: var(--card-accent);
-    font-size: 14px;
+    font-size: var(--fs-button, 14px);
     font-weight: 600;
     font-family: var(--font-sans);
     text-decoration: none;
