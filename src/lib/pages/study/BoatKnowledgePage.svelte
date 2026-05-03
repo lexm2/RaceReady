@@ -1,6 +1,32 @@
 <script lang="ts">
   import { base } from '$app/paths';
-  import { Anchor } from 'lucide-svelte';
+  import { Anchor, Sailboat, Wind, Wrench } from 'lucide-svelte';
+  import TopicCard from '$lib/components/TopicCard.svelte';
+  import type { IconComponent } from '$lib/themes/theme.svelte.ts';
+
+  type Topic = {
+    icon: IconComponent;
+    title: string;
+    blurb: string;
+  };
+
+  const topics: Topic[] = [
+    {
+      icon: Sailboat,
+      title: 'Boat Anatomy',
+      blurb: 'Hull, rig, and running rigging vocabulary you need before any rules talk makes sense.',
+    },
+    {
+      icon: Wind,
+      title: 'Sail Trim',
+      blurb: 'Reading the telltales, setting twist, and matching shape to the wind range.',
+    },
+    {
+      icon: Wrench,
+      title: 'Boat Handling',
+      blurb: 'Tacks, gybes, rounding marks cleanly, and recovering when something goes sideways.',
+    },
+  ];
 </script>
 
 <div class="page-container">
@@ -14,6 +40,12 @@
     </div>
   </div>
 
+  <div class="topics container">
+    {#each topics as topic (topic.title)}
+      <TopicCard icon={topic.icon} title={topic.title} blurb={topic.blurb} />
+    {/each}
+  </div>
+
   <div class="stub-content">
     <div class="coming-soon-card">
       <span class="stub-icon"><Anchor size={48} /></span>
@@ -23,3 +55,12 @@
     </div>
   </div>
 </div>
+
+<style>
+  .topics {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-4);
+    padding: var(--space-8) 0 var(--space-4);
+  }
+</style>
