@@ -97,10 +97,10 @@
 
   <div class="game-area">
     {#if phase === 'finished'}
-      <div class="finish-card">
+      <div class="finish-card quiz-card">
         <h2>Final Score</h2>
         <p class="big-score">{score.correct} / {score.total}</p>
-        <button class="btn primary" onclick={restart}>Play Again</button>
+        <button class="btn-primary" onclick={restart}>Play Again</button>
       </div>
     {:else if current}
       <div class="hud">
@@ -111,7 +111,7 @@
         <div class="hud-right">
           {#if dominant}
             <span class="rule-indicator severity-{dominant.severity}">
-              {dominant.ruleId.replace('rule_', 'Rule ')}: {dominant.description}
+              {dominant.description}
             </span>
           {:else}
             <span class="rule-indicator severity-none">No rule active</span>
@@ -119,9 +119,9 @@
         </div>
       </div>
 
-      <div class="question">{current.questionText}</div>
+      <h2 class="question">{current.questionText}</h2>
 
-      <div class="canvas-container">
+      <div class="canvas-card quiz-card phase-{phase}">
         <GameCanvas
           scene={current.scene}
           animation={current.animation}
@@ -133,7 +133,7 @@
       </div>
 
       {#if phase !== 'playing'}
-        <div class="result {phase}">
+        <div class="result quiz-card phase-{phase}">
           <h3>{phase === 'correct' ? 'Correct!' : 'Not quite.'}</h3>
           <p>{current.answer.explanation}</p>
           {#if ruleLoading}
@@ -144,7 +144,7 @@
               <div class="rule-md">{@html ruleHtml}</div>
             </details>
           {/if}
-          <button class="btn primary" onclick={nextScenario}>
+          <button class="btn-primary" onclick={nextScenario}>
             {index + 1 >= queue.length ? 'See Final Score' : 'Next Scenario'}
           </button>
         </div>
@@ -174,90 +174,136 @@
   }
 
   .badge {
-    background: var(--color-blue-dark, #00274C);
-    color: white;
-    padding: 4px 10px;
+    background: var(--bg-card);
+    color: var(--accent);
+    border: 1px solid var(--border);
+    padding: 4px 12px;
     border-radius: 999px;
     font-weight: 600;
     font-size: 0.875rem;
+    letter-spacing: 0.02em;
   }
 
   .score {
     font-weight: 600;
-    color: var(--color-text-muted, #555);
+    color: var(--text-muted);
   }
 
   .rule-indicator {
     font-size: 0.85rem;
     padding: 4px 10px;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     font-weight: 500;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text);
   }
-  .rule-indicator.severity-none      { background: rgba(0,0,0,0.06); color: #555; }
-  .rule-indicator.severity-advisory  { background: rgba(255,203,5,0.18); color: #6b4f00; }
-  .rule-indicator.severity-warning   { background: rgba(255,140,0,0.20); color: #863f00; }
-  .rule-indicator.severity-violation { background: rgba(239,68,68,0.20); color: #7a1010; }
+  .rule-indicator.severity-none {
+    color: var(--text-muted);
+  }
+  .rule-indicator.severity-advisory {
+    border-color: color-mix(in srgb, var(--michigan-maize) 50%, transparent);
+    color: var(--michigan-maize);
+    background: color-mix(in srgb, var(--michigan-maize) 12%, var(--bg-card));
+  }
+  .rule-indicator.severity-warning {
+    border-color: color-mix(in srgb, var(--ross-orange) 55%, transparent);
+    color: var(--ross-orange);
+    background: color-mix(in srgb, var(--ross-orange) 14%, var(--bg-card));
+  }
+  .rule-indicator.severity-violation {
+    border-color: color-mix(in srgb, var(--tappan-red) 60%, transparent);
+    color: color-mix(in srgb, var(--tappan-red) 60%, white);
+    background: color-mix(in srgb, var(--tappan-red) 22%, var(--bg-card));
+  }
 
   .question {
-    font-size: 1.125rem;
-    font-weight: 500;
+    font-family: var(--font-heading);
+    font-size: var(--fs-h2, 32px);
+    font-weight: var(--fw-h2, 600);
+    line-height: 1.2;
     text-align: center;
+    color: var(--text);
+    margin: var(--space-2) 0 var(--space-3);
+    letter-spacing: -0.01em;
   }
 
-  .canvas-container {
+  .quiz-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    color: var(--text);
+    transition: border-color var(--transition), box-shadow var(--transition);
+  }
+  .quiz-card:hover {
+    border-color: var(--border-hover);
+  }
+  .quiz-card.phase-correct {
+    border-color: var(--michigan-maize);
+    box-shadow: var(--shadow-glow);
+  }
+  .quiz-card.phase-wrong {
+    border-color: var(--tappan-red);
+    box-shadow: 0 0 32px color-mix(in srgb, var(--tappan-red) 35%, transparent);
+  }
+
+  .canvas-card {
     width: 100%;
     height: 480px;
-    border-radius: var(--radius-lg);
     overflow: hidden;
-    box-shadow: var(--shadow-card);
   }
 
   .result {
-    padding: var(--space-4);
-    border-radius: var(--radius-md);
-    border-left: 4px solid;
+    padding: var(--space-4) var(--space-6);
   }
-  .result.correct { background: rgba(34,197,94,0.10); border-color: #22c55e; }
-  .result.wrong   { background: rgba(239,68,68,0.10); border-color: #ef4444; }
-  .result h3 { margin-top: 0; }
+  .result h3 {
+    font-family: var(--font-heading);
+    margin: 0 0 var(--space-2);
+    color: var(--text);
+  }
+  .result.phase-correct h3 { color: var(--michigan-maize); }
+  .result.phase-wrong h3   { color: color-mix(in srgb, var(--tappan-red) 60%, white); }
+  .result p { color: var(--text); }
 
   .rule-details {
     margin-top: var(--space-3);
     padding: var(--space-3);
-    background: white;
-    border-radius: var(--radius-sm);
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
   }
-  .rule-details summary { cursor: pointer; font-weight: 600; }
-  .rule-md { margin-top: var(--space-2); }
-
-  .rule-loading { font-style: italic; color: var(--color-text-muted, #777); }
-
-  .btn {
-    margin-top: var(--space-3);
-    padding: 10px 20px;
-    border-radius: var(--radius-sm);
-    border: none;
+  .rule-details summary {
     cursor: pointer;
     font-weight: 600;
-    font-size: 1rem;
+    color: var(--accent);
   }
-  .btn.primary {
-    background: var(--color-blue-dark, #00274C);
-    color: white;
+  .rule-md { margin-top: var(--space-2); color: var(--text); }
+
+  .rule-loading {
+    font-style: italic;
+    color: var(--text-muted);
   }
-  .btn.primary:hover { opacity: 0.9; }
+
+  .result :global(.btn-primary) {
+    margin-top: var(--space-4);
+  }
 
   .finish-card {
     text-align: center;
-    padding: var(--space-6);
-    background: white;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-card);
+    padding: var(--space-12) var(--space-6);
+  }
+  .finish-card h2 {
+    font-family: var(--font-heading);
+    font-size: var(--fs-h2, 32px);
+    font-weight: var(--fw-h2, 600);
+    color: var(--text);
   }
   .big-score {
-    font-size: 3rem;
+    font-family: var(--font-heading);
+    font-size: 3.5rem;
     font-weight: 700;
-    color: var(--color-blue-dark, #00274C);
+    color: var(--accent);
     margin: var(--space-3) 0;
   }
 </style>
