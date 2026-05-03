@@ -160,7 +160,7 @@ function drawMarkLabel(
   r: number,
   dpr: number,
 ): void {
-  ctx.font = `${10 * dpr}px Oswald, sans-serif`
+  ctx.font = `${10 * dpr}px Montserrat, sans-serif`
   ctx.textAlign    = 'center'
   ctx.textBaseline = 'bottom'
 

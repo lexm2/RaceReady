@@ -92,7 +92,7 @@ export function drawLabels(rc: RenderContext): void {
     const fontSize   = 10 * dpr
     const labelOffY  = 26 * dpr   // fixed screen-space offset above boat centre
 
-    ctx.font         = `${fontSize}px Oswald, sans-serif`
+    ctx.font         = `${fontSize}px Montserrat, sans-serif`
     ctx.textAlign    = 'center'
     ctx.textBaseline = 'bottom'
 
