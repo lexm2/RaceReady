@@ -196,6 +196,7 @@ export function computeKeepClear(
 ): string | null {
   const r22 = applyRule22(a, b);                if (r22) return r22
   const r18 = applyRule18(a, b, wind, marks);   if (r18) return r18.keepClearId
+  const r19 = applyRule19(a, b, wind, marks);   if (r19) return r19.keepClearId
   const r13 = applyRule13(a, b, wind);          if (r13) return r13
   const r10 = applyRule10(a, b, wind);          if (r10) return r10
   const r11 = applyRule11(a, b, wind);          if (r11) return r11
@@ -276,6 +277,41 @@ export function applyRule18(
   return null
 }
 
+/**
+ * Room at an obstruction. Applies when two boats on the same tack are
+ * overlapped passing an obstruction (modeled here as a `committee_boat`
+ * mark, which carries no racing-mark zone). The outside boat must give the
+ * inside boat room to pass safely.
+ *
+ * Approximation: both boats within `OBSTRUCTION_PASSING_M` of the same
+ * obstruction, same tack, overlapped. Inside boat is the one with the
+ * smaller perpendicular offset to the obstruction along the heading vector
+ * (same geometry as Rule 18).
+ */
+export function applyRule19(
+  a: BoatState,
+  b: BoatState,
+  wind: WindState,
+  marks: Mark[],
+): { keepClearId: string; obstructionId: string } | null {
+  for (const mark of marks) {
+    if (mark.type !== 'committee_boat') continue
+    if (distance(a.position, mark.position) > OBSTRUCTION_PASSING_M) continue
+    if (distance(b.position, mark.position) > OBSTRUCTION_PASSING_M) continue
+    if (!isSameTack(a, b, wind)) continue
+    if (!isOverlapped(a, b)) continue
+
+    const v = headingToVector(a.heading)
+    const perp = { x: -v.y, y: v.x }
+    const aOff = (a.position.x - mark.position.x) * perp.x + (a.position.y - mark.position.y) * perp.y
+    const bOff = (b.position.x - mark.position.x) * perp.x + (b.position.y - mark.position.y) * perp.y
+    const insideId = Math.abs(aOff) < Math.abs(bOff) ? a.id : b.id
+    const outsideId = insideId === a.id ? b.id : a.id
+    return { keepClearId: outsideId, obstructionId: mark.id }
+  }
+  return null
+}
+
 // Per-frame evaluator
 
 const PROXIMITY_ADVISORY_M = 40   // rule applies, comfortable separation
@@ -283,6 +319,7 @@ const PROXIMITY_WARNING_M = 18    // boats getting close
 const PROXIMITY_VIOLATION_M = 8   // collision-imminent
 const CONTACT_IMMINENT_M    = 6   // both boats must avoid contact
 const HEADING_CHANGE_THRESHOLD_DEG = 12   // ROW heading delta over the lookback window
+const OBSTRUCTION_PASSING_M = 2 * HULL_LENGTH_M   // rule 19 trigger radius around an obstruction
 
 function severityFromDistance(distM: number): RuleViolation['severity'] | null {
   if (distM <= PROXIMITY_VIOLATION_M) return 'violation'
@@ -386,8 +423,8 @@ export function evaluateScene(scene: SceneState, prevScene?: SceneState): RuleVi
       }
 
       // Try rules in priority order:
-      // Rule 22 (impaired boat) > 18 (mark-room) > 13 (tacking) > 10 (port/stbd)
-      // > 11 (windward) > 12 (clear astern) > 17 (proper course)
+      // Rule 22 (impaired boat) > 18 (mark-room) > 19 (obstruction) > 13 (tacking)
+      // > 10 (port/stbd) > 11 (windward) > 12 (clear astern) > 17 (proper course)
       let ruleId: EncodedRuleId | null = null
       let keepClearId: string | null = null
       let rightOfWayId: string | undefined
@@ -404,6 +441,15 @@ export function evaluateScene(scene: SceneState, prevScene?: SceneState): RuleVi
         if (r18) {
           ruleId = 'rule_18'
           keepClearId = r18.keepClearId
+          rightOfWayId = keepClearId === a.id ? b.id : a.id
+        }
+      }
+
+      if (!ruleId) {
+        const r19 = applyRule19(a, b, wind, marks)
+        if (r19) {
+          ruleId = 'rule_19'
+          keepClearId = r19.keepClearId
           rightOfWayId = keepClearId === a.id ? b.id : a.id
         }
       }

@@ -206,6 +206,28 @@ export const PRESETS: WhiteboardPreset[] = [
     autoPlay: true,
   },
   {
+    id: 'rule_19', ruleId: 'rule_19',
+    title: 'Room at an Obstruction',
+    summary: 'Two boats overlapped beam-reach past an anchored committee boat.',
+    hint: 'Press play. Both boats sail west on starboard tack, overlapped, toward an anchored committee boat. Once both pass within 20 m of the obstruction, the room-at-an-obstruction rule fires on the outside boat - it must give the inside boat room to pass safely.',
+    scene: {
+      ...baseScene,
+      marks: [
+        ...baseScene.marks,
+        { id: 'obstruction', position: { x: 150, y: 110 }, type: 'committee_boat', side: 'none', label: 'Obstruction' },
+      ],
+      boats: [
+        A({ position: { x: 230, y: 105 }, heading: 270 }),
+        B({ position: { x: 230, y: 125 }, heading: 270 }),
+      ],
+      waypoints: [
+        wp('wp-r19-a-1', 'boat-a', 70, 105, 0),
+        wp('wp-r19-b-1', 'boat-b', 70, 125, 0),
+      ],
+    },
+    autoPlay: true,
+  },
+  {
     id: 'rule_22', ruleId: 'rule_22',
     title: 'Capsized / Anchored / Aground',
     summary: 'A boat sails toward a capsized boat that has absolute right of way.',
